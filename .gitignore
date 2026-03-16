@@ -1,0 +1,55 @@
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+*.ctxt
+
+### 빌드 도구 (Gradle) ###
+.gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+### 빌드 도구 (Maven) ###
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.utils_backup
+pom.xml.v8
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+### IDE (IntelliJ IDEA) ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/resources/
+!**/src/test/resources/
+
+### IDE (Eclipse) ###
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.classpath
+.project
+.factorypath
+
+### OS (macOS / Windows) ###
+.DS_Store
+Thumbs.db
+
+### 설정 파일 (민감 정보 포함 시) ###
+# API 키나 DB 비밀번호가 포함된 설정 파일은 버전 관리에서 제외하는 것이 권장됩니다.
+# application.yml
+# application.properties

@@ -1,0 +1,105 @@
+//순서1 queryDsl
+// 맨 상단 위에 작성.
+buildscript {
+    ext {
+        queryDslVersion = "5.0.0"
+    }
+}
+//순서1 queryDsl
+plugins {
+    id 'java'
+//    id 'org.springframework.boot' version '4.0.3'
+    //다운 그레이드 합니다. 타임리프 공통 레이아웃 기능이 버전이 호환되지 않습니다.
+    id 'org.springframework.boot' version '3.5.11'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.library.project'
+version = '0.0.1-SNAPSHOT'
+description = 'library'
+
+
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    //1 롬복, 테스트 환경에서 동작하기.
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // 2 타임리프 레이아웃 공통 기능 이용하기.
+    // https://mvnrepository.com/artifact/nz.net.ultraq.thymeleaf/thymeleaf-layout-dialect
+    // Source: https://mvnrepository.com/artifact/nz.net.ultraq.thymeleaf/thymeleaf-layout-dialect
+    // 참고, 최신 버전,
+//    implementation group: 'nz.net.ultraq.thymeleaf', name: 'thymeleaf-layout-dialect', version: '3.4.0'
+//    implementation group: 'nz.net.ultraq.thymeleaf', name: 'thymeleaf-layout-dialect', version: '3.1.0'
+    // 버전이 명시 되지 않는다면, 최신 버전으로 3.4.0
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+    // 3
+//순서2 queryDsl
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+
+    // 4
+    // 모델 맵퍼, DTO <-> VO 변환 해주는 도구.
+    // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.4'
+
+    // 5
+    // https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator
+    implementation group: 'org.hibernate', name: 'hibernate-validator', version: '6.2.1.Final'
+
+    // 6
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.7.0'
+
+//    순서3 queryDsl
+    annotationProcessor(
+            "jakarta.persistence:jakarta.persistence-api",
+            "jakarta.annotation:jakarta.annotation-api",
+            "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
+    )
+    //    순서3 queryDsl
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+//순서4 queryDsl
+//파일 내용 맨 밑에 작성.
+// Querydsl  설치, 순서3 프로젝트를 빌드 할 때마다, 해당 Q 도메인을 소스로 등록하는 과정을, 자동으로
+sourceSets {
+
+    main {
+        java {
+            srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
+        }
+    }
+}
+compileJava.dependsOn('clean')
+//순서4 queryDsl
