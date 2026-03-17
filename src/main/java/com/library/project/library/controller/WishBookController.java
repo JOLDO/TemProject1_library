@@ -2,6 +2,8 @@ package com.library.project.library.controller;
 
 
 import com.library.project.library.dto.WishBookDTO;
+import com.library.project.library.service.WishBookService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
@@ -16,25 +18,28 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class WishBookController {
 
-    /**
-     * [GET] 비치희망도서 신청 페이지 이동
-     */
+    //[GET] 비치희망도서 신청 페이지 이동
     @GetMapping("")
     public String wishBookHome() {
         log.info("비치희망도서 신청 페이지(wishBook.html) 접속");
         return "apply/wishBook";
     }
 
-    /**
-     * [POST] 비치희망도서 신청서 등록 처리
-     */
+    private final WishBookService wishBookService;
+
+    //[POST] 비치희망도서 신청서 등록 처리
     @PostMapping("/register")
     public String registerWishBook(WishBookDTO wishBookDTO, RedirectAttributes redirectAttributes) {
+
+        //로그인 기능 구현 시 주석 해제하기
+        // public String registerWishBook(WishBookDTO wishBookDTO, HttpSession session, RedirectAttributes redirectAttributes) {
+        // String loginId = (String) session.getAttribute("mid");
+        // wishBookDTO.setMid(loginId);
 
         log.info("==========================================");
         log.info("   [희망도서 신청 데이터 수신 확인]   ");
         log.info("==========================================");
-        log.info("1. 신청자명: " + wishBookDTO.getApplicantName());
+        log.info("1. 신청자명: " + wishBookDTO.getWishApplicantName());
         log.info("2. 연락처: " + wishBookDTO.getWishPhone());
         log.info("3. 도서명: " + wishBookDTO.getWishBookTitle());
         log.info("4. 저자명: " + wishBookDTO.getWishAuthor());
@@ -56,4 +61,8 @@ public class WishBookController {
         // 신청 완료 후 다시 신청 페이지로 리다이렉트
         return "redirect:/apply/wishBook";
     }
+
+
+
+
 }
