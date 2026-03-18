@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApplyDTO {
+    private String mid; // 신청자 id
     private String applicantName; // 신청자
     private String phone;         // 연락처
     private String eventName;     // 행사명
@@ -20,4 +21,6 @@ public class ApplyDTO {
     private LocalDate applyDate;  // 신청 날짜
     private String applyTime;     // 시간대 (오전/오후/야간)
     private String eventContent;  // 행사 상세 내용
+    private String inquiryContent;  // 행사 상세 내용
+
 }

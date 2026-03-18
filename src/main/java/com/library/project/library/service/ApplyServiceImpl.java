@@ -19,6 +19,10 @@ public class ApplyServiceImpl implements ApplyService {
     public Long register(ApplyDTO applyDTO) {
         // DTO -> Entity 변환
         ApplyEntity applyEntity = ApplyEntity.builder()
+
+                //mid가 비어있으면 에러발생하여 임시로 넣습니다.
+                .mid(applyDTO.getMid() != null ? applyDTO.getMid() : "test_user")
+
                 .applicantName(applyDTO.getApplicantName())
                 .phone(applyDTO.getPhone())
                 .eventName(applyDTO.getEventName())
@@ -28,6 +32,8 @@ public class ApplyServiceImpl implements ApplyService {
                 .applyTime(applyDTO.getApplyTime())
                 .eventContent((applyDTO.getEventContent() == null || applyDTO.getEventContent().trim().isEmpty())
                         ? "상세 내용 없음" : applyDTO.getEventContent())
+                .inquiryContent((applyDTO.getInquiryContent() == null || applyDTO.getInquiryContent().trim().isEmpty())
+                        ? "문의사항 없음" : applyDTO.getInquiryContent())
                 .build();
 
         // DB 저장

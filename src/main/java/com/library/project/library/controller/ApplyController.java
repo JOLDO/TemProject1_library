@@ -23,7 +23,7 @@ public class ApplyController {
     @GetMapping("/spaceReservation")
     public String getInfoPage(Model model) {
         model.addAttribute("applyDTO", new ApplyDTO());
-        return "/apply/spaceReservation";
+        return "apply/spaceReservation";
     }
 
     @PostMapping("/register")
@@ -35,7 +35,7 @@ public class ApplyController {
 
         // 성공 메시지에 신청 번호나 줄바꿈을 섞어서 전달
         redirectAttributes.addFlashAttribute("message",
-                "신청서 접수가 완료되었습니다!\n신청번호: " + ano + "\n담당자 확인 후 연락드리겠습니다.");
+                "[신청번호 : " + ano + "] 신청서 접수가 완료되었습니다!\n담당자 확인 후 연락드리겠습니다.");
 
         return "redirect:/apply/spaceReservation";
     }
