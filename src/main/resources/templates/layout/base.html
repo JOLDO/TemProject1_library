@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, 그리고 Bootstrap 기여자들">
+    <meta name="generator" content="Hugo 0.84.0">
+    <!--    <title>Sticky Footer Navbar Template · Bootstrap v5.0</title>-->
+    <title>LIBRARY</title>
+
+    <link rel="canonical" href="https://getbootstrap.kr/docs/5.0/examples/sticky-footer-navbar/">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+<!--    우리가 만든 css, js 를 불러오는 코드가 필요함, 타임리프 태그를 이용해서, 링크 설정. -->
+    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
+    <meta name="theme-color" content="#7952b3">
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+
+    <link href="sticky-footer-navbar.css" rel="stylesheet">
+</head>
+<body class="d-flex flex-column h-100">
+<header>
+    <!-- Fixed navbar -->
+<!--    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">-->
+<!--        <div class="container-fluid">-->
+<!--            <a class="navbar-brand" th:href="@{/board/list}">목록가기</a>-->
+<!--            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">-->
+<!--                <span class="navbar-toggler-icon"></span>-->
+<!--            </button>-->
+<!--            <div class="collapse navbar-collapse" id="navbarCollapse">-->
+<!--                <ul class="navbar-nav me-auto mb-2 mb-md-0">-->
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link active" aria-current="page" th:href="@{/board/register}">글쓰기</a>-->
+<!--                    </li>-->
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link" href="#">Link</a>-->
+<!--                    </li>-->
+<!--                    <li class="nav-item">-->
+<!--                        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>-->
+<!--                    </li>-->
+<!--                </ul>-->
+<!--&lt;!&ndash;                <form class="d-flex">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <button class="btn btn-outline-success" type="submit">Search</button>&ndash;&gt;-->
+<!--&lt;!&ndash;                </form>&ndash;&gt;-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </nav>-->
+</header>
+
+<!--flex-shrink-0 : 찌그러짐 방지 -->
+<main class="flex-shrink-0 pt-5 mt-3">
+    <div class="container" layout:fragment="content">
+        <p>페이지 콘텐츠 부분이고, 동적으로 교체될 예정</p>
+    </div>
+</main>
+
+<footer class="footer mt-auto py-3 bg-light">
+    <div class="container">
+        <span class="text-muted">Place sticky footer content here.</span>
+    </div>
+</footer>
+<!--    우리가 만든 css, js 를 불러오는 코드가 필요함, 타임리프 태그를 이용해서, 링크 설정. -->
+<script th:src="@{/js/script.js}"></script>
+<!--다른 html 파일에서, 부트스트랩의 js 로드를 늦게 해서, 인식을 못하는 문제가 발생해서, 순서 위치를 교체-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+<th:block layout:fragment="script">
+
+</th:block>
+
+
+</body>
+</html>
