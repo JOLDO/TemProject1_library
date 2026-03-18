@@ -37,7 +37,7 @@
          초기화 버튼은 type="button" 이라 form 제출을 하지 않음
          → JS의 .clearBtn 이벤트에서 처리
     ============================================= -->
-    <div class="row mt-3">
+    <div class="row mt-3 mx-4">
         <div class="col">
             <div class="card">
                 <div class="card-body">
@@ -68,7 +68,7 @@
          페이지/검색/정렬 변경 시 JS의 loadList()가 axios로 데이터를 받아
          .list-group 안의 내용을 통째로 교체함
     ============================================= -->
-    <div class="row content">
+    <div class="row content mt-3 mx-4">
         <div class="col">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -76,9 +76,8 @@
 
                     <!-- 정렬 드롭다운: 각 항목의 data-sort 값이 JS sort-item 이벤트에서 사용됨 -->
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            정렬 기준
-                        </button>
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">정렬 기준</button>
+
                         <ul class="dropdown-menu">
                             <!-- data-sort: loadList() 호출 시 sort 파라미터로 전달됨 -->
                             <li><a class="dropdown-item sort-item" data-sort="regDate" href="#">최신 등록순</a></li>
@@ -285,7 +284,7 @@
                                     </tr>
                                     <tr>
                                         <th class="text-muted fw-normal">ISBN</th>
-                                        <td id="detail-isbn" style="font-size:0.85rem;"></td>
+                                        <td id="detail-isbn"></td>
                                     </tr>
                                     <tr>
                                         <th class="text-muted fw-normal">상태</th>

@@ -181,10 +181,12 @@ public class BookServiceImpl implements BookService {
 
         // isbn 목록 중 AVAILABLE 상태인 isbn만 Set으로 저장
         // Set을 쓰는 이유: contains() 조회가 O(1)로 빠름 (List는 O(n))
-        Set<String> availableIsbns = new HashSet<>(bookRepository.findAvailableIsbnIn(isbns, BookStatus.AVAILABLE));
+        Set<String> availableIsbns = isbns.isEmpty() ? new HashSet<>()
+                : new HashSet<>(bookRepository.findAvailableIsbnIn(isbns, BookStatus.AVAILABLE));
 
         // bookId 목록 중 추천 기록이 있는 bookId만 Set으로 저장
-        Set<Long> recommendedBookIds = new HashSet<>(recommendRepository.findBookIdsByBookIdIn(bookIds));
+        Set<Long> recommendedBookIds = bookIds.isEmpty() ? new HashSet<>()
+                : new HashSet<>(recommendRepository.findBookIdsByBookIdIn(bookIds));
 
         // ── Book → BookDTO 변환 ────────────────────────────────────────────────
         List<BookDTO> dtoList = books.stream()
