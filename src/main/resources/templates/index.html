@@ -3,164 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>부산도서관 메인</title>
+    <title>부산도서관 - 메인</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
 
     <style>
-        /* 1. 풀 페이지 스크롤 설정 */
+        :root {
+            --lib-blue: #53a5ff;
+        }
+
+        /* 1. 기본 레이아웃 및 자석 스크롤 설정 */
         html, body {
             margin: 0; padding: 0;
             height: 100%;
-            scroll-snap-type: y mandatory; /* Y축 자석 효과 */
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            background-color: #fff;
+            /* 스크롤바 숨기기 (Firefox, IE/Edge) */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* 크롬, 사파리, 엣지에서 스크롤바 숨기기 */
+        html::-webkit-scrollbar, body::-webkit-scrollbar {
+            display: none;
+        }
+
+        body {
+            font-family: 'Pretendard Variable', sans-serif;
             overflow-y: scroll;
         }
+
         section {
-            height: 100vh; /* 화면 꽉 채우기 */
-            scroll-snap-align: start; /* 섹션 시작점에 착 붙기 */
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 2. 왼쪽 고정 점 (Scroll Dots) 스타일 */
+        .scroll-dots {
+            position: fixed;
+            top: 50%;
+            left: 30px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 2000;
+        }
+
+        .scroll-dots .dot {
+            width: 12px;
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        /* [활성화 상태] - 선택 시 색상 전부 선명한 화이트로 */
+        .scroll-dots .dot.active,
+        .scroll-dots .dot:hover {
+            /* 기존: 테두리만 있는 느낌 제거 */
+            /* [수정] 선명한 화이트로 꽉 채우기 */
+            background-color: #ffffff;
+            border: none; /* 테두리는 깔끔하게 제거 */
+
+            transform: scale(1.4); /* 살짝 커지는 효과 유지 */
+            box-shadow: 0 0 10px #e5e5e5;
+        }
+
+
+        /* 3. Section 1 디자인 (메인 비주얼) */
+        #section1 {
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+            url('https://library.busan.go.kr/portal/img/main/visual_img01.jpg') no-repeat center center/cover;
+            color: white;
+            flex-direction: column;
+        }
+
+        .main-title { font-weight: 800; letter-spacing: -1px; }
+
+        /* [핵심] 레이어드 검색 캡슐 */
+        .search-capsule {
+            display: flex;
+            align-items: center;
+            width: 90%;
+            max-width: 930px;
+            height: 75px;
+            background: transparent;
+            overflow: visible;
+        }
+
+        .weather-box {
+            background: linear-gradient(to right, #4db3ff, var(--lib-blue));
+            color: white;
+            height: 100%;
+            min-width: 160px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            font-weight: 700;
+            padding: 0 15px;
+            border-top-left-radius: 50px;
+            border-bottom-left-radius: 50px;
+            z-index: 1;
         }
 
-        /* Section 1: 배경 이미지 및 검색바 */
-        #section1 {
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
-            url('https://via.placeholder.com/1920x1080?text=Library+Background') no-repeat center center/cover;
-            color: white;
-        }
-        .search-box {
-            width: 80%; max-width: 600px;
-            background: white;
+        .search-input-group {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            background-color: white;
             border-radius: 50px;
-            padding: 10px 25px;
-            display: flex; align-items: center;
-        }
-        .weather-info {
-            position: absolute; top: 15%; right: 10%;
-            background: rgba(0, 123, 255, 0.8);
-            padding: 15px; border-radius: 30px;
+            padding: 0 30px;
+            align-items: center;
+            margin-left: -30px; /* 레이어 겹치기 */
+            z-index: 2;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
 
-        /* Section 2: 도서관 소식 탭 */
-        #section2 { background-color: #f8f9fa; }
-        .nav-tabs .nav-link.active { background-color: #007bff; color: white; }
+        .search-input {
+            border: none; outline: none;
+            width: 100%; font-size: 18px; color: #333;
+            background: transparent;
+        }
 
-        /* Section 3: 공간 소개 캐러셀 */
+        .search-btn {
+            background: none; border: none;
+            color: var(--lib-blue); font-size: 26px;
+            cursor: pointer;
+        }
+
+        /* 스크롤 가이드 가사 애니메이션 */
+        .scroll-down-guide {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.94);
+        }
+
+        .scroll-down-guide .arrow {
+            font-size: 24px;
+            animation: scrollDownAni 1.5s infinite;
+        }
+
+        @keyframes scrollDownAni {
+            0%, 100% { transform: translateY(0); opacity: 0.7; }
+            50% { transform: translateY(10px); opacity: 1; }
+        }
+
+        /* 4. Section 2 & 3 (공지사항 및 슬라이드) */
+        #section2 { background-color: #f8faff; }
         #section3 { background-color: #ffffff; }
-        .carousel-item img { height: 60vh; object-fit: cover; }
+        .card { border: none; border-radius: 20px; transition: 0.3s; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .badge-notice { background-color: #eef6ff; color: var(--lib-blue); }
+        .carousel-item img { height: 65vh; object-fit: cover; border-radius: 25px; }
     </style>
 </head>
 <body>
 
+<div class="scroll-dots" id="scrollDots">
+    <a href="#section1" class="dot active"></a>
+    <a href="#section2" class="dot"></a>
+    <a href="#section3" class="dot"></a>
+</div>
+
 <section id="section1">
-    <div class="weather-info shadow">
-        <span id="busan-temp">로딩 중...</span>
-        <span id="weather-icon">☁️</span>
+    <div class="text-center mb-5">
+        <h1 class="display-3 main-title">BUSAN LIBRARY</h1>
+        <p class="fs-5 opacity-75">부산의 미래를 담는 독서·문화·지식정보의 보고</p>
     </div>
 
-    <h1 class="display-3 fw-bold mb-4">BUSAN LIBRARY</h1>
-    <div class="search-box shadow">
-        <input type="text" class="form-control border-0 shadow-none"
-               placeholder="찾으시는 도서의 정보를 입력하세요.">
-        <button class="btn text-primary"><i class="bi bi-search">🔍</i></button>
+    <form action="/book/list" method="get" class="search-capsule">
+        <div class="weather-box">
+            <span id="weather-icon" th:text="${weatherIcon}">☀️</span>
+            <span id="busan-text" th:text="'부산 ' + ${temp} + '°C'">부산 00°C</span>
+        </div>
+
+        <div class="search-input-group">
+            <input type="text" name="keyword" class="search-input"
+                   placeholder="찾으시는 도서의 정보를 입력하세요." required autofocus
+                   oninvalid="this.setCustomValidity('검색어를 입력해주세요.')"
+                   oninput="this.setCustomValidity('')">
+            <button type="submit" class="search-btn">
+                <i class="bi bi-search align-middle"></i>
+            </button>
+        </div>
+    </form>
+
+    <div class="scroll-down-guide">
+        <div class="text" style="font-size: 13px; letter-spacing: 2px;">SCROLL DOWN</div>
+        <i class="bi bi-chevron-down arrow"></i>
     </div>
 </section>
 
-<section id="section2" class="container">
-    <h2 class="mb-5 fw-bold">도서관 소식</h2>
-    <ul class="nav nav-tabs mb-4" id="newsTab" role="tablist">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#notice">공지사항</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#event">문화행사</button></li>
-    </ul>
-    <div class="tab-content w-100 p-4 bg-white rounded shadow-sm">
-        <div class="tab-pane fade show active" id="notice">
-            <p>등록된 공지사항이 없습니다. <a href="#">[전체보기]</a></p>
-        </div>
-        <div class="tab-pane fade" id="event">
-            <p>진행 중인 행사가 없습니다. <a href="#">[전체보기]</a></p>
-        </div>
-    </div>
-</section>
-
-<section id="section3" class="container">
-    <h2 class="mb-4 fw-bold">공간 소개</h2>
-    <div id="spaceCarousel" class="carousel slide w-100" data-bs-ride="carousel">
-        <div class="carousel-inner rounded shadow">
-            <div class="carousel-item active">
-                <img src="https://via.placeholder.com/1200x600?text=Space+01" class="d-block w-100" alt="공간1">
-                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50">
-                    <h5>책누리터</h5>
-                    <p>자유로운 독서 공간</p>
+<section id="section2">
+    <div class="container">
+        <h2 class="fw-bold mb-5"><i class="bi bi-megaphone align-middle me-2"></i>도서관 소식</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card p-4 shadow-sm h-100">
+                    <span class="badge badge-notice mb-3 w-25">공지사항</span>
+                    <h5 class="fw-bold mb-3">[안내] 상반기 인문 예술 살롱 운영 안내</h5>
+                    <p class="text-muted small">인문학 특강에 시민 여러분을 초대합니다.</p>
+                    <div class="mt-auto text-end text-muted">03.17</div>
                 </div>
             </div>
+            <div class="col-md-4">
+                <div class="card p-4 shadow-sm h-100 border-primary border-top">
+                    <span class="badge badge-notice mb-3 w-25">문화행사</span>
+                    <h5 class="fw-bold mb-3">들락날락 영어랑 놀자 수강생 모집</h5>
+                    <p class="text-muted small">유아 및 초등학생 대상 영어 프로그램</p>
+                    <div class="mt-auto text-end text-muted">03.13</div>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-center justify-content-center">
+                <a href="#" class="btn btn-outline-primary rounded-circle p-4"><i class="bi bi-plus-lg fs-2"></i></a>
+            </div>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#spaceCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#spaceCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
+    </div>
+</section>
+
+<section id="section3">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-5 text-start">공간 소개</h2>
+        <div id="libCarousel" class="carousel slide shadow-lg rounded-5" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active"><img src="https://library.busan.go.kr/portal/img/main/space_img01.jpg" class="d-block w-100"></div>
+                <div class="carousel-item"><img src="https://library.busan.go.kr/portal/img/main/space_img02.jpg" class="d-block w-100"></div>
+            </div>
+        </div>
     </div>
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    const dots = document.querySelectorAll('.dot');
+    const sections = document.querySelectorAll('section');
+    const dotsContainer = document.getElementById('scrollDots');
 
-    // 1. 공공데이터포털에서 받은 인증키 (Encoding 키를 권장하지만 안 되면 Decoding 키로 교체)
-    const WEATHER_API_KEY = '7e3732823bcfddf911e567ea22fe8bfcb55a3cc9e0ce0d9512bcf6c9d0312123';
-
-    async function getBusanWeather() {
-        // 2. 현재 날짜와 시간을 기상청 형식(YYYYMMDD / HH00)에 맞게 생성
-        const now = new Date();
-        const baseDate = now.toISOString().split('T')[0].replace(/-/g, '');
-
-        // 초단기실황은 매시간 45분에 데이터가 생성되므로, 45분 이전이면 전 시간 데이터를 가져옵니다.
-        let hours = now.getHours();
-        if (now.getMinutes() < 45) hours -= 1;
-        const baseTime = String(hours).padStart(2, '0') + '00';
-
-        // 3. 부산광역시청 부근 좌표 (nx=98, ny=76)
-        const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst`
-            + `?serviceKey=${WEATHER_API_KEY}`
-            + `&pageNo=1&numOfRows=10&dataType=JSON`
-            + `&base_date=${baseDate}&base_time=${baseTime}&nx=98&ny=76`;
-
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-
-            if (data.response.header.resultCode === '00') {
-                const items = data.response.body.items.item;
-
-                // T1H: 기온, PTY: 강수형태 (0:없음, 1:비, 3:눈 등)
-                const temp = items.find(i => i.category === 'T1H').obsrValue;
-                const pty = items.find(i => i.category === 'PTY').obsrValue;
-
-                // 기온 업데이트
-                document.getElementById('busan-temp').innerText = `부산 ${temp}°C`;
-
-                // 강수 형태에 따른 아이콘 변경 (간단 버전)
-                let icon = '☀️';
-                if (pty === '1' || pty === '2') icon = '🌧️';
-                else if (pty === '3') icon = '❄️';
-                else if (now.getHours() >= 18 || now.getHours() < 6) icon = '🌙';
-
-                document.getElementById('weather-icon').innerText = icon;
-
-                console.log("날씨 업데이트 완료!", baseDate, baseTime);
-            } else {
-                console.error("API 응답 오류:", data.response.header.resultMsg);
+    window.addEventListener('scroll', () => {
+        let current = "";
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (pageYOffset >= (sectionTop - sectionHeight / 3)) {
+                current = section.getAttribute('id');
             }
-        } catch (error) {
-            console.error("날씨 호출 실패:", error);
-            document.getElementById('busan-temp').innerText = "날씨 정보 오류";
-        }
-    }
+        });
 
-    // 페이지 로드 시 즉시 실행
-    getBusanWeather();
+        dots.forEach(dot => {
+            dot.classList.remove('active');
+            if (dot.getAttribute('href').includes(current)) {
+                dot.classList.add('active');
+            }
+        });
+
+        // 배경이 밝은 섹션2, 3에서는 점 색상을 어둡게 변경
+        if (current === 'section2' || current === 'section3') {
+            dotsContainer.classList.add('dots-dark');
+        } else {
+            dotsContainer.classList.remove('dots-dark');
+        }
+    });
 </script>
 </body>
 </html>
