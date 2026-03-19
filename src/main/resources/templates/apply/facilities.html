@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>시설 현황</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/info/basic}">부산 IT 도서관</a>
+        <div class="navbar-nav">
+            <a class="nav-link" th:href="@{/info/basic}">자료현황</a>
+            <a class="nav-link" th:href="@{/info/organization}">조직&업무</a>
+            <a class="nav-link active" th:href="@{/info/facilities}">시설현황</a>
+            <a class="nav-link" th:href="@{/info/map}">찾아오시는 길</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h3 class="border-bottom pb-2 mb-4">층별 시설 안내</h3>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white text-center">지상 2층 ~ 3층</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>3F</strong> : 제1열람실, PC 존, 세미나실</li>
+                    <li class="list-group-item"><strong>2F</strong> : 종합자료실, 정기간행물실</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-secondary text-white text-center">지하 1층 ~ 지상 1층</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>1F</strong> : 어린이자료실, 북카페, 안내데스크</li>
+                    <li class="list-group-item"><strong>B1</strong> : 보존서고, 식당, 주차장</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

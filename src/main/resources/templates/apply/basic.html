@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>부산 IT 도서관 - 홈</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container { max-width: 900px; margin-top: 30px; }
+        .section-title { border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-top: 50px; margin-bottom: 20px; font-weight: bold; }
+        .greeting-box { background-color: #f8f9fa; border-left: 5px solid #007bff; padding: 25px; border-radius: 5px; }
+        .history-list { list-style: none; padding-left: 0; }
+        .history-list li { margin-bottom: 10px; display: flex; }
+        .history-date { font-weight: bold; color: #007bff; min-width: 100px; }
+        .stats-table thead { background-color: #212529; color: white; }
+        /* 버튼 정렬을 위한 스타일 */
+        .section-header { border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-top: 50px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/info/basic}">부산 IT 도서관</a>
+        <div class="navbar-nav">
+            <a class="nav-link active" th:href="@{/info/basic}">홈/자료현황</a>
+            <a class="nav-link" th:href="@{/info/organization}">조직&업무</a>
+            <a class="nav-link" th:href="@{/info/facilities}">시설현황</a>
+            <a class="nav-link" th:href="@{/info/map}">찾아오시는 길</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mb-5">
+    <h2 class="section-title">관장 인사말</h2>
+    <div class="greeting-box shadow-sm">
+        <h4 class="text-primary mb-3">"지식과 문화가 살아 숨쉬는 공간, 부산 IT 도서관입니다."</h4>
+        <p class="lead" style="font-size: 1.05rem; line-height: 1.8;">
+            안녕하세요. 우리 도서관 방문을 진심으로 환영합니다.<br>
+            저희 도서관은 지역 주민 여러분의 지식 탐구와 문화적 성장을 돕기 위해 최선을 다하고 있습니다.<br>
+            언제나 편안하게 머물다 가실 수 있는 따뜻한 공간이 되겠습니다. 감사합니다.
+        </p>
+        <p class="text-end fw-bold mt-4">— 부산 IT 도서관장 정성규 올림 —</p>
+    </div>
+
+    <h2 class="section-title">도서관 연혁</h2>
+    <div class="card card-body border-0 shadow-sm">
+        <ul class="history-list">
+            <li><span class="history-date">2026. 03.</span> <span>도서관 관리 시스템(Spring Boot) 고도화 완료</span></li>
+            <li><span class="history-date">2025. 12.</span> <span>디지털 정보 서비스실 개관</span></li>
+            <li><span class="history-date">2020. 05.</span> <span>부산 IT 도서관 개관 (본관)</span></li>
+            <li><span class="history-date">2019. 11.</span> <span>도서관 설립 인가</span></li>
+        </ul>
+    </div>
+
+    <div class="section-header d-flex justify-content-between align-items-center">
+        <h3 class="fw-bold m-0">자료 현황</h3>
+        <a th:href="@{/info/donation}" class="btn btn-outline-primary btn-sm shadow-sm">
+            📚 도서 기증/납본 절차 안내 >
+        </a>
+    </div>
+
+    <table class="table table-hover text-center align-middle shadow-sm">
+        <thead class="stats-table">
+        <tr>
+            <th style="width: 40%;">구분</th>
+            <th style="width: 30%;">장서량 (권/매)</th>
+            <th style="width: 30%;">관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="stat : ${stats}">
+            <form th:action="@{/info/modify}" method="post">
+                <input type="hidden" name="statId" th:value="${stat.statId}">
+                <td><input type="text" name="categoryName" th:value="${stat.categoryName}" class="form-control form-control-sm text-center"></td>
+                <td><input type="number" name="itemCount" th:value="${stat.itemCount}" class="form-control form-control-sm text-center"></td>
+                <td>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-success btn-sm">수정</button>
+                        <button type="button" class="btn btn-danger btn-sm"
+                                th:onclick="|if(confirm('정말 삭제하시겠습니까?')) { document.getElementById('del-'+${stat.statId}).submit(); }|">삭제</button>
+                    </div>
+                </td>
+            </form>
+            <form th:id="'del-'+${stat.statId}" th:action="@{'/info/remove/' + ${stat.statId}}" method="post" style="display:none;"></form>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="text-end mt-3">
+        <a th:href="@{/info/register}" class="btn btn-primary shadow-sm px-4">새 자료 등록하기</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

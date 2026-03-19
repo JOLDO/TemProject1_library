@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>조직 및 업무</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/info/basic}">부산 IT 도서관</a>
+        <div class="navbar-nav">
+            <a class="nav-link" th:href="@{/info/basic}">자료현황</a>
+            <a class="nav-link active" th:href="@{/info/organization}">조직&업무</a>
+            <a class="nav-link" th:href="@{/info/facilities}">시설현황</a>
+            <a class="nav-link" th:href="@{/info/map}">찾아오시는 길</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h3 class="border-bottom pb-2 mb-4">조직 및 주요 업무</h3>
+    <table class="table table-bordered shadow-sm">
+        <thead class="table-light text-center">
+        <tr>
+            <th>팀명</th>
+            <th>주요 업무</th>
+            <th>내선번호</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="text-center fw-bold">관장</td>
+            <td>도서관 운영 총괄 및 대외 협력</td>
+            <td class="text-center">051-123-4500</td>
+        </tr>
+        <tr>
+            <td class="text-center fw-bold">행정지원팀</td>
+            <td>시설 관리, 예산 집행, 인사 및 서무</td>
+            <td class="text-center">051-123-4501</td>
+        </tr>
+        <tr>
+            <td class="text-center fw-bold">정보기획팀</td>
+            <td>도서 구입 및 정리, 전산 시스템 관리</td>
+            <td class="text-center">051-123-4502</td>
+        </tr>
+        <tr>
+            <td class="text-center fw-bold">열람봉사팀</td>
+            <td>도서 대출/반납, 참고봉사, 문화행사 기획</td>
+            <td class="text-center">051-123-4503</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
