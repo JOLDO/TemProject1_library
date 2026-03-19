@@ -43,4 +43,7 @@ public class Member extends BaseEntity {
         this.region = region;
     }
 
+
+
+
 }
