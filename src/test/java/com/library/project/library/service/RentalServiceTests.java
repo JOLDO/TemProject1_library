@@ -1,6 +1,7 @@
 package com.library.project.library.service;
 
 import com.library.project.library.dto.rentalDto.RentalRequestDTO;
+import com.library.project.library.dto.rentalDto.RentalResponseDTO;
 import com.library.project.library.dto.rentalDto.ReturnRequestDTO;
 import com.library.project.library.entity.Book;
 import com.library.project.library.entity.Member;
@@ -53,14 +54,14 @@ class RentalServiceTests {
 
         Book book = bookRepository.save(
                 Book.builder()
-                        .title("자바의 정석")
+                        .bookTitle("자바의 정석")
                         .status(BookStatus.AVAILABLE)
                         .build()
         );
 
         RentalRequestDTO dto = RentalRequestDTO.builder()
                 .memberId(member.getId())
-                .bookId(book.getBookId())
+                .bookId(book.getId())
                 .build();
 
         rentalService.rentBook(dto);
@@ -71,7 +72,7 @@ class RentalServiceTests {
         assert rentals.size() == 1;
         assert rentals.get(0).getStatus() == RentalStatus.RENTED;
 
-        Book resultBook = bookRepository.findById(book.getBookId()).get();
+        Book resultBook = bookRepository.findById(book.getId()).get();
         assert resultBook.getStatus() == BookStatus.RENTED;
 
         log.info("대출 성공 검증 완료");
@@ -95,7 +96,7 @@ class RentalServiceTests {
         for(int i = 0; i < 3; i++){
             Book book = bookRepository.save(
                     Book.builder()
-                            .title("책" + i)
+                            .bookTitle("책" + i)
                             .status(BookStatus.AVAILABLE)
                             .build()
             );
@@ -112,14 +113,14 @@ class RentalServiceTests {
 
         Book newBook = bookRepository.save(
                 Book.builder()
-                        .title("초과책")
+                        .bookTitle("초과책")
                         .status(BookStatus.AVAILABLE)
                         .build()
         );
 
         RentalRequestDTO dto = RentalRequestDTO.builder()
                 .memberId(member.getId())
-                .bookId(newBook.getBookId())
+                .bookId(newBook.getId())
                 .build();
 
         try {
@@ -148,7 +149,7 @@ class RentalServiceTests {
 
         Book book = bookRepository.save(
                 Book.builder()
-                        .title("중복책")
+                        .bookTitle("중복책")
                         .status(BookStatus.RENTED)
                         .build()
         );
@@ -164,7 +165,7 @@ class RentalServiceTests {
 
         RentalRequestDTO dto = RentalRequestDTO.builder()
                 .memberId(member.getId())
-                .bookId(book.getBookId())
+                .bookId(book.getId())
                 .build();
 
         try {
@@ -191,7 +192,7 @@ class RentalServiceTests {
 
         Book book = bookRepository.save(
                 Book.builder()
-                        .title("반납책")
+                        .bookTitle("반납책")
                         .status(BookStatus.RENTED)
                         .build()
         );
@@ -212,7 +213,7 @@ class RentalServiceTests {
         assert result.getStatus() == RentalStatus.RETURNED;
         assert result.getReturnDate() != null;
 
-        Book resultBook = bookRepository.findById(book.getBookId()).get();
+        Book resultBook = bookRepository.findById(book.getId()).get();
         assert resultBook.getStatus() == BookStatus.AVAILABLE;
 
         log.info("반납 성공 검증 완료");
@@ -284,7 +285,7 @@ class RentalServiceTests {
 
         Book book = bookRepository.save(
                 Book.builder()
-                        .title("조회책")
+                        .bookTitle("조회책")
                         .status(BookStatus.RENTED)
                         .build()
         );

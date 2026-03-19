@@ -5,18 +5,18 @@ import com.library.project.library.enums.RentalStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
-@ToString
-public class Book extends BaseEntity {
+@AllArgsConstructor
+@Builder
+@Table(name = "book")
+public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,22 +37,7 @@ public class Book extends BaseEntity {
     @Column(length = 100, nullable = false)
     private String author;
 
-    @Column(length = 500, nullable = false)
-    private String publisher;
-
-    private LocalDate pubdate;
-
-    @Column(length = 3000)
-    private String description;
-
-    @Column(length = 500)
-    private String bookTitleNormal;
-
-    @Column(length = 500)
-    private String bookTitleChosung;
-
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private BookStatus status;
 
     // 📌 연관관계

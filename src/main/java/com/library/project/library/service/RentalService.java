@@ -50,8 +50,8 @@ public class RentalService {
         }
 
         // ⭐ 이미 대출된 책인지
-        rentalRepository.findByBook_BookIdAndStatus(
-                book.getBookId(),
+        rentalRepository.findByBook_IdAndStatus(
+                book.getId(),
                 RentalStatus.RENTED
         ).ifPresent(r -> {
             throw new RuntimeException("이미 대출된 책입니다.");

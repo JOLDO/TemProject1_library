@@ -14,7 +14,7 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
 
     List<Rental> findByMember_IdAndStatus(Long MemberId, RentalStatus status);
 
-    Optional<Rental> findByBook_IdAndStatus(Long bookId, RentalStatus status);
+    Optional<Rental> findByBook_IdAndStatus(Long Id, RentalStatus status);
 
         @Query("""
         SELECT r.book.id, COUNT(r)
