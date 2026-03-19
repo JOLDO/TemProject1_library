@@ -1,6 +1,5 @@
 package com.library.project.library.repository;
 
-
 import com.library.project.library.entity.ApplyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>이달의 행사 | 도서관</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
+
+    <style>
+        :root {
+            --primary-blue: #003366;
+            --holiday-red: #d9534f;
+            --lecture-orange: #f0ad4e;
+            --movie-blue: #5bc0de;
+            --event-green: #5cb85c;
+            --sidebar-brown: #a68b6d;
+        }
+
+        body { font-family: "Pretendard", sans-serif; background-color: #fff; }
+
+        .sidebar { min-width: 260px; border-right: 2px solid #333; min-height: 100vh; }
+        .sidebar-title { padding: 25px 20px; font-size: 20px; font-weight: bold; color: #333; border-bottom: 2px solid #333; }
+        .list-group-item { padding: 18px 20px; border: none; border-bottom: 1px solid #eee; font-size: 15px; color: #555; }
+        .list-group-item:hover { background-color: #f9f9f9; }
+        .list-group-item.active { background-color: var(--sidebar-brown) !important; border-color: var(--sidebar-brown) !important; color: white !important; font-weight: bold; }
+
+        .main-content { flex-grow: 1; padding: 50px; }
+        .breadcrumb { font-size: 13px; color: #888; margin-bottom: 15px; }
+        h2 { font-size: 32px; color: #333; font-weight: bold; margin-bottom: 40px; }
+
+        .legend-container { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 25px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #444; }
+        .legend-badge {
+            width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+            border-radius: 3px; color: white; font-size: 11px; font-weight: bold;
+        }
+
+        #calendar { border-top: 2px solid var(--primary-blue); padding-top: 15px; }
+        .fc-col-header-cell { background-color: #fcfcfc; padding: 12px 0 !important; color: #555; font-size: 14px; }
+
+        /* [추가] 일요일(sun)과 월요일(mon) 헤더 및 날짜 숫자 빨간색 */
+        .fc-day-sun .fc-col-header-cell-cushion,
+        .fc-day-sun .fc-daygrid-day-number,
+        .fc-day-mon .fc-col-header-cell-cushion,
+        .fc-day-mon .fc-daygrid-day-number {
+            color: var(--holiday-red) !important;
+            text-decoration: none !important;
+        }
+
+        .fc-day-sat .fc-col-header-cell-cushion { color: var(--movie-blue); text-decoration: none !important; }
+        .fc-col-header-cell-cushion { text-decoration: none !important; }
+
+        .fc-event { border: none !important; background: transparent !important; color: #333 !important; }
+
+        .event-badge-container { display: flex; align-items: center; gap: 6px; font-size: 11px; margin-top: 3px; cursor: pointer; }
+        .event-badge {
+            width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center;
+            color: white; border-radius: 3px; font-weight: bold; font-size: 10px; flex-shrink: 0;
+        }
+
+        .cat-f { background-color: var(--holiday-red); }
+        .cat-g { background-color: var(--lecture-orange); }
+        .cat-m { background-color: var(--movie-blue); }
+        .cat-e { background-color: var(--event-green); }
+    </style>
+</head>
+<body>
+
+<div class="d-flex">
+    <div class="sidebar d-none d-md-block">
+        <div class="sidebar-title">열린공간</div>
+        <div class="list-group list-group-flush">
+            <a th:href="@{/event/list}" class="list-group-item list-group-item-action active">이달의 행사</a>
+            <a th:href="@{/event/lecture}" class="list-group-item list-group-item-action">강좌·세미나</a>
+            <a href="#" class="list-group-item list-group-item-action">주말 극장</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">🏠</li>
+                <li class="breadcrumb-item">열린공간</li>
+                <li class="breadcrumb-item active" aria-current="page">이달의 행사</li>
+            </ol>
+        </nav>
+
+        <h2>이달의 행사</h2>
+
+        <div class="legend-container">
+            <div class="legend-item"><span class="legend-badge cat-f">F</span> 휴관</div>
+            <div class="legend-item"><span class="legend-badge cat-e">E</span> 행사</div>
+            <div class="legend-item"><span class="legend-badge cat-m">M</span> 주말 극장</div>
+            <div class="legend-item"><span class="legend-badge cat-g">G</span> 강좌</div>
+        </div>
+
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border: none;">
+            <div class="modal-header" style="background-color: var(--primary-blue); color: white;">
+                <h5 class="modal-title fw-bold">행사 상세 정보</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <span id="modalCategory" class="event-badge mb-2 d-inline-block"></span>
+                    <h3 id="modalEventTitle" class="fw-bold mt-2"></h3>
+                </div>
+                <hr>
+                <div class="mb-2"><b>일시:</b> <span id="modalDate"></span></div>
+                <div class="mb-2"><b>장소:</b> <span id="modalPlace"></span></div>
+                <div class="mt-3">
+                    <b>내용:</b>
+                    <div id="modalContent" class="mt-2 p-3 bg-light rounded" style="min-height: 80px; font-size: 14px; line-height: 1.6;"></div>
+                </div>
+
+                <div id="applyButtonContainer" class="mt-4 d-grid">
+                    <a href="#" id="btnApply" class="btn btn-primary fw-bold p-3" style="background-color: var(--primary-blue); border: none; border-radius: 10px;">
+                        신청하기
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        const eventData = /*[[${dtoList}]]*/ [];
+
+        const events = eventData.map(dto => ({
+            id: dto.id,
+            title: (dto.category === 'G') ? '강좌' : dto.title,
+            start: dto.eventDate,
+            extendedProps: {
+                category: dto.category,
+                content: dto.content,
+                place: dto.place,
+                realTitle: dto.title
+            }
+        }));
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'ko',
+            height: 'auto',
+            headerToolbar: { left: 'prev', center: 'title', right: 'next' },
+            titleFormat: { year: 'numeric', month: '2-digit' },
+            events: events,
+
+            // [추가] 숫자 뒤에 '일'을 빼고 숫자만 표시
+            dayCellContent: function(info) {
+                return info.date.getDate();
+            },
+
+            eventSources: [
+                function(info, successCallback, failureCallback) {
+                    let dynamicEvents = [];
+                    let start = new Date(info.start);
+                    let end = new Date(info.end);
+
+                    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                        let day = d.getDay();
+                        let dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                        let dateNum = d.getDate();
+
+                        if (day === 1) { // 월요일
+                            dynamicEvents.push({ start: dateStr, title: '휴관', extendedProps: { category: 'F' } });
+                        } else if (day >= 2 && day <= 4) { // 화~목
+                            dynamicEvents.push({ start: dateStr, title: '행사', extendedProps: { category: 'E' } });
+                        } else if (day === 5) { // 금요일 (셋째 주 제외)
+                            let isThirdFriday = (dateNum >= 15 && dateNum <= 21);
+                            if (!isThirdFriday) {
+                                dynamicEvents.push({ start: dateStr, title: '행사', extendedProps: { category: 'E' } });
+                            }
+                        } else if (day === 6) { // 토요일
+                            dynamicEvents.push({ start: dateStr, title: '주말 극장', extendedProps: { category: 'M' } });
+                        }
+                    }
+                    successCallback(dynamicEvents);
+                }
+            ],
+
+            eventContent: function(arg) {
+                let cat = arg.event.extendedProps.category || 'E';
+                let displayTitle = "행사";
+                if (cat === 'G') displayTitle = '강좌';
+                else if (cat === 'M') displayTitle = '주말 극장';
+                else if (cat === 'F') displayTitle = '휴관';
+
+                let titleColor = (cat === 'F') ? 'var(--holiday-red)' : '#333';
+
+                return {
+                    html: `
+                        <div class="event-badge-container">
+                            <span class="event-badge cat-${cat.toLowerCase()}">${cat}</span>
+                            <span class="text-truncate" style="font-weight: bold; color: ${titleColor}; font-size: 11px;">${displayTitle}</span>
+                        </div>
+                    `
+                };
+            },
+
+            eventClick: function(info) {
+                const props = info.event.extendedProps;
+
+                // (A) 휴관일(F)은 클릭 무시!
+                if (props.category === 'F') return;
+
+                document.getElementById('modalEventTitle').innerText = props.realTitle || info.event.title;
+                document.getElementById('modalDate').innerText = info.event.start.toLocaleDateString();
+                document.getElementById('modalContent').innerText = props.content || "상세 내용이 없습니다.";
+                document.getElementById('modalPlace').innerText = props.place || "장소 미정";
+
+                const catBadge = document.getElementById('modalCategory');
+                catBadge.innerText = props.category;
+                catBadge.className = 'event-badge cat-' + props.category.toLowerCase();
+
+                const btnContainer = document.getElementById('applyButtonContainer');
+                if (props.category === 'G' || props.category === 'E') {
+                    btnContainer.setAttribute('style', 'display: grid !important; margin-top: 1.5rem;');
+                    document.getElementById('btnApply').href = '/event/read?id=' + info.event.id;
+                } else {
+                    // (C) 영화(M)는 신청하기 버튼 숨기기
+                    btnContainer.setAttribute('style', 'display: none !important;');
+                }
+
+                new bootstrap.Modal(document.getElementById('eventModal')).show();
+            }
+        });
+        calendar.render();
+    });
+</script>
+</body>
+</html>

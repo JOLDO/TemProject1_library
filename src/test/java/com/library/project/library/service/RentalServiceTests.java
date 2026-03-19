@@ -1,7 +1,6 @@
 package com.library.project.library.service;
 
 import com.library.project.library.dto.rentalDto.RentalRequestDTO;
-import com.library.project.library.dto.rentalDto.RentalResponseDTO;
 import com.library.project.library.dto.rentalDto.ReturnRequestDTO;
 import com.library.project.library.entity.Book;
 import com.library.project.library.entity.Member;

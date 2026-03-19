@@ -14,12 +14,12 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
 
     List<Rental> findByMember_IdAndStatus(Long MemberId, RentalStatus status);
 
-    Optional<Rental> findByBook_BookIdAndStatus(Long bookId, RentalStatus status);
+    Optional<Rental> findByBook_IdAndStatus(Long bookId, RentalStatus status);
 
         @Query("""
-        SELECT r.book.bookId, COUNT(r)
+        SELECT r.book.id, COUNT(r)
         FROM Rental r
-        GROUP BY r.book.bookId
+        GROUP BY r.book.id
         ORDER BY COUNT(r) DESC
     """)
         List<Object[]> findMostRentedBooks();
