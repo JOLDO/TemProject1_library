@@ -3,6 +3,9 @@ package com.library.project.library.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -14,6 +17,10 @@ public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 내부 PK
+
+    @OneToMany(mappedBy = "member")
+    @Builder.Default
+    private List<BookRequest> bookRequests = new ArrayList<>();
 
     @Column(length = 50, nullable = false, unique = true)
     private String mid; // 로그인 아이디

@@ -16,11 +16,11 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession();
 
         // 세션에 loginInfo(로그인 정보)가 없으면 로그인 페이지로 튕겨내기
-        if (session.getAttribute("loginInfo") == null) {
+        /*if (session.getAttribute("loginInfo") == null) {
             log.info("로그인 정보 없음! 로그인 페이지로 이동합니다.");
             response.sendRedirect("/member/login");
             return false; // 컨트롤러로 못 가게 막음
-        }
+        }*/
 
         return true; // 로그인 되어 있으면 통과!
     }

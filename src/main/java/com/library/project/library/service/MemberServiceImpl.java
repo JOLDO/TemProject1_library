@@ -40,6 +40,9 @@ public class MemberServiceImpl implements MemberService {
         Optional<Member> result = memberRepository.findByMid(mid);
         Member member = result.orElseThrow(); // 데이터 없으면 예외 발생
 
+        // ModelMapper로 변환 후 role 수동 세팅
+        MemberDTO memberDTO = modelMapper.map(member, MemberDTO.class);
+        memberDTO.setRole(member.getRole().name()); // ← enum → String 변환
         // 엔티티를 DTO로 변환하여 반환
         return modelMapper.map(member, MemberDTO.class);
     }

@@ -16,13 +16,13 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
 
     Optional<Rental> findByBook_IdAndStatus(Long Id, RentalStatus status);
 
-        @Query("""
-        SELECT r.book.id, COUNT(r)
-        FROM Rental r
-        GROUP BY r.book.id
-        ORDER BY COUNT(r) DESC
-    """)
-        List<Object[]> findMostRentedBooks();
+    @Query("""
+    SELECT r.book.bookTitle, COUNT(r)
+    FROM Rental r
+    GROUP BY r.book.bookTitle
+    ORDER BY COUNT(r) DESC
+""")
+    List<Object[]> findMostRentedBooks();
 
     // 오늘 대출 개수
     @Query("""
