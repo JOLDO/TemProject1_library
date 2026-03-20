@@ -1,22 +1,19 @@
 package com.library.project.library.repository;
 
 import com.library.project.library.entity.Event;
-import org.springframework.data.domain.Page; // 추가
-import org.springframework.data.domain.Pageable; // 추가
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 public interface EventRepository extends JpaRepository<Event, Long> {
-    // Pageable이 꼭 있어야 페이징 처리가 돼!
+
+    // [통합 검색 메서드] 특정 카테고리 내에서 제목으로 검색 + 페이징
+    // 강좌(G), 영화(M) 호출 시 카테고리만 바꿔서 던지면 됨!
+    Page<Event> findByCategoryAndTitleContaining(String category, String title, Pageable pageable);
+
+    // [기본 목록 메서드] 검색어 없을 때 특정 카테고리 전체 페이징
     Page<Event> findByCategory(String category, Pageable pageable);
 
-    // 아까 만든 검색용 메서드도 잘 있는지 확인!
-    Page<Event> findByTitleContainingAndCategory(String title, String category, Pageable pageable);
-
-    // Pageable을 넣어야 페이징 처리가 유지되면서 'M'만 쏙 빠져!
+    // [참고] 혹시 특정 카테고리 제외가 필요할 때 사용 (기존 코드 유지)
     Page<Event> findByCategoryNot(String category, Pageable pageable);
-
-    // 카테고리가 'M'이고 제목에 키워드가 포함된 데이터를 페이징 처리해서 가져오기
-    Page<Event> findByCategoryAndTitleContaining(String category, String title, Pageable pageable);
 }

@@ -41,7 +41,6 @@
         #calendar { border-top: 2px solid var(--primary-blue); padding-top: 15px; }
         .fc-col-header-cell { background-color: #fcfcfc; padding: 12px 0 !important; color: #555; font-size: 14px; }
 
-        /* [추가] 일요일(sun)과 월요일(mon) 헤더 및 날짜 숫자 빨간색 */
         .fc-day-sun .fc-col-header-cell-cushion,
         .fc-day-sun .fc-daygrid-day-number,
         .fc-day-mon .fc-col-header-cell-cushion,
@@ -75,7 +74,7 @@
         <div class="list-group list-group-flush">
             <a th:href="@{/event/list}" class="list-group-item list-group-item-action active">이달의 행사</a>
             <a th:href="@{/event/lecture}" class="list-group-item list-group-item-action">강좌·세미나</a>
-            <a href="#" class="list-group-item list-group-item-action">주말 극장</a>
+            <a th:href="@{/event/cinema}" class="list-group-item list-group-item-action">주말 극장</a>
         </div>
     </div>
 
@@ -157,11 +156,12 @@
             initialView: 'dayGridMonth',
             locale: 'ko',
             height: 'auto',
+            showNonCurrentDates: false,
+            fixedWeekCount: false,
             headerToolbar: { left: 'prev', center: 'title', right: 'next' },
             titleFormat: { year: 'numeric', month: '2-digit' },
             events: events,
 
-            // [추가] 숫자 뒤에 '일'을 빼고 숫자만 표시
             dayCellContent: function(info) {
                 return info.date.getDate();
             },
@@ -173,21 +173,27 @@
                     let end = new Date(info.end);
 
                     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                        let year = d.getFullYear();
+                        let month = d.getMonth() + 1;
                         let day = d.getDay();
-                        let dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                        let dateStr = year + '-' + String(month).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
                         let dateNum = d.getDate();
 
-                        if (day === 1) { // 월요일
-                            dynamicEvents.push({ start: dateStr, title: '휴관', extendedProps: { category: 'F' } });
-                        } else if (day >= 2 && day <= 4) { // 화~목
-                            dynamicEvents.push({ start: dateStr, title: '행사', extendedProps: { category: 'E' } });
-                        } else if (day === 5) { // 금요일 (셋째 주 제외)
-                            let isThirdFriday = (dateNum >= 15 && dateNum <= 21);
-                            if (!isThirdFriday) {
-                                dynamicEvents.push({ start: dateStr, title: '행사', extendedProps: { category: 'E' } });
+                        // [핵심 수정] 2026년 3월과 4월은 DB 데이터를 사용하므로 '행사' 자동 생성을 건너뜀
+                        let isTargetPeriod = (year === 2026 && (month === 3 || month === 4));
+
+                        if (day === 1) { // 월요일은 휴관 (3,4월에도 유지)
+                            dynamicEvents.push({start: dateStr, title: '휴관', extendedProps: {category: 'F'}});
+                        } else if (!isTargetPeriod) {
+                            // 3,4월이 아닐 때만 기존의 임시 행사 로직 작동
+                            if (day >= 2 && day <= 4) { // 화~목
+                                dynamicEvents.push({start: dateStr, title: '행사', extendedProps: {category: 'E'}});
+                            } else if (day === 5) { // 금요일
+                                let isThirdFriday = (dateNum >= 15 && dateNum <= 21);
+                                if (!isThirdFriday) {
+                                    dynamicEvents.push({start: dateStr, title: '행사', extendedProps: {category: 'E'}});
+                                }
                             }
-                        } else if (day === 6) { // 토요일
-                            dynamicEvents.push({ start: dateStr, title: '주말 극장', extendedProps: { category: 'M' } });
                         }
                     }
                     successCallback(dynamicEvents);
@@ -215,9 +221,9 @@
 
             eventClick: function(info) {
                 const props = info.event.extendedProps;
+                const cat = props.category;
 
-                // (A) 휴관일(F)은 클릭 무시!
-                if (props.category === 'F') return;
+                if (cat === 'F') return;
 
                 document.getElementById('modalEventTitle').innerText = props.realTitle || info.event.title;
                 document.getElementById('modalDate').innerText = info.event.start.toLocaleDateString();
@@ -225,16 +231,17 @@
                 document.getElementById('modalPlace').innerText = props.place || "장소 미정";
 
                 const catBadge = document.getElementById('modalCategory');
-                catBadge.innerText = props.category;
-                catBadge.className = 'event-badge cat-' + props.category.toLowerCase();
+                catBadge.innerText = cat;
+                catBadge.className = 'event-badge cat-' + cat.toLowerCase();
 
                 const btnContainer = document.getElementById('applyButtonContainer');
-                if (props.category === 'G' || props.category === 'E') {
-                    btnContainer.setAttribute('style', 'display: grid !important; margin-top: 1.5rem;');
+
+                if (cat === 'G' || cat === 'E') {
+                    btnContainer.style.setProperty('display', 'grid', 'important');
+                    btnContainer.style.marginTop = '1.5rem';
                     document.getElementById('btnApply').href = '/event/read?id=' + info.event.id;
                 } else {
-                    // (C) 영화(M)는 신청하기 버튼 숨기기
-                    btnContainer.setAttribute('style', 'display: none !important;');
+                    btnContainer.style.setProperty('display', 'none', 'important');
                 }
 
                 new bootstrap.Modal(document.getElementById('eventModal')).show();
