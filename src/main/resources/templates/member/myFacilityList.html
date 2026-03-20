@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>내 시설 예약 내역</title>
+    <link rel="stylesheet" th:href="@{/css/busan-library-common.css}">
+    <style>
+        .table-container { margin: 30px 0; }
+        .no-data { padding: 80px; color: var(--color-text-muted); text-align: center; font-size: 1.1rem; }
+        .modal-data-text { color: var(--color-text-main); font-weight: 500; margin-left: 8px; }
+        #modalEventContent { border-radius: var(--radius-sm); line-height: 1.6; color: var(--color-text-sub); }
+        .info-ment { margin-top: 16px; color: var(--color-text-muted); font-size: 0.875rem; }
+    </style>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <div class="modal fade" id="applyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg" style="border:none; border-radius: var(--radius-md);">
+                <div class="modal-header" style="background-color: var(--color-bg-light); border-bottom: 2px solid var(--color-primary);">
+                    <h5 class="modal-title font-serif" id="modalEventName" style="color: var(--color-primary); font-weight: 700;">행사명</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label font-bold text-primary">신청번호</label>
+                            <span id="modalAno" class="modal-data-text"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label font-bold text-primary">신청자명</label>
+                            <span id="modalApplicantName" class="modal-data-text"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label font-bold text-primary">시설 종류</label>
+                            <span id="modalFacilityType" class="modal-data-text"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label font-bold text-primary">예약 날짜</label>
+                            <span id="modalApplyDate" class="modal-data-text"></span>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label font-bold text-primary">이용 시간</label>
+                            <span id="modalApplyTime" class="modal-data-text"></span>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label font-bold text-primary mb-2">행사 내용</label>
+                            <div id="modalEventContent" class="p-3 border bg-light" style="min-height:100px; white-space:pre-wrap;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--color-border-light);">
+                    <button type="button" class="btn btn--outline btn--sm" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container section">
+        <div class="section-title text-left mb-40">
+            <span class="section-title__en">MY RESERVATION</span>
+            <h2 class="section-title__ko">내 시설 예약 내역</h2>
+            <p class="section-title__desc">부산도서관 시설 예약 신청 현황을 확인하실 수 있습니다.</p>
+        </div>
+
+        <div class="flex-between mb-16">
+            <div class="count-info">
+                총 <span th:text="${totalCount}" class="font-bold text-primary">0</span>건의 내역이 있습니다.
+            </div>
+        </div>
+
+        <div class="table-wrap shadow-sm rounded">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>신청 번호</th>
+                    <th>신청일</th>
+                    <th>행사명</th>
+                    <th>시설 종류</th>
+                    <th>예약 날짜</th>
+                    <th>이용 시간</th>
+                    <th>인원</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="dto : ${applyList}">
+                    <td th:text="${dto.ano}">1</td>
+                    <td th:text="${#temporals.format(dto.regDate, 'yyyy-MM-dd HH:mm')}">2026-03-15</td>
+                    <td>
+                        <a href="javascript:void(0);"
+                           th:text="${dto.eventName}"
+                           th:onclick="'openModal(' + ${dto.ano} + ')'"
+                           class="font-bold text-primary">행사명</a>
+                    </td>
+                    <td><span class="card__badge" style="margin-bottom:0;" th:text="${dto.facilityType}">강당</span></td>
+                    <td th:text="${dto.applyDate}">2026-04-04</td>
+                    <td>
+                        <span th:switch="${dto.applyTime}">
+                            <span th:case="'오전'">오전 (09:00~12:00)</span>
+                            <span th:case="'오후'">오후 (13:00~17:00)</span>
+                            <span th:case="'야간'">야간 (18:00~22:00)</span>
+                            <span th:case="*" th:text="${dto.applyTime}"></span>
+                        </span>
+                    </td>
+                    <td><span th:text="${dto.participants}">50</span>명</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(applyList)}">
+                    <td colspan="7" class="no-data">신청 내역이 존재하지 않습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="info-ment">
+            <span>※ 대관이 종료된 내역은 3개월 후 삭제됩니다.</span>
+        </div>
+
+    </div> </div> <th:block layout:fragment="script">
+    <script th:inline="javascript">
+        let applyModal;
+        document.addEventListener('DOMContentLoaded', function () {
+            // 모달 객체 초기화 확인
+            const modalElement = document.getElementById('applyModal');
+            if(modalElement) {
+                applyModal = new bootstrap.Modal(modalElement);
+            }
+        });
+
+        function openModal(ano) {
+            console.log("Fetching data for ano:", ano); // 디버깅용 로그
+
+            fetch('/apply/readApi?ano=' + ano)
+                .then(response => {
+                    if (!response.ok) throw new Error('네트워크 응답 에러');
+                    return response.json();
+                })
+                .then(data => {
+                    // 1. 데이터 세팅
+                    document.getElementById('modalEventName').innerText = data.eventName;
+                    document.getElementById('modalAno').innerText = data.ano;
+                    document.getElementById('modalApplicantName').innerText = data.applicantName || '정보 없음';
+                    document.getElementById('modalFacilityType').innerText = data.facilityType;
+
+                    // 2. 날짜 가공
+                    if (Array.isArray(data.applyDate)) {
+                        const [year, month, day] = data.applyDate;
+                        document.getElementById('modalApplyDate').innerText = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    } else {
+                        document.getElementById('modalApplyDate').innerText = data.applyDate;
+                    }
+
+                    // 3. 이용 시간 가공
+                    let timeDetail = "";
+                    const rawTime = data.applyTime;
+                    if (rawTime === "오전") timeDetail = "오전 (09:00 ~ 12:00)";
+                    else if (rawTime === "오후") timeDetail = "오후 (13:00 ~ 17:00)";
+                    else if (rawTime === "야간") timeDetail = "야간 (18:00 ~ 22:00)";
+                    else timeDetail = rawTime;
+
+                    document.getElementById('modalApplyTime').innerText = timeDetail;
+                    document.getElementById('modalEventContent').innerText = data.eventContent || '상세 내용 없음';
+
+                    // 4. 모달 열기
+                    applyModal.show();
+                })
+                .catch(error => {
+                    console.error('Error Details:', error);
+                    alert('상세 정보를 불러오는 중 오류가 발생했습니다. 개발자 도구(F12)를 확인해주세요.');
+                });
+        }
+    </script>
+</th:block>
+
+</body>
+</html>

@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -40,5 +43,28 @@ public class ApplyServiceImpl implements ApplyService {
         ApplyEntity result = applyRepository.save(applyEntity);
 
         return result.getAno(); // 저장된 번호 반환
+    }
+
+    @Override
+    public List<ApplyDTO> getApplyListByMid(String mid) {
+        log.info("내 신청 내역 조회 요청 - 회원 ID: " + mid);
+
+        // 1. 레포지토리에서 해당 mid의 데이터 조회
+        List<ApplyEntity> result = applyRepository.findByMid(mid);
+
+        // 2. Entity 리스트 -> DTO 리스트 변환 (Stream 활용)
+        return result.stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ApplyDTO getApply(Long ano) {
+        // 1. DB에서 해당 번호의 엔티티를 찾음 (없으면 예외 발생)
+        java.util.Optional<ApplyEntity> result = applyRepository.findById(ano);
+        ApplyEntity entity = result.orElseThrow();
+
+        // 2. 엔티티를 DTO로 변환해서 반환
+        return entityToDto(entity);
     }
 }

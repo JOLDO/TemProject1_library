@@ -2,17 +2,18 @@ package com.library.project.library.repository;
 
 import com.library.project.library.entity.ApplyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-@Repository
+import java.time.LocalDate;
+import java.util.List;
+
 public interface ApplyRepository extends JpaRepository<ApplyEntity, Long> {
-    /**
-     * JpaRepository를 상속받는 것만으로도 기본적인 CRUD가 가능합니다.
-     * <ApplyEntity, Long> 은 <엔티티 클래스명, PK의 타입>을 의미합니다.
-     * * - 저장: save(entity)
-     * - 조회: findById(id)
-     * - 전체 조회: findAll()
-     * - 삭제: deleteById(id)
-     */
-}
 
+    // 사용자 아이디(mid)로 신청 내역 조회
+    // 최신순 정렬을 위해 OrderByRegDateDesc를 붙이는 것을 권장합니다.
+    List<ApplyEntity> findByMid(String mid);
+
+
+}
