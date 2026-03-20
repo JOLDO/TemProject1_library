@@ -5,65 +5,77 @@
       layout:decorate="~{layout/base}">
 
 <body>
+<link rel="stylesheet" href="/css/busan-library-common.css">
+
 <div layout:fragment="content">
     <div class="row mt-3 justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-6">
+
             <!-- 1. 아이디 찾기 카드 -->
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">아이디 찾기</div>
-                <div class="card-body">
-                    <form action="/member/find-id" method="post">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">이름</span>
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header text-center py-3">
+                    <h5 class="mb-0 fw-bold">아이디 찾기</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/member/find-id}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이름</label>
                             <input type="text" name="mname" class="form-control" placeholder="가입 시 등록한 성함" required>
                         </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">이메일</span>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이메일</label>
                             <input type="email" name="email" class="form-control" placeholder="example@lib.com" required>
                         </div>
-                        <div class="text-end">
+                        <div class="d-grid mt-4">
                             <button type="submit" class="btn btn-primary">아이디 찾기</button>
                         </div>
                     </form>
 
-                    <!-- 결과 메시지 -->
-                    <div th:if="${foundMid}" class="mt-3 alert alert-success text-center">
-                        찾으시는 아이디는 [ <strong th:text="${foundMid}"></strong> ] 입니다.
+                    <!-- 결과 메시지 (카드 내부 하단) -->
+                    <div th:if="${foundMid}" class="mt-4 alert alert-success text-center shadow-sm">
+                        찾으시는 아이디는 [ <strong th:text="${foundMid}" class="text-primary"></strong> ] 입니다.
                     </div>
-                    <div th:if="${errorId}" class="mt-3 alert alert-danger text-center">
+                    <div th:if="${errorId}" class="mt-4 alert alert-danger text-center shadow-sm">
                         일치하는 정보가 없습니다. 다시 확인해주세요.
                     </div>
                 </div>
             </div>
 
-            <!-- 2. 비밀번호 재설정 본인 확인 카드 -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">비밀번호 재설정 (본인 확인)</div>
-                <div class="card-body">
-                    <form action="/member/find-pw" method="post">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">아이디</span>
-                            <input type="text" name="mid" class="form-control" placeholder="아이디 입력" required>
+            <!-- 2. 비밀번호 재설정 카드 -->
+            <div class="card shadow-sm mb-5">
+                <div class="card-header text-center py-3">
+                    <h5 class="mb-0 fw-bold">비밀번호 재설정</h5>
+                    <p class="text-muted small mb-0 mt-1">본인 확인 후 비밀번호 변경이 가능합니다.</p>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/member/find-pw}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">아이디</label>
+                            <input type="text" name="mid" class="form-control" placeholder="ID" required>
                         </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">이메일</span>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이메일</label>
                             <input type="email" name="email" class="form-control" placeholder="가입 시 등록한 이메일" required>
                         </div>
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-dark">본인 확인 후 비밀번호 변경</button>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-dark">본인 확인 및 변경</button>
                         </div>
                     </form>
 
                     <!-- 실패 메시지 -->
-                    <div th:if="${errorPw}" class="mt-3 alert alert-danger text-center">
+                    <div th:if="${errorPw}" class="mt-4 alert alert-danger text-center shadow-sm">
                         아이디 또는 이메일 정보가 일치하지 않습니다.
                     </div>
                 </div>
+                <div class="card-footer bg-light text-center py-3">
+                    <a th:href="@{/member/login}" class="text-decoration-none text-muted small">로그인 페이지로 돌아가기</a>
+                </div>
             </div>
+
         </div>
     </div>
-
 </div>
+
 <script layout:fragment="script" th:inline="javascript">
 </script>
 

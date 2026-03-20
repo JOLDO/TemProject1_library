@@ -5,47 +5,60 @@
       layout:decorate="~{layout/base}">
 
 <body>
+<link rel="stylesheet" href="/css/busan-library-common.css">
+
 <div layout:fragment="content">
-    <div class="row mt-3">
-        <div class="col">
-            <div class="card">
-                <div class="card-header">
-                    회원 가입 (Join)
+    <div class="row mt-3 justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm mb-5">
+                <div class="card-header text-center py-3">
+                    <h4 class="mb-0 fw-bold">회원 가입</h4>
+                    <p class="text-muted small mb-0 mt-1">부산 도서관의 새 가족이 되어주세요.</p>
                 </div>
-                <div class="card-body">
-                    <form action="/member/join" method="post">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">아이디</span>
-                            <input type="text" name="mid" id="mid" class="form-control" placeholder="4자 이상" required>
-                            <button type="button" class="btn btn-outline-secondary" id="checkIdBtn">중복확인</button>
+                <div class="card-body p-4">
+                    <!-- 기존 action 유지 / id="joinForm" 추가(스크립트 연동용) -->
+                    <form action="/member/join" method="post" id="joinForm">
+
+                        <!-- 아이디 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">아이디</label>
+                            <div class="input-group">
+                                <input type="text" name="mid" id="mid" class="form-control" placeholder="4자 이상 입력" required>
+                                <button type="button" class="btn btn-outline-primary" id="checkIdBtn">중복확인</button>
+                            </div>
+                            <div id="idCheckMsg" class="mt-1" style="font-size: 0.85em; min-height: 1.2em;"></div>
                         </div>
-                        <div id="idCheckMsg" class="mb-3" style="font-size: 0.9em;"></div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">비밀번호</span>
-                            <input type="password" name="mpw" class="form-control" placeholder="비밀번호" required>
+
+                        <!-- 비밀번호 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">비밀번호</label>
+                            <input type="password" name="mpw" class="form-control" placeholder="안전한 비밀번호를 입력하세요" required>
                         </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">이름</span>
+
+                        <!-- 이름 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이름</label>
                             <input type="text" name="mname" class="form-control" placeholder="성함" required>
                         </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">이메일</span>
-                            <input type="email" name="email" id="email" class="form-control" placeholder="example@lib.com" required>
-                            <button type="button" class="btn btn-outline-secondary" id="checkEmailBtn">중복확인</button>
+
+                        <!-- 이메일 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이메일</label>
+                            <div class="input-group">
+                                <input type="email" name="email" id="email" class="form-control" placeholder="example@lib.com" required>
+                                <button type="button" class="btn btn-outline-primary" id="checkEmailBtn">중복확인</button>
+                            </div>
+                            <div id="emailCheckMsg" class="mt-1" style="font-size: 0.85em; min-height: 1.2em;"></div>
                         </div>
-                        <div id="emailCheckMsg" class="mb-3" style="font-size: 0.9em;"></div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">지역</span>
-                            <!--<select name="region" class="form-select">
-                                <option value="BUSAN">부산</option>
-                                <option value="SEOUL">서울</option>
-                                <option value="GYEONGGI">경기</option>
-                            </select>-->
+
+                        <!-- 지역 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">지역 선택</label>
                             <select name="region" class="form-select" required>
-                                <option value="" th:selected="${dto == null || dto.region == null}">선택</option>
+                                <option value="" th:selected="${dto == null || dto.region == null}">선택하세요</option>
                                 <option value="SEOUL" th:selected="${dto?.region == 'SEOUL'}">서울</option>
                                 <option value="BUSAN" th:selected="${dto?.region == 'BUSAN'}">부산</option>
-                                <option value="BUSAN" th:selected="${dto?.region == 'YANGSAN'}">양산</option>
+                                <option value="YANGSAN" th:selected="${dto?.region == 'YANGSAN'}">양산</option>
                                 <option value="DAEGU" th:selected="${dto?.region == 'DAEGU'}">대구</option>
                                 <option value="INCHEON" th:selected="${dto?.region == 'INCHEON'}">인천</option>
                                 <option value="GWANGJU" th:selected="${dto?.region == 'GWANGJU'}">광주</option>
@@ -63,26 +76,29 @@
                                 <option value="JEJU" th:selected="${dto?.region == 'JEJU'}">제주</option>
                             </select>
                         </div>
+
                         <input type="hidden" name="role" value="USER">
 
-                        <div class="my-4">
-                            <div class="float-end">
-                                <button type="submit" class="btn btn-primary">회원가입</button>
-                                <button type="reset" class="btn btn-secondary">다시쓰기</button>
-                            </div>
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg">회원가입 완료</button>
+                            <button type="reset" class="btn btn-link text-muted text-decoration-none">다시 쓰기</button>
                         </div>
                     </form>
+                </div>
+                <div class="card-footer bg-light text-center py-3">
+                    <span class="small text-muted">이미 계정이 있으신가요?</span>
+                    <a th:href="@{/member/login}" class="text-primary fw-bold text-decoration-none ms-1 small">로그인</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <script layout:fragment="script" th:inline="javascript">
-    /// 1. 상태 변수 (중복 확인 통과 여부 저장)
+    /* 기존 로직 100% 동일 유지 */
     let isIdChecked = false;
     let isEmailChecked = false;
 
-    // 2. 아이디 중복 확인 버튼 이벤트
     document.querySelector("#checkIdBtn").addEventListener("click", function() {
         const mid = document.querySelector("#mid").value;
         const msgArea = document.querySelector("#idCheckMsg");
@@ -92,11 +108,9 @@
             return;
         }
 
-        // [중요] Fetch API를 이용해 컨트롤러(@GetMapping) 호출
         fetch(`/member/checkId?mid=${mid}`)
             .then(response => response.text())
             .then(data => {
-                console.log("서버가 보낸 값: " + data);
                 if(data === "exist") {
                     msgArea.innerText = "이미 사용 중인 아이디입니다.";
                     msgArea.style.color = "red";
@@ -109,22 +123,17 @@
             });
     });
 
-    // 3. 이메일 중복 확인 이벤트
     document.querySelector("#checkEmailBtn").addEventListener("click", function() {
         const email = document.querySelector("#email").value;
-        const msgArea = document.querySelector("#emailCheckMsg"); // 메시지 뿌릴 곳
 
-        // 이메일 형식 간단 체크
         if(!email.includes('@')) {
             alert("올바른 이메일 형식이 아닙니다.");
             return;
         }
 
-        // 서버로 신호 보내기
         fetch(`/member/checkEmail?email=${email}`)
             .then(res => res.text())
             .then(data => {
-                console.log("서버 응답:", data);
                 if(data === "exist") {
                     alert("이미 사용 중인 이메일입니다.");
                     isEmailChecked = false;
@@ -136,13 +145,12 @@
             .catch(err => console.error("에러 발생:", err));
     });
 
-    // 4. [최종 방어] 폼 제출 시 체크
     document.querySelector("#joinForm").addEventListener("submit", function(e) {
         if(!isIdChecked) {
-            e.preventDefault(); // 가입 중단!
+            e.preventDefault();
             alert("아이디 중복 확인을 먼저 해주세요.");
         } else if(!isEmailChecked) {
-            e.preventDefault(); // 가입 중단!
+            e.preventDefault();
             alert("이메일 중복 확인을 먼저 해주세요.");
         }
     });

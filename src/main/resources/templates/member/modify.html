@@ -5,41 +5,58 @@
       layout:decorate="~{layout/base}">
 
 <body>
+<link rel="stylesheet" href="/css/busan-library-common.css">
+
 <div layout:fragment="content">
-    <div class="row mt-3">
-        <div class="col">
-            <div class="card">
-                <div class="card-header">회원 정보 수정 (Modify)</div>
-                <div class="card-body">
+    <div class="row mt-3 justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm mb-5">
+                <div class="card-header text-center py-3">
+                    <h4 class="mb-0 fw-bold">회원 정보 수정</h4>
+                    <p class="text-muted small mb-0 mt-1">소중한 정보를 안전하게 관리하세요.</p>
+                </div>
+                <div class="card-body p-4">
                     <form th:action="@{/member/modify}" method="post">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">아이디</span>
-                            <input type="text" name="mid" class="form-control" th:value="${dto.mid}" readonly>
+
+                        <!-- 아이디 (수정 불가) -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted">아이디</label>
+                            <input type="text" name="mid" class="form-control bg-light" th:value="${dto.mid}" readonly>
+                            <div class="form-text small">아이디는 변경할 수 없습니다.</div>
                         </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">비밀번호</span>
+
+                        <!-- 비밀번호 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">비밀번호</label>
                             <input type="password" name="mpw" class="form-control" th:value="${dto.mpw}" required>
                         </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">이름</span>
+
+                        <!-- 이름 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이름</label>
                             <input type="text" name="mname" class="form-control" th:value="${dto.mname}" required>
                         </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">이메일</span>
+
+                        <!-- 이메일 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이메일</label>
                             <input type="email" name="email" class="form-control" th:value="${dto.email}" required>
                         </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">지역</span>
+
+                        <!-- 지역 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">지역</label>
                             <select name="region" class="form-select">
                                 <option value="BUSAN" th:selected="${dto.region == 'BUSAN'}">부산</option>
                                 <option value="SEOUL" th:selected="${dto.region == 'SEOUL'}">서울</option>
                                 <option value="GYEONGGI" th:selected="${dto.region == 'GYEONGGI'}">경기</option>
+                                <!-- 필요 시 가입 페이지처럼 옵션 추가 가능 -->
                             </select>
                         </div>
 
-                        <div class="my-4 text-center">
-                            <button type="submit" class="btn btn-warning">수정 완료</button>
-                            <button type="button" class="btn btn-secondary"
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-warning btn-lg fw-bold text-dark">수정 완료</button>
+                            <button type="button" class="btn btn-outline-secondary"
                                     th:onclick="|location.href='@{/member/mypage(mid=${dto.mid})}'|">취소</button>
                         </div>
                     </form>
@@ -47,9 +64,10 @@
             </div>
         </div>
     </div>
-
 </div>
+
 <script layout:fragment="script" th:inline="javascript">
+    /* 기존 에러 처리 로직 유지 */
     const errors = [[${errors}]]
     if(errors) {
         alert("입력값이 올바르지 않습니다. 다시 확인해주세요.");
