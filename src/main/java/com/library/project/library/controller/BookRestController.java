@@ -26,10 +26,10 @@ public class BookRestController {
     // =============================================
     // 책 상세정보 조회 (상세보기 모달용)
     // =============================================
-    /*@GetMapping("/book/{bookId}")
+    @GetMapping("/book/{bookId}")
     public BookDTO getBook(@PathVariable Long bookId) {
         return bookService.getBook(bookId);
-    }*/
+    }
 
     // =============================================
     // 책 목록 조회 (리스트 페이지 axios용) 추가된거
@@ -47,26 +47,6 @@ public class BookRestController {
     /*@GetMapping("/book/{bookId}/copies")
     public List<BookDTO> getCopies(@PathVariable Long bookId) {
         return bookService.getCopiesByBookId(bookId);
-    }*/
-
-    // =============================================
-    // 대여하기
-    // bookId: 리스트에서 클릭한 책의 대표 row id (isbn 기준 min id)
-    // → isbn 중 AVAILABLE 권 하나를 RENTED로 변경 + RentalHistory 저장
-    // =============================================
-    /*@PostMapping("/book/rental/{bookId}")
-    public void rental(@PathVariable Long bookId) {
-        bookService.rental(bookId);
-    }*/
-
-    // =============================================
-    // 반납하기
-    // bookId: 대여된 특정 권의 Book.id (RentalHistory에 저장해둔 값)
-    // → 해당 권 AVAILABLE로 변경 + RentalHistory 반납일 업데이트
-    // =============================================
-    /*@PatchMapping("/book/rental/{bookId}/return")
-    public void returnBook(@PathVariable Long bookId) {
-        bookService.returnBook(bookId);
     }*/
 
     // =============================================

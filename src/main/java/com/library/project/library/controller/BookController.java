@@ -19,7 +19,7 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping("/book/booklist")
-    public void list2(@ModelAttribute("pageRequestDTO") PageRequestDTO pageRequestDTO, Model model) {
+    public void list(PageRequestDTO pageRequestDTO, Model model) {
         PageResponseDTO<BookDTO> responseDTO = bookService.list(pageRequestDTO);
         model.addAttribute("responseDTO", responseDTO);
     }

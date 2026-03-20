@@ -3,7 +3,6 @@
     width: 80%;
 }
 
-/* 검색어 하이라이트 */
 mark {
     font: inherit;
     line-height: inherit;
@@ -28,21 +27,9 @@ mark {
     box-shadow: none;
 }
 
-/* list-group-item 높이 자동 */
-.list-group-item {
-    height: auto;
-    overflow: hidden;
-}
-
-/* 아이템 내부 flex 컨테이너: stretch로 book-actions가 이미지 높이만큼 늘어나도록 */
-.list-group-item .d-flex.w-100 {
-    align-items: stretch !important;
-}
-
 /* flex 안에서 말줄임 동작하려면 부모에 min-width: 0 필요 */
 .list-group-item .flex-grow-1 {
     min-width: 0;
-    align-self: center;
 }
 
 
@@ -56,16 +43,6 @@ mark {
 .list-group-item .book-actions .recommend-btn {
     font-size: 1.1rem;
     padding: 0.5em 1em;
-}
-
-/* 책 제목, 저자, 발행사 한 줄 말줄임 */
-.list-group-item h5,
-.list-group-item p,
-.list-group-item small {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
 }
 
 /* 텍스트 크기 */
@@ -87,16 +64,6 @@ mark {
     color: #000;
 }
 
-/* 모달 책 이미지 + 텍스트: 수직 중앙 정렬 */
-.detail-book-image-wrap,
-#bookDetailModal .flex-grow-1 {
-    align-self: center;
-}
-
-.detail-book-image-wrap {
-    flex-shrink: 0;
-}
-
 /* 모달 공통: Bootstrap 소형 화면 덮어쓰기 방지 */
 #bookDetailModal .modal-dialog {
     max-width: 80% !important;
@@ -107,11 +74,6 @@ mark {
 #recommendModal .modal-dialog {
     max-width: 50% !important;
     margin: 5vh auto !important;
-}
-
-.list-group-item .book-image-wrap {
-    display: flex;
-    align-items: center;
 }
 
 /* 모바일: 이미지+배지/버튼 위, 텍스트 아래 */

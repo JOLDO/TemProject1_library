@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
+<!-- [변경] base.html 레이아웃 적용 -->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<!-- [원본] 독립 페이지였을 때의 head -->
+<!--<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>부산도서관 메인</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>-->
 
+<head>
     <style>
         /* 1. 풀 페이지 스크롤 설정 */
         html, body {
@@ -52,7 +58,10 @@
         .carousel-item img { height: 60vh; object-fit: cover; }
     </style>
 </head>
+<!-- [원본] <body> -->
 <body>
+<!-- [변경] base.html의 content 영역에 삽입 -->
+<div layout:fragment="content">
 
 <section id="section1">
     <div class="weather-info shadow">
@@ -105,8 +114,13 @@
     </div>
 </section>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
+<!-- [원본] 독립 페이지용 Bootstrap JS (base.html에서 이미 로드하므로 주석 처리) -->
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
+
+</div><!-- /layout:fragment="content" -->
+
+<!-- [변경] base.html의 script 영역에 삽입 -->
+<script layout:fragment="script">
 
     // 1. 공공데이터포털에서 받은 인증키 (Encoding 키를 권장하지만 안 되면 Decoding 키로 교체)
     const WEATHER_API_KEY = '7e3732823bcfddf911e567ea22fe8bfcb55a3cc9e0ce0d9512bcf6c9d0312123';

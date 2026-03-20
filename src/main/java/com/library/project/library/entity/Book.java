@@ -60,11 +60,6 @@ public class Book extends BaseEntity {
     @Builder.Default
     private List<Rental> rentals = new ArrayList<>();
 
-    public void addRental(Rental rental) {
-        this.rentals.add(rental);
-        rental.setBook(this);  // 반대쪽도 동기화
-    }
-
     // 대여/반납 처리 시 status 변경용 메서드
 // 대여 시: AVAILABLE → RENTED
 // 반납 시: RENTED → AVAILABLE

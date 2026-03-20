@@ -22,7 +22,9 @@ public class RootConfig {
         return modelMapper;
     }
 
-    @Bean
+
+    //api 사용할때 json을 객첼로 변경할때 사용
+    /*@Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
 
@@ -33,7 +35,7 @@ public class RootConfig {
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         return mapper;
-    }
+    }*/
 
     @Bean
     public KoreanDecomposer koreanDecomposer() {

@@ -29,10 +29,108 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final RecommendRepository recommendRepository;
-    // private final RentalHistoryRepository rentalHistoryRepository;
     private final ModelMapper modelMapper;
-    private final ObjectMapper objectMapper;
     private final KoreanDecomposer koreanDecomposer;
+
+    @Override
+    public PageResponseDTO<BookDTO> list(PageRequestDTO pageRequestDTO) {
+        String keyword = pageRequestDTO.getKeyword();
+
+        // 한글 검색 지원을 위해 검색어를 두 가지 형태로 변환
+        // keywordNor: 자모 분리 정규화 (예: "스프링" → "ㅅㅡㅍㄹㅣㅇ")
+        // keywordCho: 초성만 추출       (예: "스프링" → "ㅅㅍㄹ")
+        String keywordNor = koreanDecomposer.toNormal(pageRequestDTO.getKeyword());
+        String keywordCho = koreanDecomposer.toChosung(pageRequestDTO.getKeyword());
+
+        // Pageable: 페이지 번호, 페이지 크기, 기본 정렬 기준을 담은 객체
+        // "id" 기준 내림차순 = 최신 등록순 (정렬 드롭다운 기본값과는 별개로 페이징 처리에 사용)
+        Pageable pageable = pageRequestDTO.getPageable("id");
+
+        // 정렬 드롭다운에서 선택한 sort 값 (id / pubdate / bookTitle / recommend / rental)
+        String sort = pageRequestDTO.getSort();
+
+        // QueryDSL로 구현된 커스텀 메서드: isbn 중복 제거 + 검색 + 정렬 + 페이징을 한 번에 처리
+        Page<Book> result = bookRepository.searchDistinctAll(keyword, keywordNor, keywordCho, sort, pageable);
+
+        // 현재 페이지의 책 목록
+        List<Book> books = result.getContent();
+
+        // ── 배치 조회: 책 목록 전체의 isbn/id를 한꺼번에 IN 쿼리로 조회 ──────────
+        // stream().map()으로 books 리스트에서 isbn/id만 추출해서 리스트로 만듦
+        List<String> isbns = books.stream().map(book -> book.getIsbn()).collect(Collectors.toList());
+        List<Long> bookIds = books.stream().map(book -> book.getId()).collect(Collectors.toList());
+
+        // isbn 목록 중 AVAILABLE 상태인 isbn만 Set으로 저장
+        // Set을 쓰는 이유: contains() 조회가 O(1)로 빠름 (List는 O(n))
+        Set<String> availableIsbns = isbns.isEmpty() ? new HashSet<>()
+                : new HashSet<>(bookRepository.findAvailableIsbnIn(isbns, BookStatus.AVAILABLE));   //isbn이 있으면 빌릴수 있는 책있는지 찾아서 중복 제거해서 넣어줌
+
+        // bookId 목록 중 추천 기록이 있는 bookId만 Set으로 저장
+        Set<Long> recommendedBookIds = bookIds.isEmpty() ? new HashSet<>()
+                : new HashSet<>(recommendRepository.findBookIdsByBookIdIn(bookIds));    //id가 있으면 추천한 책을 찾는다. 중복 제거 해서
+
+        // ── Book → BookDTO 변환 ────────────────────────────────────────────────
+        List<BookDTO> dtoList = books.stream()
+                .map(book -> {
+                    // ModelMapper: Book 엔티티의 필드를 BookDTO에 자동으로 복사
+                    BookDTO dto = modelMapper.map(book, BookDTO.class);
+
+                    // 대여 가능 여부: 같은 isbn을 가진 책 중 AVAILABLE인 것이 있으면 대여 가능
+                    // Set.contains()로 O(1) 조회 (DB 추가 쿼리 없음)
+                    dto.setStatus(availableIsbns.contains(book.getIsbn())
+                            ? BookStatus.AVAILABLE
+                            : BookStatus.RENTED);
+
+                    // 추천 여부: 이 bookId에 추천 기록이 있으면 true
+                    // → 프론트에서 추천 버튼 초기 상태(♥ 추천됨 / ♡ 추천하기) 결정에 사용
+                    dto.setRecommended(recommendedBookIds.contains(book.getId()));
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        // 전체 결과 수 (페이지네이션 계산에 사용)
+        int total = (int) result.getTotalElements();
+
+        // 빌더 패턴으로 페이지 응답 객체 생성
+        // withAll(): 페이지 범위(start/end), prev/next 여부 등을 내부에서 자동 계산
+        return PageResponseDTO.<BookDTO>withAll()
+                .pageRequestDTO(pageRequestDTO)
+                .dtoList(dtoList)
+                .total(total)
+                .build();
+    }
+
+    // 책 단건 조회 (모달 상세정보용)
+    @Override
+    public BookDTO getBook(Long bookId) {
+        Book book = bookRepository.findById(bookId).orElseThrow();
+        BookDTO dto = modelMapper.map(book, BookDTO.class);
+        dto.setStatus(bookRepository.existsByIsbnAndStatus(book.getIsbn(), BookStatus.AVAILABLE)
+                ? BookStatus.AVAILABLE
+                : BookStatus.RENTED);
+        dto.setRecommended(recommendRepository.existsByBook_Id(book.getId()));
+        return dto;
+    }
+
+    // 추천하기: RecommendHistory에 row 추가
+    // bookId는 isbn 대표 row(min id)의 id
+    @Override
+    public void recommend(Long bookId) {
+        Book book = bookRepository.findById(bookId).orElseThrow();
+        recommendRepository.save(Recommend.builder().book(book).build());
+    }
+
+    // 추천 해제: RecommendHistory에서 해당 bookId row 삭제
+    // deleteBy~ 메서드는 @Transactional 필수
+    @Override
+    @Transactional
+    public void unrecommend(Long bookId) {
+        recommendRepository.deleteByBook_Id(bookId);
+    }
+
+
+    //-----------------------api관련(사용x)
 
     // 네이버 API 검색 키워드 목록
     /*public static final String[] SEARCH_KEYWORDS = {
@@ -151,165 +249,5 @@ public class BookServiceImpl implements BookService {
     // 현재: isbn 목록 배치 조회 1번 + bookId 목록 배치 조회 1번
     //       → 10권이어도 1 + 1 + 1 = 3개 쿼리
     // ─────────────────────────────────────────────────────────────────
-    @Override
-    public PageResponseDTO<BookDTO> list(PageRequestDTO pageRequestDTO) {
-        String keyword = pageRequestDTO.getKeyword();
 
-        // 한글 검색 지원을 위해 검색어를 두 가지 형태로 변환
-        // keywordNor: 자모 분리 정규화 (예: "스프링" → "ㅅㅡㅍㄹㅣㅇ")
-        // keywordCho: 초성만 추출       (예: "스프링" → "ㅅㅍㄹ")
-        String keywordNor = koreanDecomposer.toNormal(pageRequestDTO.getKeyword());
-        String keywordCho = koreanDecomposer.toChosung(pageRequestDTO.getKeyword());
-
-        // Pageable: 페이지 번호, 페이지 크기, 기본 정렬 기준을 담은 객체
-        // "id" 기준 내림차순 = 최신 등록순 (정렬 드롭다운 기본값과는 별개로 페이징 처리에 사용)
-        Pageable pageable = pageRequestDTO.getPageable("id");
-
-        // 정렬 드롭다운에서 선택한 sort 값 (id / pubdate / bookTitle / recommend / rental)
-        String sort = pageRequestDTO.getSort();
-
-        // QueryDSL로 구현된 커스텀 메서드: isbn 중복 제거 + 검색 + 정렬 + 페이징을 한 번에 처리
-        Page<Book> result = bookRepository.searchDistinctAll(keyword, keywordNor, keywordCho, sort, pageable);
-
-        // 현재 페이지의 책 목록
-        List<Book> books = result.getContent();
-
-        // ── 배치 조회: 책 목록 전체의 isbn/id를 한꺼번에 IN 쿼리로 조회 ──────────
-        // stream().map()으로 books 리스트에서 isbn/id만 추출해서 리스트로 만듦
-        List<String> isbns = books.stream().map(Book::getIsbn).collect(Collectors.toList());
-        List<Long> bookIds = books.stream().map(Book::getId).collect(Collectors.toList());
-
-        // isbn 목록 중 AVAILABLE 상태인 isbn만 Set으로 저장
-        // Set을 쓰는 이유: contains() 조회가 O(1)로 빠름 (List는 O(n))
-        Set<String> availableIsbns = isbns.isEmpty() ? new HashSet<>()
-                : new HashSet<>(bookRepository.findAvailableIsbnIn(isbns, BookStatus.AVAILABLE));
-
-        // bookId 목록 중 추천 기록이 있는 bookId만 Set으로 저장
-        Set<Long> recommendedBookIds = bookIds.isEmpty() ? new HashSet<>()
-                : new HashSet<>(recommendRepository.findBookIdsByBookIdIn(bookIds));
-
-        // ── Book → BookDTO 변환 ────────────────────────────────────────────────
-        List<BookDTO> dtoList = books.stream()
-                .map(book -> {
-                    // ModelMapper: Book 엔티티의 필드를 BookDTO에 자동으로 복사
-                    BookDTO dto = modelMapper.map(book, BookDTO.class);
-
-                    // 대여 가능 여부: 같은 isbn을 가진 책 중 AVAILABLE인 것이 있으면 대여 가능
-                    // Set.contains()로 O(1) 조회 (DB 추가 쿼리 없음)
-                    dto.setStatus(availableIsbns.contains(book.getIsbn())
-                            ? BookStatus.AVAILABLE
-                            : BookStatus.RENTED);
-
-                    // 추천 여부: 이 bookId에 추천 기록이 있으면 true
-                    // → 프론트에서 추천 버튼 초기 상태(♥ 추천됨 / ♡ 추천하기) 결정에 사용
-                    dto.setRecommended(recommendedBookIds.contains(book.getId()));
-
-                    return dto;
-                })
-                .collect(Collectors.toList());
-
-        // 전체 결과 수 (페이지네이션 계산에 사용)
-        int total = (int) result.getTotalElements();
-
-        // 빌더 패턴으로 페이지 응답 객체 생성
-        // withAll(): 페이지 범위(start/end), prev/next 여부 등을 내부에서 자동 계산
-        return PageResponseDTO.<BookDTO>withAll()
-                .pageRequestDTO(pageRequestDTO)
-                .dtoList(dtoList)
-                .total(total)
-                .build();
-    }
-
-    // 책 단건 조회 (모달 상세정보용)
-    /*@Override
-    public BookDTO getBook(Long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow();
-        BookDTO dto = modelMapper.map(book, BookDTO.class);
-        dto.setStatus(bookRepository.existsByIsbnAndStatus(book.getIsbn(), BookStatus.AVAILABLE)
-                ? BookStatus.AVAILABLE
-                : BookStatus.RENTED);
-        dto.setRecommended(recommendHistoryRepository.existsByBook_Id(book.getId()));
-        return dto;
-    }*/
-
-    // 추천하기: RecommendHistory에 row 추가
-    // bookId는 isbn 대표 row(min id)의 id
-    @Override
-    public void recommend(Long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow();
-        recommendRepository.save(Recommend.builder().book(book).build());
-    }
-
-    // 추천 해제: RecommendHistory에서 해당 bookId row 삭제
-    // deleteBy~ 메서드는 @Transactional 필수
-    @Override
-    @Transactional
-    public void unrecommend(Long bookId) {
-        recommendRepository.deleteByBook_Id(bookId);
-    }
-
-    // isbn 기준 전체 권 목록 반환 (모달에서 권별 상태 표시용)
-    // bookId로 isbn을 먼저 조회 후 해당 isbn의 전체 권 목록 반환
-    /*@Override
-    public List<BookDTO> getCopiesByBookId(Long bookId) {
-        Book representative = bookRepository.findById(bookId).orElseThrow();
-        return bookRepository.findAllByIsbn(representative.getIsbn()).stream()
-                .map(book -> modelMapper.map(book, BookDTO.class))
-                .collect(Collectors.toList());
-    }*/
-
-    // 대여 처리
-    // 1. bookId로 isbn 조회
-    // 2. 해당 isbn 중 AVAILABLE 권 하나 → RENTED로 변경
-    // 3. RentalHistory에 대여 이력 저장 (isbn, 대여된 권의 id, 대여일)
-    /*@Override
-    @Transactional
-    public void rental(Long bookId) {
-        Book representative = bookRepository.findById(bookId).orElseThrow();
-        Book availableCopy = bookRepository.findFirstByIsbnAndStatus(representative.getIsbn(), Book.Status.AVAILABLE)
-                .orElseThrow(() -> new IllegalStateException("대여 가능한 권이 없습니다."));
-        availableCopy.changeStatus(Book.Status.RENTED);
-        rentalHistoryRepository.save(RentalHistory.builder()
-                .isbn(availableCopy.getIsbn())
-                .bookId(availableCopy.getId())
-                .rentalDate(LocalDateTime.now())
-                .build());
-    }*/
-
-    // 반납 처리
-    // 1. bookId로 현재 대여 중인 RentalHistory 조회 (returnDate = null)
-    // 2. 반납일 업데이트
-    // 3. 해당 권 status → AVAILABLE로 변경
-    /*@Override
-    @Transactional
-    public void returnBook(Long bookId) {
-        Book book = bookRepository.findById(bookId).orElseThrow();
-        RentalHistory history = rentalHistoryRepository.findByBookIdAndReturnDateIsNull(bookId)
-                .orElseThrow(() -> new IllegalStateException("대여 이력을 찾을 수 없습니다."));
-        history.updateReturnDate(LocalDateTime.now());
-        book.changeStatus(Book.Status.AVAILABLE);
-    }*/
-
-    // 한국어 자모 분리 함수
-    // 예) "사과" → "ㅅㅏㄱㅗㅏ", "없음" → "ㅇㅓㅂㅅㅇㅡㅁ"
-//    private static final char[] CHOSUNG  = {'ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'};
-//
-//    private String decomposeKorean(String text, boolean normalFlag) {
-//        if (text == null) return null;
-//        StringBuilder sb = new StringBuilder();
-//        for (char c : text.toCharArray()) {
-//            if (c >= 0xAC00 && c <= 0xD7A3) {
-//                if(normalFlag) {
-//                    sb.append(c);
-//                } else {
-//                    int syllable = c - 0xAC00;
-//                    int cho  = syllable / (21 * 28);
-//                    sb.append(CHOSUNG[cho]);
-//                }
-//            } else if(Character.isLetterOrDigit(c)){
-//                sb.append(c);
-//            }
-//        }
-//        return sb.toString();
-//    }
 }

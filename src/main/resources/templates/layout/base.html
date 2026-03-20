@@ -37,9 +37,14 @@
 
     <link href="sticky-footer-navbar.css" rel="stylesheet">
 </head>
-<body class="d-flex flex-column h-100">
+<body class="h-100">
 
-<header>
+<header style="
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+">
     <a href="/" id="header-logo">
         <img src="/images/페페1.jpg" alt="로고" style="width:40px; height:40px; border-radius:8px; cursor:pointer;">
     </a>
@@ -192,8 +197,10 @@
     </ul>
 </nav>
 
-<div id="page-title" class="d-none d-flex align-items-center justify-content-center fw-bold fs-4">
-</div>
+<th:block th:unless="${currentURI == '/'}">
+    <div id="page-title" class="d-flex align-items-center justify-content-center fw-bold fs-4" style="margin-top: 101px; height: 100px; background-color: #dc3545;">
+    </div>
+</th:block>
 
 <!-- 페이지별 컨텐츠 -->
 <main class="flex-shrink-0 pt-4">

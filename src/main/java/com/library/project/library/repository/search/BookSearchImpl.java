@@ -20,12 +20,12 @@ public class BookSearchImpl extends QuerydslRepositorySupport implements BookSea
     }
 
     // Book 데이터가 하나라도 있는지 확인 (앱 시작 시 API 중복 호출 방지용)
-    @Override
+    /*@Override
     public boolean existsByBooks() {
         QBook book = QBook.book;
         JPQLQuery<Book> query = from(book);
         return query.fetchCount() > 0;
-    }
+    }*/
 
     // isbn 기준으로 중복 제거된 책 목록 조회 (검색 + 페이징 포함)
     //
@@ -43,12 +43,14 @@ public class BookSearchImpl extends QuerydslRepositorySupport implements BookSea
 
         // isbn별 가장 먼저 저장된 row의 id(min)를 서브쿼리로 추출
         // → 같은 isbn 중 대표 row 하나씩만 메인 쿼리에서 조회
+        //JPAExpressions는 서브 쿼리 만들때 씀
         JPQLQuery<Long> minIdPerIsbn = JPAExpressions
                 .select(book.id.min())
                 .from(book)
                 .groupBy(book.isbn);
         query.where(book.id.in(minIdPerIsbn));
 
+        //쿼리로 키워드로 검색
         if (keyword != null && !keyword.isBlank()) {
             query.where(book.bookTitle.contains(keyword)
                     .or(book.bookTitleNormal.contains(keywordNor))
@@ -61,6 +63,7 @@ public class BookSearchImpl extends QuerydslRepositorySupport implements BookSea
         // 정렬 적용 전 total 계산 (join 전)
         long total = query.fetchCount();
 
+        //검색한 데이터에서 우선순위 정해서 정렬을 함
         NumberExpression<Integer> priority = keyword != null && !keyword.isBlank() ?
                 new CaseBuilder()
                     .when(book.bookTitle.contains(keyword)).then(1)
@@ -71,7 +74,7 @@ public class BookSearchImpl extends QuerydslRepositorySupport implements BookSea
                     .when(book.description.contains(keyword)).then(6)
                     .otherwise(7) : null;
 
-        // 키워드 없으면 sort 파라미터 기준 정렬
+        // 정렬 기준이 있으면 1순위로 정렬 하고 나서 2순위로 우선수 정렬 함
         switch (sort != null ? sort : "id") {
             case "recommend":
                 // ===============================
