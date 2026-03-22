@@ -15,3 +15,13 @@ public class CustomConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:///C:/upload/");
     }
 }
+
+/*
+ * ========== CustomConfig 설명 ==========
+ * - 역할: 업로드된 파일을 브라우저에서 접근 가능하게 하는 정적 리소스 매핑 설정
+ *
+ * [설정 내용]
+ * - /display/** 패턴 요청 → C:/upload/ 폴더에서 파일 탐색
+ * - 예: /display/movie/movie1.webp → C:/upload/movie/movie1.webp
+ * - FileController와 함께 이미지 파일 서빙에 사용
+ */

@@ -69,7 +69,7 @@
                                            #strings.toString(param.sort) == 'pubdate' ? '최신 발행순' :
                                            #strings.toString(param.sort) == 'bookTitle' ? '제목 가나다순' :
                                            #strings.toString(param.sort) == 'recommend' ? '최다 추천순' :
-                                           #strings.toString(param.sort) == 'rental' ? '최다 대여순' : '정렬 기준'}">정렬 기준</button>
+                                           #strings.toString(param.sort) == 'rental' ? '최다 대여순' : '정렬 기준'}"></button>
 
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item sort-item" th:href="@{/book/booklist(keyword=${param.keyword}, sort='regDate')}">최신 등록순</a></li>
@@ -126,10 +126,12 @@
                                                   th:classappend="${dto.status.name() == 'AVAILABLE'} ? 'bg-success' : 'bg-secondary'"
                                                   th:text="${dto.status.name() == 'AVAILABLE'} ? '대여 가능' : '대여 불가'"></span>
 
-                                            <button class="btn btn-sm recommend-btn"
-                                                    th:classappend="${dto.recommended} ? 'btn-danger' : 'btn-outline-danger'"
-                                                    th:data-id="${dto.id}"
-                                                    th:text="${dto.recommended} ? '♥ 추천됨' : '♡ 추천하기'"></button>
+                                            <th:block th:if="${session.loginInfo != null}">
+                                                <button class="btn btn-sm recommend-btn"
+                                                        th:classappend="${dto.recommended} ? 'btn-danger' : 'btn-outline-danger'"
+                                                        th:data-id="${dto.id}"
+                                                        th:text="${dto.recommended} ? '♥ 추천됨' : '♡ 추천하기'"></button>
+                                            </th:block>
                                         </div>
 
                                         <div class="text-end text-muted" style="font-size:0.8rem;">
@@ -296,14 +298,16 @@
 
     <!-- axios 라이브러리: CDN으로 불러옴. 비동기 HTTP 요청에 사용 -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
+    <script th:src="@{/js/booklist.js}"></script>
 </div>
 
 <!--
     layout:fragment="script": base.html의 </body> 직전에 이 블록이 삽입됨
     → DOM이 모두 로드된 후 JS가 실행되므로 document.querySelector 등이 안전하게 동작함
 -->
-<script layout:fragment="script" th:src="@{/js/booklist.js}"></script>
+<script layout:fragment="script" th:inline="javascript">
+    const loginInfo = [[${session.loginInfo}]];
+</script>
 
 </body>
 </html>

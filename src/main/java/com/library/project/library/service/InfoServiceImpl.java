@@ -68,3 +68,16 @@ public class InfoServiceImpl implements InfoService {
         statsRepository.deleteById(statId);
     }
 }
+
+/*
+ * ========== InfoServiceImpl 설명 ==========
+ * - 역할: InfoService 인터페이스의 구현체. 도서관 정보 + 자료 현황 CRUD
+ * - 쓰이는 곳: InfoController에서 주입받아 사용
+ *
+ * [메서드]
+ * - getStaticLibraryInfo(): id=1L 고정으로 도서관 정보 조회 → LibraryInfoDTO 반환
+ * - getLibraryStatistics(): 전체 통계 조회 → LibraryStatsDTO 리스트 반환
+ * - registerStat(): DTO → Entity 변환 후 DB 저장 (infoId=1L 고정)
+ * - modifyStat(): statId로 Entity 찾은 후 changeCategoryName/changeItemCount로 수정 (Dirty Checking)
+ * - removeStat(): statId로 삭제
+ */

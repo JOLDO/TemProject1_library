@@ -17,3 +17,13 @@ public class WebConfig implements WebMvcConfigurer {
 
 
 }
+
+/*
+ * ========== WebConfig 설명 ==========
+ * - 역할: 간단한 URL → View 매핑을 설정하는 클래스 (컨트롤러 없이 뷰 연결)
+ *
+ * [설정 내용]
+ * - /user_rentals → user_rentals.html (회원용 대출 현황)
+ * - /rentals → rentals.html (관리자용 대출 관리)
+ * - 비즈니스 로직 없이 단순 페이지 이동만 필요할 때 사용
+ */

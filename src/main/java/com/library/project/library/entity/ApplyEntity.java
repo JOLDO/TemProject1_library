@@ -63,3 +63,25 @@ public class ApplyEntity {
         }
     }
 }
+
+/*
+ * ========== ApplyEntity 설명 ==========
+ * - 역할: 도서관 시설(공간) 대관 신청 정보를 저장하는 엔티티
+ * - 쓰이는 곳: ApplyRepository, ApplyServiceImpl, ApplyController에서 사용
+ * - DB 테이블명: apply
+ *
+ * [주요 필드]
+ * - ano: 대관 신청 고유 번호 (PK)
+ * - mid: 신청한 회원 아이디 (내 서재에서 본인 신청 내역 조회 기준)
+ * - applicantName / phone: 신청자 정보
+ * - eventName: 행사명
+ * - facilityType: 대관 시설 종류
+ * - participants: 예상 인원
+ * - applyDate / applyTime: 이용 희망 일시
+ * - eventContent: 행사 상세 내용 (기본값: "상세 내용 없음")
+ * - inquiryContent: 문의사항 (기본값: "문의사항 없음")
+ * - regDate: 신청 접수 일시 (prePersist로 자동 기록)
+ *
+ * [메서드]
+ * - prePersist(): DB 저장 전 regDate 자동 세팅 + eventContent null 방지
+ */

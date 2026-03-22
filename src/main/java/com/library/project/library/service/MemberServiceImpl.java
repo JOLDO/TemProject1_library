@@ -40,6 +40,9 @@ public class MemberServiceImpl implements MemberService {
         Optional<Member> result = memberRepository.findByMid(mid);
         Member member = result.orElseThrow(); // 데이터 없으면 예외 발생
 
+        // ModelMapper로 변환 후 role 수동 세팅
+        MemberDTO memberDTO = modelMapper.map(member, MemberDTO.class);
+        memberDTO.setRole(member.getRole().name()); // ← enum → String 변환
         // 엔티티를 DTO로 변환하여 반환
         return modelMapper.map(member, MemberDTO.class);
     }
@@ -121,3 +124,21 @@ public class MemberServiceImpl implements MemberService {
 
 
 }
+
+/*
+ * ========== MemberServiceImpl 설명 ==========
+ * - 역할: MemberService 인터페이스의 구현체. 회원 CRUD + 인증 관련 비즈니스 로직
+ * - 쓰이는 곳: MemberController에서 주입받아 사용
+ * - @Transactional: 모든 메서드에 트랜잭션 적용 (데이터 일관성 보장)
+ *
+ * [메서드]
+ * - register(): DTO → Entity 변환 후 DB 저장, 생성된 id 반환
+ * - readOne(): mid로 회원 조회 → Entity → DTO 변환 후 반환
+ * - modify(): mid로 회원 찾은 후 change() 메서드로 정보 수정 (Dirty Checking)
+ * - remove(): mid로 회원 찾은 후 deleteById()로 삭제
+ * - checkId(): existsByMid()로 아이디 존재 여부 반환
+ * - checkEmail(): existsByEmail()로 이메일 존재 여부 반환
+ * - findId(): 이름+이메일로 회원 조회 → mid 반환 (없으면 null)
+ * - checkMemberForPw(): 아이디+이메일 일치 여부 확인
+ * - updatePassword(): 회원 찾은 후 change()로 비밀번호 변경 (현재 암호화 없음)
+ */

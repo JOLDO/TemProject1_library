@@ -88,3 +88,19 @@ public class MainController {
         return "index";
     }
 }
+
+/*
+ * ========== MainController 설명 ==========
+ * - 역할: 메인 페이지(index.html) 요청 처리 + 실시간 날씨 데이터 연동
+ * - URL 패턴: /
+ *
+ * [index() 동작 흐름]
+ * 1. 기상청 초단기실황 API 호출 (부산 좌표 nx=98, ny=76)
+ * 2. JSON 응답에서 T1H(기온), PTY(강수형태) 추출
+ * 3. 기온과 날씨 아이콘을 뷰에 전달 (temp, weatherIcon)
+ * 4. API 실패 시 기본값("--", "❓") 전달
+ *
+ * [외부 설정]
+ * - weather.api.key: 기상청 API 서비스 키 (application.properties)
+ * - weather.api.url: 기상청 API URL (application.properties)
+ */

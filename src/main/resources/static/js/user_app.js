@@ -1,20 +1,5 @@
 const API_BASE  = '/api/rentals';
-const MOCK_MODE = true; // false → 실제 API 호출
-
-// ┌─────────────────────────────────────────────────────┐
-// │  ⚠️  로그인 연동 시 아래 세 줄만 수정하세요!        │
-// └─────────────────────────────────────────────────────┘
-// 이렇게 되어있어야 해요
-const CURRENT_MEMBER_ID   = 1001;
-const CURRENT_MEMBER_NAME = '김도서';
-const CURRENT_ROLE        = 'ADMIN';
-
-
-// // 나중에 로그인 연동 후 (예시)
-// const CURRENT_MEMBER_ID   = session.memberId;  // 로그인 팀원이 알려준 방식으로
-// const CURRENT_MEMBER_NAME = session.mname;     // 로그인 팀원이 알려준 방식으로
-// const CURRENT_MEMBER_ROLE = session.role;     // 로그인 팀원이 알려준 방식으로
-
+const MOCK_MODE = false; // false → 실제 API 호출
 
 // ── MOCK DATA ─────────────────────────────────────────
 function daysFromNow(d) {
@@ -35,10 +20,13 @@ let nextId = 200;
 async function apiGet(url) {
     if (MOCK_MODE) return mockGet(url);
     const res = await fetch(API_BASE + url);
-    if (!res.ok) throw new Error(await res.text());
+    if (!res.ok) {
+        const buffer = await res.arrayBuffer();
+        const text = new TextDecoder('utf-8').decode(buffer);
+        throw new Error(text);
+    }
     return res.json();
 }
-
 async function apiPost(url, body) {
     if (MOCK_MODE) return mockPost(url, body);
     const res = await fetch(API_BASE + url, {
@@ -46,7 +34,12 @@ async function apiPost(url, body) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error(await res.text());
+    if (!res.ok) {
+        // ← 이렇게 변경! UTF-8로 디코딩
+        const buffer = await res.arrayBuffer();
+        const text = new TextDecoder('utf-8').decode(buffer);
+        throw new Error(text);
+    }
     return res.text();
 }
 
@@ -100,8 +93,18 @@ function daysLeft(str) {
     return Math.round((due - now) / 86400000);
 }
 
+/** YYYY-MM-DD 또는 [YYYY, MM, DD] → YYYY.MM.DD */
 function formatDate(str) {
-    return str ? str.replace(/-/g, '.') : '—';
+    if (!str) return '—';
+
+    // 배열 형태로 오는 경우 [2026, 3, 20]
+    if (Array.isArray(str)) {
+        const [y, m, d] = str;
+        return `${y}.${String(m).padStart(2,'0')}.${String(d).padStart(2,'0')}`;
+    }
+
+    // 문자열 형태로 오는 경우 "2026-03-20"
+    return str.replace(/-/g, '.');
 }
 
 
@@ -111,16 +114,19 @@ let myRentals = [];
 async function loadMyRentals() {
     const listEl = document.getElementById('rental-list');
     listEl.innerHTML = `<div class="empty-state">
-    <span class="spinner" style="width:24px;height:24px;border-width:3px;color:var(--accent);"></span>
-  </div>`;
+        <span class="spinner" style="width:24px;height:24px;border-width:3px;color:var(--accent);"></span>
+    </div>`;
     try {
         myRentals = await apiGet(`/member/${CURRENT_MEMBER_ID}`);
         renderRentals(myRentals);
         updateStats(myRentals);
     } catch (e) {
+        // API 오류 시 빈 목록으로 처리
         listEl.innerHTML = `<div class="empty-state">
-      <i class="bi bi-exclamation-circle"></i><p>${e.message}</p>
-    </div>`;
+            <i class="bi bi-inbox"></i>
+            <p>현재 대출 중인 도서가 없어요</p>
+        </div>`;
+        updateStats([]);
     }
 }
 
@@ -266,7 +272,7 @@ function closeModal(e) {
     document.getElementById('greeting-name').textContent    = CURRENT_MEMBER_NAME;
 
     // ADMIN이면 관리자 페이지 링크 표시
-    if (CURRENT_ROLE === 'ADMIN') {
+    if (CURRENT_MEMBER_ROLE === 'ADMIN') {
         document.getElementById('admin-link').style.display = 'flex';
     }
 

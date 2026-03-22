@@ -51,3 +51,20 @@ public class PageRequestDTO {
         return link;
     }
 }
+
+/*
+ * ========== PageRequestDTO 설명 ==========
+ * - 역할: 페이징 요청 정보를 담는 DTO (페이지 번호, 크기, 검색어, 정렬 기준)
+ * - 쓰이는 곳: BookController, BookRestController, BookServiceImpl 등 페이징이 필요한 곳에서 사용
+ *
+ * [주요 필드]
+ * - page: 현재 페이지 번호 (기본값 1)
+ * - size: 페이지당 항목 수 (기본값 10)
+ * - keyword: 검색어
+ * - sort: 정렬 기준 (id / pubdate / bookTitle / recommend / rental)
+ * - link: 페이지 링크 문자열 (캐싱)
+ *
+ * [메서드]
+ * - getPageable(): Spring Data의 Pageable 객체 생성 (page는 0-based로 변환)
+ * - getLink(): 쿼리스트링 생성 (page, size, keyword, sort 포함). 한번 생성 후 캐싱
+ */

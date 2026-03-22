@@ -40,3 +40,12 @@ public class EventApplyController {
         }
     }
 }
+
+/*
+ * ========== EventApplyController 설명 ==========
+ * - 역할: 행사 신청 처리 REST API 컨트롤러
+ * - URL 패턴: /event/**
+ *
+ * [메서드]
+ * - apply(): POST /event/apply → 행사 신청 처리 (로그인 검증 + 중복 신청 방지)
+ */

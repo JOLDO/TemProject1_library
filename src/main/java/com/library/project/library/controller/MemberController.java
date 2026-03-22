@@ -234,3 +234,25 @@ public class MemberController {
 
 
 }
+
+/*
+ * ========== MemberController 설명 ==========
+ * - 역할: 회원 관련 화면 요청 + 로그인/로그아웃 처리를 담당하는 컨트롤러
+ * - URL 패턴: /member/**
+ *
+ * [메서드]
+ * - joinGet(): GET /member/join → 회원가입 화면 (join.html)
+ * - joinPost(): POST /member/join → 회원가입 처리 (유효성 검증 + 중복 체크)
+ * - loginGet(): GET /member/login → 로그인 화면 (login.html)
+ * - loginPost(): POST /member/login → 로그인 처리 (세션 방식, loginInfo 저장)
+ * - logout(): GET /member/logout → 로그아웃 (세션 무효화)
+ * - myPage(): GET /member/mypage → 마이페이지 (dto 전달)
+ * - modifyGet(): GET /member/modify → 정보 수정 화면
+ * - modifyPost(): POST /member/modify → 정보 수정 처리
+ * - checkId(): GET /member/checkId → 아이디 중복 체크 (@ResponseBody, AJAX용)
+ * - checkEmail(): GET /member/checkEmail → 이메일 중복 체크 (@ResponseBody, AJAX용)
+ * - findGet(): GET /member/find → 아이디/비밀번호 찾기 페이지
+ * - findIdPost(): POST /member/find-id → 아이디 찾기 처리 (이름+이메일)
+ * - findPwPost(): POST /member/find-pw → 비밀번호 찾기 본인확인 → 비밀번호 변경 페이지로 이동
+ * - changePwPost(): POST /member/change-pw → 비밀번호 실제 변경 처리
+ */

@@ -45,3 +45,16 @@ public class FileController {
         return new ResponseEntity<>(resource, headers, HttpStatus.OK);
     }
 }
+
+/*
+ * ========== FileController 설명 ==========
+ * - 역할: 업로드된 파일(이미지)을 브라우저에 전달하는 REST 컨트롤러
+ * - URL 패턴: /display?fileName=xxx
+ *
+ * [display() 동작]
+ * 1. fileName 파라미터로 파일 경로 수신
+ * 2. uploadPath(C:/upload) + fileName으로 실제 파일 위치 조합
+ * 3. 파일 존재 여부 확인 (없으면 404)
+ * 4. 파일 확장자로 Content-Type 헤더 설정 (jpg, webp 등)
+ * 5. 파일 데이터를 ResponseEntity로 반환
+ */

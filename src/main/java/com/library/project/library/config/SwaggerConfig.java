@@ -18,3 +18,15 @@ public class SwaggerConfig {
                 );
     }
 }
+
+/*
+ * ========== SwaggerConfig 설명 ==========
+ * - 역할: Swagger UI(API 문서 자동 생성) 설정 클래스
+ * - 접속 URL: http://localhost:8080/swagger-ui/index.html
+ *
+ * [설정 내용]
+ * - title: API 문서 제목
+ * - description: API 설명
+ * - version: API 버전
+ * - MemberController 등에서 @Operation, @Tag로 개별 API 문서화
+ */

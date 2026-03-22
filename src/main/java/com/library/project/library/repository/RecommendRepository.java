@@ -10,28 +10,31 @@ import java.util.List;
 
 public interface RecommendRepository extends JpaRepository<Recommend, Long> {
 
-    // 특정 bookId에 대한 추천 기록이 하나라도 있는지 확인
-    // → SELECT COUNT(*) > 0 FROM recommend_history WHERE book_id = ?
-    boolean existsByBook_Id(Long bookId);
+    // 특정 회원이 특정 책을 추천했는지 확인 (추천 버튼 초기 상태용)
+    boolean existsByBook_IdAndMember_Id(Long bookId, Long memberId);
 
-    // 특정 bookId에 대한 추천 기록 전부 삭제 (추천 취소 시 사용)
-    // → DELETE FROM recommend_history WHERE book_id = ?
-    void deleteByBook_Id(Long bookId);
+    // 특정 회원의 특정 책 추천 삭제 (추천 해제 시 사용)
+    void deleteByBook_IdAndMember_Id(Long bookId, Long memberId);
 
     // ─────────────────────────────────────────────────────────────────
-    // bookId 목록을 한 번에 받아서, 추천 기록이 있는 bookId만 반환 (배치 조회)
-    //
-    // [왜 이 메서드가 필요한가]
-    // 리스트 화면에서 책마다 existsByBook_Id()를 따로 호출하면
-    // 책 10권 = 10번의 쿼리 발생 → 성능 저하
-    //
-    // 대신 bookId 목록을 한 번에 넘겨서 IN 절로 한 방에 조회하면 쿼리 1번으로 해결됨
-    //
-    // [JPQL 설명]
-    // SELECT r.book.id           : RecommendHistory 엔티티의 book 필드(연관관계)에서 id만 가져옴
-    // FROM RecommendHistory r    : RecommendHistory 엔티티를 r로 별칭
-    // WHERE r.book.id IN :bookIds: book_id가 전달받은 목록 안에 있는 것만 필터
+    // 특정 회원이 추천한 bookId만 배치 조회 (목록 화면 최적화)
+    // 책마다 existsBy~를 호출하면 N번 쿼리 → IN 절로 1번에 해결
     // ─────────────────────────────────────────────────────────────────
-    @Query("SELECT r.book.id FROM Recommend r WHERE r.book.id IN :bookIds")
-    List<Long> findBookIdsByBookIdIn(@Param("bookIds") Collection<Long> bookIds);
+    @Query("SELECT r.book.id FROM Recommend r WHERE r.book.id IN :bookIds AND r.member.id = :memberId")
+    List<Long> findBookIdsByBookIdIn(@Param("bookIds") Collection<Long> bookIds, @Param("memberId") Long memberId);
+
+    // 특정 책의 총 추천 수 집계
+    int countByBook_Id(Long bookId);
 }
+
+/*
+ * ========== RecommendRepository 설명 ==========
+ * - 역할: Recommend 엔티티의 DB 접근을 담당하는 리포지토리
+ * - 쓰이는 곳: BookServiceImpl에서 사용
+ *
+ * [메서드]
+ * - existsByBook_IdAndMember_Id(): 특정 회원이 특정 책을 추천했는지 확인 → 단건 조회 시 추천 버튼 상태
+ * - deleteByBook_IdAndMember_Id(): 특정 회원의 특정 책 추천만 삭제 → 추천 해제
+ * - findBookIdsByBookIdIn(): 특정 회원이 추천한 bookId를 IN 쿼리로 배치 조회 → 목록 화면 최적화
+ * - countByBook_Id(): 특정 책의 총 추천 수 집계 → 추천 수 표시
+ */

@@ -1,3 +1,15 @@
+// 세션 만료(401) 시 로그인 페이지로 이동
+axios.interceptors.response.use(
+    res => res,
+    err => {
+        if (err.response?.status === 401) {
+            alert("로그인이 필요합니다.");
+            location.reload();
+        }
+        return Promise.reject(err);
+    }
+);
+
 const CHOSUNG = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 
 function getChosung(char) {
@@ -100,7 +112,7 @@ document.querySelector('.list-group').addEventListener('click', function (e) {
                 document.getElementById('modal-body-text').textContent = `"${bookTitle}" 추천을 취소했습니다.`;
                 modal.show();
             }).catch(e => {
-                alert("오류가 발생했습니다.");
+                if (e.response?.status !== 401) alert("오류가 발생했습니다.");
             })
             // 버튼 스타일을 '미추천' 상태로 변경
 
@@ -116,7 +128,7 @@ document.querySelector('.list-group').addEventListener('click', function (e) {
                 document.getElementById('modal-body-text').textContent = `"${bookTitle}" 을(를) 추천했습니다.`;
                 modal.show();
             }).catch(e => {
-                alert("오류가 발생했습니다.");
+                if (e.response?.status !== 401) alert("오류가 발생했습니다.");
             })
 
         }
@@ -136,6 +148,11 @@ document.querySelector('.list-group').addEventListener('click', function (e) {
     if (!target.getAttribute('data-id')) return;
     currentBookId = target.getAttribute('data-id');
     selectBookDetail(currentBookId).then(result => {
+        if (loginInfo && result.recommended == null) {
+            alert("세션이 만료되었습니다.");
+            location.reload();
+            return;
+        }
         // ── 상세 모달 데이터 채우기 ──────────────────────
         // API를 다시 호출하지 않고, 리스트 항목에 심어둔 data-* 속성값을 읽어서 바로 표시
         // dataset.title = data-title 속성값, dataset.image = data-image 속성값 ... 이런 방식
@@ -143,7 +160,7 @@ document.querySelector('.list-group').addEventListener('click', function (e) {
         const isRecommended = recommendBtn && recommendBtn.classList.contains('btn-danger');
         const detailTitle = document.getElementById('detail-book-title');
         // detailTitle.textContent = (result.bookTitle || '') + (isRecommended ? ' ♥' : ' ♡');
-        detailTitle.innerHTML = highlight(result.bookTitle || '', listKeyword) + (isRecommended ? ' ♥' : ' ♡');
+        detailTitle.innerHTML = highlight(result.bookTitle || '', listKeyword) + (loginInfo ? (isRecommended ? '<span style="color:red"> ♥</span>' : '<span style="color:red"> ♡</span>') : '');
         detailTitle.style.cursor = 'pointer';
         document.getElementById('detail-book-image').src = result.bookImage;
         // document.getElementById('detail-author').textContent = result.author || '-';
@@ -159,22 +176,24 @@ document.querySelector('.list-group').addEventListener('click', function (e) {
         // 대여 상태에 따라 뱃지 색상과 버튼 텍스트/스타일을 다르게 표시
         const statusEl = document.getElementById('detail-status');
         const actionBtn = document.getElementById('detail-action-btn');
-        if (result.status === 'AVAILABLE') {
-            statusEl.textContent = '대여 가능';
-            statusEl.className = 'badge bg-success';    // 초록색 뱃지
-            actionBtn.textContent = '대여하기';
-            actionBtn.className = 'btn btn-success';
-        } else {
-            statusEl.textContent = '대여 불가';
-            statusEl.className = 'badge bg-secondary';  // 회색 뱃지
-            actionBtn.textContent = '닫기';
-            actionBtn.className = 'btn btn-secondary';
+        if(loginInfo) {
+            if (result.status === 'AVAILABLE') {
+                statusEl.textContent = '대여 가능';
+                statusEl.className = 'badge bg-success';    // 초록색 뱃지
+                actionBtn.textContent = '대여하기';
+                actionBtn.className = 'btn btn-success';
+            } else {
+                statusEl.textContent = '대여 불가';
+                statusEl.className = 'badge bg-secondary';  // 회색 뱃지
+                actionBtn.textContent = '닫기';
+                actionBtn.className = 'btn btn-secondary';
+            }
         }
 
         // 상세 모달 표시
         new bootstrap.Modal(document.getElementById('bookDetailModal')).show();
     }).catch(e => {
-        alert("오류가 발생했습니다.");
+        if (e.response?.status !== 401) alert("오류가 발생했습니다.");
         document.querySelectorAll('.list-group-item').forEach(item => item.classList.remove('active'));
     })
 });
@@ -195,11 +214,13 @@ document.getElementById('bookDetailModal').addEventListener('hide.bs.modal', fun
 // 상세 모달 제목 클릭 → 추천 토글
 // =============================================
 document.getElementById('detail-book-title').addEventListener('click', function () {
+    if(!loginInfo)   return;
     // 현재 추천 상태 확인 (제목 끝에 ♥가 있으면 추천된 상태)
     const isRecommended = this.textContent.includes('♥');
 
     // 리스트에서 해당 책의 추천 버튼 찾기
     const listBtn = document.querySelector(`.recommend-btn[data-id="${currentBookId}"]`);
+
 
     if (isRecommended) {
         // 추천 취소
@@ -210,7 +231,7 @@ document.getElementById('detail-book-title').addEventListener('click', function 
                 listBtn.textContent = '♡ 추천하기';
             }
         }).catch(e => {
-            alert("오류가 발생했습니다.");
+            if (e.response?.status !== 401) alert("오류가 발생했습니다.");
         })
     } else {
         // 추천 등록
@@ -221,7 +242,7 @@ document.getElementById('detail-book-title').addEventListener('click', function 
                 listBtn.textContent = '♥ 추천됨';
             }
         }).catch(e => {
-            alert("오류가 발생했습니다.");
+            if (e.response?.status !== 401) alert("오류가 발생했습니다.");
         })
     }
 });

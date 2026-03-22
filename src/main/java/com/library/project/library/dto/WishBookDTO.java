@@ -31,3 +31,19 @@ public class WishBookDTO {
     private MultipartFile wishBookImage; // 화면에서 전송된 실제 이미지 파일 (Binary)
     private String fileName;             // 서버에 저장된 파일 이름 (DB 저장 및 이미지 출력용)
 }
+
+/*
+ * ========== WishBookDTO 설명 ==========
+ * - 역할: 비치희망도서 신청 데이터를 화면과 주고받는 DTO
+ * - 쓰이는 곳: WishBookController, WishBookServiceImpl에서 사용
+ *
+ * [주요 필드]
+ * - wno: 신청 고유 번호 (PK)
+ * - mid: 회원 아이디 (본인 신청 내역 필터링용)
+ * - status: 처리 상태 (신청중~이용가능/반려)
+ * - regDate: 신청 일자
+ * - wishApplicantName / wishPhone: 신청자 정보
+ * - wishBookTitle / wishAuthor / wishPublisher: 희망 도서 정보
+ * - wishBookImage: 화면에서 업로드한 이미지 파일 (MultipartFile)
+ * - fileName: 서버에 저장된 파일명 (DB 저장용)
+ */

@@ -37,3 +37,11 @@ public class MemberEventApplyController {
 //    }
 }
 
+/*
+ * ========== MemberEventApplyController 설명 ==========
+ * - 역할: 마이페이지에서 회원의 행사 신청 내역을 조회하는 컨트롤러
+ * - URL 패턴: /mypage/**
+ *
+ * [메서드]
+ * - myApplyList(): GET /mypage/apply-list → 내 행사 신청 목록 조회 (member/applyList.html)
+ */

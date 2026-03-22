@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!-- [원본] <html xmlns:th="http://www.thymeleaf.org"> -->
+<html lang="ko"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/base}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>부산도서관 - 메인</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <!-- [원본] <meta charset="UTF-8"> -->
+    <!-- [원본] <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <!-- [원본] <title>부산도서관 - 메인</title> -->
+    <!-- [원본] <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <!-- [원본] <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"> -->
+    <!-- [원본] <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" /> -->
 
     <style>
         :root {
@@ -174,9 +176,16 @@
         .card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .badge-notice { background-color: #eef6ff; color: var(--lib-blue); }
         .carousel-item img { height: 65vh; object-fit: cover; border-radius: 25px; }
+
+        /* base.html 푸터를 scroll-snap 대상으로 추가 */
+        footer { scroll-snap-align: start; scroll-snap-stop: always; }
     </style>
 </head>
+<!-- [원본] <body> -->
 <body>
+
+<!-- layout:fragment="content" 로 base.html의 content 영역에 삽입 -->
+<div layout:fragment="content">
 
 <div class="scroll-dots" id="scrollDots">
     <a href="#section1" class="dot active"></a>
@@ -190,7 +199,7 @@
         <p class="fs-5 opacity-75">부산의 미래를 담는 독서·문화·지식정보의 보고</p>
     </div>
 
-    <form action="/book/list" method="get" class="search-capsule">
+    <form action="/book/booklist" method="get" class="search-capsule">
         <div class="weather-box">
             <span id="weather-icon" th:text="${weatherIcon}">☀️</span>
             <span id="busan-text" th:text="'부산 ' + ${temp} + '°C'">부산 00°C</span>
@@ -252,7 +261,11 @@
     </div>
 </section>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- [원본] <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+
+</div><!-- layout:fragment="content" 끝 -->
+
+<th:block layout:fragment="script">
 <script>
     const dots = document.querySelectorAll('.dot');
     const sections = document.querySelectorAll('section');
@@ -283,5 +296,7 @@
         }
     });
 </script>
+</th:block>
+
 </body>
 </html>

@@ -68,3 +68,14 @@ public class WishBookController {
 
 
 }
+
+/*
+ * ========== WishBookController 설명 ==========
+ * - 역할: 비치희망도서 신청 관련 화면 + 등록 처리 컨트롤러
+ * - URL 패턴: /apply/wishBook/**
+ *
+ * [메서드]
+ * - wishBookHome(): GET /apply/wishBook → 희망도서 신청 페이지 (wishBook.html)
+ * - registerWishBook(): POST /apply/wishBook/register → 희망도서 신청서 등록 처리
+ *   → 신청 데이터 로그 출력 + DB 저장 + 성공 메시지 전달 후 신청 페이지로 리다이렉트
+ */

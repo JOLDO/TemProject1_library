@@ -78,3 +78,15 @@ public class EventController {
         return "event/cinema";
     }
 }
+
+/*
+ * ========== EventController 설명 ==========
+ * - 역할: 행사/강좌/영화상영 관련 화면 요청을 처리하는 컨트롤러
+ * - URL 패턴: /event/**
+ *
+ * [메서드]
+ * - list(): GET /event/list → 이달의 행사 캘린더 (전체 데이터 조회, event/list.html)
+ * - read(): GET /event/read?id=N → 행사 상세 페이지 (event/read.html)
+ * - lectureList(): GET /event/lecture → 강좌 리스트 (카테고리 "G", 페이징, event/lecture.html)
+ * - cinemaList(): GET /event/cinema → 주말 극장 (카테고리 "M", 검색+페이징, event/cinema.html)
+ */

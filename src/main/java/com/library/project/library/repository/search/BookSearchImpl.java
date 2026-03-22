@@ -118,3 +118,16 @@ public class BookSearchImpl extends QuerydslRepositorySupport implements BookSea
         return new PageImpl<>(list, pageable, total);
     }
 }
+
+/*
+ * ========== BookSearchImpl 설명 ==========
+ * - 역할: BookSearch 인터페이스의 QueryDSL 구현체
+ * - 쓰이는 곳: BookRepository를 통해 BookServiceImpl.list()에서 간접 호출
+ *
+ * [searchDistinctAll() 동작 흐름]
+ * 1. isbn별 MIN(id) 서브쿼리로 대표 row만 필터링 (같은 책 여러 권 중 하나만 표시)
+ * 2. 키워드 검색: 제목(원본/정규화/초성) + 저자 + 출판사 + 설명에서 검색
+ * 3. 검색 결과 우선순위: 제목 일치(1) > 정규화(2) > 초성(3) > 저자(4) > 출판사(5) > 설명(6)
+ * 4. 정렬: recommend(추천수) / rental(대출수) / pubdate(출판일) / bookTitle(제목) / regDate(등록일)
+ * 5. 페이징 적용 후 PageImpl로 반환
+ */

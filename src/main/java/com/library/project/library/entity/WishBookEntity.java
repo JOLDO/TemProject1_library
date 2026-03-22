@@ -58,3 +58,22 @@ public class WishBookEntity {
         this.status = status;
     }
 }
+
+/*
+ * ========== WishBookEntity 설명 ==========
+ * - 역할: 비치희망도서 신청 정보를 저장하는 엔티티
+ * - 쓰이는 곳: WishBookRepository, WishBookServiceImpl, WishBookController에서 사용
+ * - DB 테이블명: wish_book
+ *
+ * [주요 필드]
+ * - wno: 신청 고유 번호 (PK)
+ * - mid: 신청한 회원 아이디 (내 서재에서 본인 신청 내역 필터링용)
+ * - status: 처리 상태 (신청중 / 심사중 / 구입중 / 정리중 / 이용가능 / 반려)
+ * - regDate: 신청 일자 (JPA Auditing 자동 기록)
+ * - applicantName / wishPhone: 신청자 정보
+ * - wishBookTitle / wishAuthor / wishPublisher: 희망 도서 정보
+ * - fileName: 업로드된 도서 이미지 파일명
+ *
+ * [메서드]
+ * - changeStatus(): 관리자가 신청 상태를 변경할 때 사용
+ */

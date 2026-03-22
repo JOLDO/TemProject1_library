@@ -79,3 +79,18 @@ public class RentalController {
     }
 
 }
+
+/*
+ * ========== RentalController 설명 ==========
+ * - 역할: 도서 대출/반납/재대출 REST API 컨트롤러
+ * - URL 패턴: /api/rentals/**
+ * - 쓰이는 곳: 프론트엔드 JavaScript에서 AJAX 호출
+ *
+ * [메서드]
+ * - rentalPage(): GET /api/rentals/rental → 대출 페이지 뷰 반환
+ * - rentBook(): POST /api/rentals → 도서 대출 처리 (JSON body: memberId, bookId)
+ * - returnBook(): POST /api/rentals/return → 도서 반납 처리 (JSON body: rentalId)
+ * - renewBook(): POST /api/rentals/renew/{id} → 재대출 처리
+ * - getUserRentals(): GET /api/rentals/member/{MemberId} → 특정 회원의 대출 목록 조회
+ * - getMostRentedBooks(): GET /api/rentals/stats → 인기 도서 통계 (대출 많은 순)
+ */

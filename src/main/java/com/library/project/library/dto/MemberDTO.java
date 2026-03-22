@@ -39,3 +39,22 @@ public class MemberDTO {
     private LocalDateTime regDate;
     private LocalDateTime modDate;
 }
+
+/*
+ * ========== MemberDTO 설명 ==========
+ * - 역할: 회원 정보를 화면과 주고받기 위한 DTO (회원가입, 로그인, 마이페이지 등)
+ * - 쓰이는 곳: MemberController, MemberServiceImpl에서 사용
+ *
+ * [주요 필드]
+ * - id: 내부 PK
+ * - mid: 로그인 아이디 (@NotEmpty, 4~20자)
+ * - mpw: 비밀번호 (@NotEmpty)
+ * - mname: 이름 (@NotEmpty)
+ * - email: 이메일 (@Email, @NotEmpty)
+ * - region: 지역
+ * - role: 권한 (USER / ADMIN)
+ * - regDate / modDate: 가입일 / 수정일
+ *
+ * [유효성 검증]
+ * - 회원가입/수정 시 @Valid로 검증 → 실패 시 BindingResult로 에러 처리
+ */

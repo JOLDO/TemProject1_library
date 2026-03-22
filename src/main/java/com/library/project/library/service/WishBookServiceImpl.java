@@ -46,3 +46,16 @@ public class WishBookServiceImpl implements WishBookService {
         return result.getWno();
     }
 }
+
+/*
+ * ========== WishBookServiceImpl 설명 ==========
+ * - 역할: WishBookService 인터페이스의 구현체. 희망도서 신청 등록 처리
+ * - 쓰이는 곳: WishBookController에서 주입받아 사용
+ *
+ * [register() 동작]
+ * 1. WishBookDTO → WishBookEntity 변환 (Builder 패턴)
+ * 2. mid가 null이면 임시값 "user01" 세팅 (로그인 연동 전 임시 처리)
+ * 3. status 기본값 "신청중" 세팅
+ * 4. 이미지 파일이 있으면 원본 파일명 저장
+ * 5. DB 저장 후 생성된 wno 반환
+ */

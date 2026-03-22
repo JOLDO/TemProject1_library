@@ -40,3 +40,14 @@ public interface BookRepository extends JpaRepository<Book, Long>, BookSearch {
     // 대여 시 AVAILABLE인 권 하나만 가져오기 - 현재 미사용
     // Optional<Book> findFirstByIsbnAndStatus(String isbn, Book.Status status);
 }
+
+/*
+ * ========== BookRepository 설명 ==========
+ * - 역할: Book 엔티티의 DB 접근을 담당하는 리포지토리
+ * - 상속: JpaRepository (기본 CRUD) + BookSearch (QueryDSL 커스텀 검색)
+ * - 쓰이는 곳: BookServiceImpl, RentalService에서 사용
+ *
+ * [메서드]
+ * - existsByIsbnAndStatus(): 특정 isbn의 책 중 해당 status인 게 있는지 확인 → 단건 대여 가능 여부 체크 (BookServiceImpl.getBook())
+ * - findAvailableIsbnIn(): isbn 목록을 IN 쿼리로 한 번에 조회하여 AVAILABLE인 isbn만 반환 → 목록 화면 배치 조회 최적화 (BookServiceImpl.list())
+ */

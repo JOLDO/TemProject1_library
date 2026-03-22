@@ -123,3 +123,24 @@ public class RentalService {
         return rentalRepository.findMostRentedBooks();
     }
 }
+
+/*
+ * ========== RentalService 설명 ==========
+ * - 역할: 도서 대출/반납/재대출 비즈니스 로직 처리 (인터페이스 없이 직접 구현)
+ * - 쓰이는 곳: RentalController에서 주입받아 사용
+ *
+ * [메서드]
+ * - rentBook(): 도서 대출 처리
+ *   → 회원/도서 존재 확인 → 하루 3권 제한 체크 → 이미 대출 여부 체크 → Rental 생성 + Book status 변경
+ *
+ * - renewBook(): 재대출 처리
+ *   → 재대출 횟수 1회 초과 체크 → renewCount 증가 + 기존 대출 종료
+ *
+ * - returnBook(): 도서 반납 처리
+ *   → 이미 반납 여부 체크 → 반납일 기록 + Rental/Book status 변경 (RETURNED/AVAILABLE)
+ *
+ * - getUserRentals(): 특정 회원의 현재 대출 목록 조회 (RENTED 상태만)
+ *   → Rental → RentalResponseDTO 변환 후 반환
+ *
+ * - getMostRentedBooks(): 도서별 대출 횟수 통계 (인기 도서 순위)
+ */

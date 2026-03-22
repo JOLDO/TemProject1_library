@@ -48,3 +48,17 @@ public class CustomServletConfig implements WebMvcConfigurer {
 
 
 }
+
+/*
+ * ========== CustomServletConfig 설명 ==========
+ * - 역할: 정적 리소스 핸들링 + 로그인 체크 인터셉터 설정
+ *
+ * [addResourceHandlers]
+ * - /js/** → static/js/ 폴더
+ * - /css/** → static/css/ 폴더
+ * - /** → static/ 최상위 폴더 (나머지 정적 자원)
+ *
+ * [addInterceptors]
+ * - LoginCheckInterceptor를 /member/mypage, /member/modify에 적용
+ * - 로그인/회원가입/중복체크/정적자원은 인터셉터에서 제외
+ */

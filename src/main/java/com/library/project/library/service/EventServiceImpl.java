@@ -113,3 +113,18 @@ public class EventServiceImpl implements EventService {
         eventApplicationRepository.save(application);
     }
 }
+
+/*
+ * ========== EventServiceImpl 설명 ==========
+ * - 역할: EventService 인터페이스의 구현체. 행사/강좌/영화 CRUD 처리
+ * - 쓰이는 곳: EventController에서 주입받아 사용
+ *
+ * [메서드]
+ * - register(): EventDTO → Event 변환 후 DB 저장
+ * - readOne(): id로 Event 조회 → EventDTO 변환
+ * - getList(): 전체 행사 페이징 조회 (캘린더 데이터 포함)
+ * - getLecturesByCategory(): 카테고리별 페이징 조회 (강좌/영화 분류)
+ * - getLecturesWithSearch(): 카테고리 유지 + 제목 검색 (강좌 검색)
+ * - getAllEvents(): 페이징 없이 전체 조회 (캘린더 전용)
+ * - getCinemaWithSearch(): 카테고리 "M" 고정 + 제목 검색 (주말 극장 전용)
+ */

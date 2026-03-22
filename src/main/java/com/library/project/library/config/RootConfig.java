@@ -36,9 +36,19 @@ public class RootConfig {
 
         return mapper;
     }*/
-
-    @Bean
-    public KoreanDecomposer koreanDecomposer() {
-        return new KoreanDecomposer();
-    }
 }
+
+/*
+ * ========== RootConfig 설명 ==========
+ * - 역할: 프로젝트 공통 Bean 등록 설정 클래스
+ *
+ * [등록된 Bean]
+ * - ModelMapper: Entity ↔ DTO 자동 변환에 사용 (STRICT 매칭, PRIVATE 필드 접근)
+ *   → BookServiceImpl, MemberServiceImpl, EventServiceImpl 등에서 사용
+ *
+ * - KoreanDecomposer: 한글 초성/정규화 변환 유틸
+ *   → BookServiceImpl에서 검색어 변환에 사용
+ *
+ * [주석 처리된 Bean]
+ * - ObjectMapper: API 사용 시 JSON ↔ 객체 변환용 (현재 미사용)
+ */
