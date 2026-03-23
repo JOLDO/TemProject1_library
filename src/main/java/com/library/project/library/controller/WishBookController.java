@@ -1,16 +1,23 @@
 package com.library.project.library.controller;
 
 
+import com.library.project.library.dto.ApplyDTO;
+import com.library.project.library.dto.MemberDTO;
 import com.library.project.library.dto.WishBookDTO;
 import com.library.project.library.service.WishBookService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/apply/wishBook")
@@ -62,6 +69,30 @@ public class WishBookController {
 
         // 신청 완료 후 다시 신청 페이지로 리다이렉트
         return "redirect:/apply/wishBook";
+    }
+
+    // private final WishBookService wishBookService; // 로그인x 임시 코드
+
+    @GetMapping("/applyMyWishBook")
+    public String getMyWishBookList(Model model, HttpSession session) {
+
+        // [임시] 로그인 무시 단계: 테스트를 위해 가짜 아이디를 세팅합니다.
+        String mid = "testUser01";
+        log.info("희망도서 신청 내역 조회 요청 - 회원 ID: " + mid);
+
+        // [임시] DB 연동 전까지 화면 확인을 위한 가짜 데이터(샘플) 생성
+        // 실제 구현 시에는 List<WishBookDTO> list = wishBookService.getList(mid); 로 바뀝니다.
+        List<Map<String, String>> sampleList = List.of(
+                Map.of("wno", "1", "title", "자바의 정석", "author", "남궁성", "regDate", "2024-03-20", "status", "신청중"),
+                Map.of("wno", "2", "title", "스프링 부트 실전", "author", "김영한", "regDate", "2024-03-21", "status", "처리완료"),
+                Map.of("wno", "3", "title", "클린 코드", "author", "로버트 C. 마틴", "regDate", "2024-03-23", "status", "취소됨")
+        );
+
+        model.addAttribute("wishList", sampleList);
+        model.addAttribute("totalCount", sampleList.size());
+        model.addAttribute("mid", mid);
+
+        return "member/applyMyWishBook";
     }
 
 

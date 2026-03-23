@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>내 희망도서 신청 내역</title>
+    <link rel="stylesheet" th:href="@{/css/busan-library-common.css}">
+    <style>
+        .table-container { margin: 30px 0; }
+        .no-data { padding: 80px; color: var(--color-text-muted); text-align: center; font-size: 1.1rem; }
+        .modal-data-text { color: var(--color-text-main); font-weight: 500; margin-left: 8px; }
+        #modalEventContent { border-radius: var(--radius-sm); line-height: 1.6; color: var(--color-text-sub); }
+        .info-ment { margin-top: 16px; color: var(--color-text-muted); font-size: 0.875rem; }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container-fluid bg-light py-5 mb-5">
+        <div class="container">
+            <div class="section-title text-center">
+                <span class="section-title__en d-block mb-2"
+                      style="color: #004085; font-weight: 600; font-size: 0.9rem; letter-spacing: 2px;">
+                    MY WISH BOOKS
+                </span>
+                <h2 class="section-title__ko" style="font-weight: 700; color: #222; margin-bottom: 15px;">
+                    나의 희망도서 신청 내역
+                </h2>
+                <p class="section-title__desc" style="color: #777; font-size: 1rem;">
+                    부산도서관 비치 희망 신청 현황을 확인하실 수 있습니다.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="mb-3 ps-2" style="font-size: 0.95rem; color: #333;">
+            총 <strong class="text-primary" th:text="${totalCount}">10</strong>건의 내역이 있습니다.
+        </div>
+
+        <div class="table-responsive" style="border-top: 2px solid #004085;"> <table class="table table-hover" style="vertical-align: middle;">
+            <thead style="background-color: #f8f9fa;">
+            <tr class="text-center" style="border-bottom: 1px solid #004085;">
+                <th class="py-3" style="font-weight: 600; color: #004085; width: 10%;">번호</th>
+                <th class="py-3" style="font-weight: 600; color: #004085; width: 45%;">도서명</th>
+                <th class="py-3" style="font-weight: 600; color: #004085; width: 15%;">저자</th>
+                <th class="py-3" style="font-weight: 600; color: #004085; width: 15%;">신청일</th>
+                <th class="py-3" style="font-weight: 600; color: #004085; width: 15%;">처리상태</th>
+            </tr>
+            </thead>
+            <tbody class="text-center">
+            <tr th:each="book : ${wishList}">
+                <td th:text="${book.wno}">1</td>
+                <td class="text-start ps-4" th:text="${book.title}">자바의 정석</td>
+                <td th:text="${book.author}">남궁성</td>
+                <td th:text="${book.regDate}" class="text-muted">2026-03-23</td>
+                <td>
+                            <span class="badge rounded-pill px-3 py-2"
+                                  th:classappend="${book.status == '신청중' ? 'bg-info' : (book.status == '처리완료' ? 'bg-success' : 'bg-danger')}"
+                                  th:text="${book.status}" style="min-width: 75px;">
+                                신청중
+                            </span>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(wishList)}">
+                <td colspan="5" class="py-5 text-muted text-center">신청하신 내역이 없습니다.</td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+
+        <div class="text-end mt-4">
+            <a th:href="@{/member/mypage(mid=${mid})}" class="btn btn-outline-dark px-4" style="border-radius: 4px;">
+                마이페이지로 돌아가기
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

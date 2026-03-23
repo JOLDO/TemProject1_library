@@ -21,7 +21,7 @@ public interface InfoService {
 }
 
     // 수정 처리를 위한 메서드도 미리 선언해두면 좋습니다.
-}
+
 
 /*
  * ========== InfoService 설명 ==========
