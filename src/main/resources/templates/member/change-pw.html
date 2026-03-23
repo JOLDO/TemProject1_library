@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<body>
+<div layout:fragment="content">
+    <div class="row mt-3 justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">비밀번호 변경</div>
+                <div class="card-body">
+                    <p class="text-center"><strong>[[${mid}]]</strong> 님의 새로운 비밀번호를 입력해주세요.</p>
+                    <hr>
+                    <form action="/member/change-pw" method="post">
+                        <!-- 누구의 비번을 바꿀지 알아야 하므로 hidden으로 전송 -->
+                        <input type="hidden" name="mid" th:value="${mid}">
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">새 비밀번호</span>
+                            <input type="password" name="newPw" class="form-control" placeholder="최소 4자 이상" required minlength="4">
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">변경 완료</button>
+                            <a href="/member/login" class="btn btn-secondary">취소</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script layout:fragment="script" th:inline="javascript">
+</script>
+
+</body>
+</html>

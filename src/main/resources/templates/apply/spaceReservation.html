@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+<!--spaceReservation-->
+
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
@@ -48,10 +51,7 @@
 <body>
 
 <div class="container-main shadow-sm">
-    <div th:if="${message}" class="alert alert-success alert-dismissible fade show shadow-sm mb-4" role="alert">
-        <strong th:text="${message}">신청 완료 메시지</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="this.parentElement.style.display='none'"></button>
-    </div>
+
     <h1 class="text-center mb-5">도서관 시설 대관 안내</h1>
 
     <h2>■ 시설대관 이용절차</h2>
@@ -142,8 +142,14 @@
 
                 <div class="mb-3">
                     <label class="form-label">행사 상세 내용</label>
-                    <textarea th:field="*{eventContent}" class="form-control" rows="4" placeholder="상세 내용을 입력하세요."></textarea>
+                    <textarea th:field="*{eventContent}" class="form-control" rows="3" placeholder="내용을 입력하세요."></textarea>
                 </div>
+
+                <div class="mb-3">
+                    <label class="form-label">문의사항</label>
+                    <textarea th:field="*{inquiryContent}" class="form-control" rows="3" placeholder="내용을 입력하세요."></textarea>
+                </div>
+
             </div>
 
             <div class="text-end mt-5">
@@ -159,7 +165,30 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+
+
 <script th:inline="javascript">
+
+    const phoneInput = document.getElementById('phone');
+
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let val = e.target.value.replace(/[^0-9]/g, '');
+            if (val.length > 3 && val.length <= 7) {
+                val = val.slice(0, 3) + '-' + val.slice(3);
+            } else if (val.length > 7) {
+                val = val.slice(0, 3) + '-' + val.slice(3, 7) + '-' + val.slice(7, 11);
+            }
+            e.target.value = val;
+        });
+    }
+
+    const dateInput = document.getElementById('applyDate');
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today; // 오늘 날짜보다 이전은 선택 불가
+    }
+
     document.getElementById('applyForm').addEventListener('submit', function(e) {
         // 1. 검사할 항목들을 순서대로 배열에 담습니다. (ID, 이름)
         const checkList = [
@@ -190,8 +219,14 @@
             }
         }
 
-        // 모든 검사를 통과했을 때 (선택 사항: 확인 창)
-        // if(!confirm('신청서를 제출하시겠습니까?')) { e.preventDefault(); }
+        if (!confirm("신청서를 제출하시겠습니까?")) {
+            e.preventDefault();
+        } else {
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> 전송 중...';
+        }
+
     });
 
     // 성공 메시지 처리 (기존과 동일)

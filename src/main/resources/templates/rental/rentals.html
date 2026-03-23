@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>도서관 관리 시스템</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/admin_style.css"/>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-icon"><i class="bi bi-book-half"></i></div>
+    <div class="sb-brand-name">도서관 관리</div>
+    <div class="sb-brand-tag">Library OS v1.0</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section-label">대출 관리</div>
+    <button class="sb-btn active" onclick="showPage('list')"><i class="bi bi-list-ul"></i> 대출 목록 조회</button>
+    <button class="sb-btn" onclick="showPage('rent')"><i class="bi bi-box-arrow-in-down"></i> 대출 신청</button>
+    <button class="sb-btn" onclick="showPage('request')"><i class="bi bi-bell"></i> 대출 예약</button>
+    <button class="sb-btn" onclick="showPage('return')"><i class="bi bi-box-arrow-up"></i> 반납 처리</button>
+    <div class="sb-section-label" style="margin-top:8px;">통계</div>
+    <button class="sb-btn" onclick="showPage('stats')"><i class="bi bi-bar-chart-line"></i> 인기 도서</button>
+  </div>
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">관</div>
+      <div>
+        <div class="sb-uname">관리자</div>
+        <div class="sb-urole">사서 담당자</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="topbar-title">대출 목록 조회</div>
+      <div class="topbar-bc" id="topbar-bc">대출 관리 / 목록</div>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-date" id="topbar-date"></span>
+      <button class="btn-ghost btn-sm" onclick="refreshCurrentPage()">
+        <i class="bi bi-arrow-clockwise"></i> 새로고침
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- PAGE: 대출 목록 조회 -->
+    <div class="page active" id="page-list">
+      <div class="stats-grid">
+        <div class="stat-card sc-blue">
+          <div class="stat-label">전체 대출</div>
+          <div class="stat-value" id="st-total">—</div>
+          <div class="stat-sub">현재 대출 중</div>
+          <i class="bi bi-journals stat-icon"></i>
+        </div>
+        <div class="stat-card sc-red">
+          <div class="stat-label">연체 도서</div>
+          <div class="stat-value" id="st-overdue">—</div>
+          <div class="stat-sub">반납 기한 초과</div>
+          <i class="bi bi-exclamation-triangle stat-icon"></i>
+        </div>
+        <div class="stat-card sc-teal">
+          <div class="stat-label">오늘 반납 예정</div>
+          <div class="stat-value" id="st-duetoday">—</div>
+          <div class="stat-sub">오늘 마감</div>
+          <i class="bi bi-calendar-check stat-icon"></i>
+        </div>
+        <div class="stat-card sc-amber">
+          <div class="stat-label">재대출</div>
+          <div class="stat-value" id="st-renewed">—</div>
+          <div class="stat-sub">연장 완료</div>
+          <i class="bi bi-arrow-repeat stat-icon"></i>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-head">
+          <span class="section-title"><i class="bi bi-list-ul me-2"></i>대출 현황</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="number" id="list-member-id" class="form-control"
+                   placeholder="회원 ID" style="width:110px;height:32px;font-size:0.8rem;border-radius:6px;border-color:var(--border);"/>
+            <button class="btn-ink" style="height:32px;padding:0 14px;font-size:0.78rem;" onclick="loadRentals()">
+              <i class="bi bi-search"></i> 조회
+            </button>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <input type="text" id="filter-keyword" class="form-control"
+                 placeholder="도서명 / 저자 검색…" style="width:200px;" oninput="filterTable()"/>
+          <select id="filter-status" class="form-select" style="width:130px;" onchange="filterTable()">
+            <option value="">전체 상태</option>
+            <option value="RENTED">대출 중</option>
+            <option value="OVERDUE">연체</option>
+            <option value="RETURNED">반납 완료</option>
+          </select>
+          <span id="list-count" style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--muted);margin-left:auto;"></span>
+        </div>
+        <div class="table-wrap">
+          <table id="rental-table">
+            <thead>
+            <tr>
+              <th>대출 ID</th><th>도서명</th><th>저자</th><th>대출일</th>
+              <th>반납 기한</th><th>남은 일수</th><th>상태</th><th>재대출</th><th>액션</th>
+            </tr>
+            </thead>
+            <tbody id="rental-tbody">
+            <tr><td colspan="9"><div class="empty-state"><i class="bi bi-search"></i><p>회원 ID를 입력하고 조회하세요</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: 대출 신청 -->
+    <div class="page" id="page-rent">
+      <div class="section-card" style="max-width:600px;">
+        <div class="section-head">
+          <span class="section-title"><i class="bi bi-box-arrow-in-down me-2"></i>대출 신청</span>
+        </div>
+        <div id="rent-alert" class="alert-box" style="margin-top:16px;"></div>
+        <div class="form-grid form-grid-2">
+          <div>
+            <label class="form-label-custom">회원 ID <span style="color:var(--accent)">*</span></label>
+            <input type="number" id="rent-member-id" class="form-control-custom" placeholder="예: 1001"/>
+            <div class="form-hint">대출 신청할 회원의 ID</div>
+          </div>
+          <div>
+            <label class="form-label-custom">도서 ID <span style="color:var(--accent)">*</span></label>
+            <input type="number" id="rent-book-id" class="form-control-custom" placeholder="예: 42"/>
+            <div class="form-hint">대출할 도서의 ID</div>
+          </div>
+        </div>
+        <div style="padding: 0 22px 20px;">
+          <div style="background:var(--amber-lt);border:1px solid #fcd47a;border-radius:8px;padding:12px 14px;font-size:0.8rem;color:var(--amber);display:flex;align-items:flex-start;gap:8px;">
+            <i class="bi bi-info-circle-fill" style="margin-top:1px;flex-shrink:0;"></i>
+            <div>
+              <strong>대출 규정 안내</strong><br/>
+              • 1일 최대 3권까지 대출 가능합니다<br/>
+              • 대출 기간은 14일이며, 1회 연장 가능합니다<br/>
+              • 이미 대출 중인 도서는 신청이 불가합니다
+            </div>
+          </div>
+        </div>
+        <div class="form-footer">
+          <button class="btn-ghost" onclick="clearForm('rent')"><i class="bi bi-x"></i> 초기화</button>
+          <button class="btn-ink" id="rent-submit-btn" onclick="submitRent()">
+            <i class="bi bi-check2"></i> 대출 신청
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: 대출 예약 -->
+    <div class="page" id="page-request">
+      <div class="section-card">
+        <div class="section-head">
+          <span class="section-title"><i class="bi bi-bell me-2"></i>대출 예약 목록</span>
+          <button class="btn-ghost" onclick="loadRequests()">
+            <i class="bi bi-arrow-clockwise"></i> 새로고침
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+            <tr>
+              <th>신청 ID</th>
+              <th>회원 ID</th>
+              <th>회원명</th>
+              <th>도서명</th>
+              <th>저자</th>
+              <th>신청일</th>
+              <th>상태</th>
+              <th>처리</th>
+            </tr>
+            </thead>
+            <tbody id="request-tbody">
+            <tr>
+              <td colspan="8">
+                <div class="empty-state">
+                  <i class="bi bi-bell"></i>
+                  <p>대출 예약 목록을 불러오는 중...</p>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: 반납 처리 -->
+    <div class="page" id="page-return">
+      <div class="section-card" style="max-width:600px;">
+        <div class="section-head">
+          <span class="section-title"><i class="bi bi-box-arrow-up me-2"></i>반납 처리</span>
+        </div>
+        <div id="return-alert" class="alert-box" style="margin-top:16px;"></div>
+        <div class="form-grid" style="grid-template-columns:1fr;">
+          <div>
+            <label class="form-label-custom">대출 ID <span style="color:var(--accent)">*</span></label>
+            <input type="number" id="return-rental-id" class="form-control-custom" placeholder="예: 305"/>
+            <div class="form-hint">반납할 대출 건의 ID</div>
+          </div>
+          <div style="background:var(--teal-lt);border:1px solid #a8d8d3;border-radius:8px;padding:12px 14px;font-size:0.8rem;color:var(--teal);">
+            <i class="bi bi-info-circle-fill me-1"></i>
+            반납일은 오늘 날짜로 자동 기록됩니다.
+          </div>
+        </div>
+        <div class="form-footer">
+          <button class="btn-ghost" onclick="clearForm('return')"><i class="bi bi-x"></i> 초기화</button>
+          <button class="btn-teal" id="return-submit-btn" onclick="submitReturn()">
+            <i class="bi bi-check2"></i> 반납 처리
+          </button>
+        </div>
+      </div>
+
+      <div class="section-card" style="max-width:600px;">
+        <div class="section-head">
+          <span class="section-title" style="font-size:0.85rem;">
+            <i class="bi bi-lightning-charge me-2"></i>빠른 반납 — 회원 대출 조회
+          </span>
+        </div>
+        <div class="filter-bar" style="gap:8px;">
+          <input type="number" id="quick-member-id" class="form-control" placeholder="회원 ID" style="width:120px;"/>
+          <button class="btn-ink" style="height:34px;font-size:0.78rem;" onclick="loadQuickReturn()">
+            <i class="bi bi-search"></i> 조회
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>대출 ID</th><th>도서명</th><th>반납 기한</th><th>상태</th><th>반납</th></tr></thead>
+            <tbody id="quick-return-tbody">
+            <tr><td colspan="5"><div class="empty-state"><i class="bi bi-person-circle"></i><p>회원 ID로 조회하세요</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: 인기 도서 통계 -->
+    <div class="page" id="page-stats">
+      <div class="section-card">
+        <div class="section-head">
+          <span class="section-title"><i class="bi bi-bar-chart-line me-2"></i>인기 도서 (대출 많은 순)</span>
+          <button class="btn-ghost" onclick="loadStats()"><i class="bi bi-arrow-clockwise"></i> 불러오기</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+            <tr><th>#</th><th>도서명</th><th>총 대출 횟수</th></tr>
+            </thead>
+            <tbody id="stats-tbody">
+            <tr><td colspan="5"><div class="empty-state"><i class="bi bi-bar-chart"></i><p>상단 버튼을 눌러 통계를 불러오세요</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 대출 상세 모달 -->
+<div class="detail-overlay" id="detail-overlay" onclick="closeDetail(event)">
+  <div class="detail-panel">
+    <div class="detail-header">
+      <h5><i class="bi bi-file-text me-2"></i>대출 상세 정보</h5>
+      <button class="detail-close" onclick="closeDetailPanel()"><i class="bi bi-x"></i></button>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
+    <div class="detail-footer" id="detail-footer"></div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- 세션 변수 선언 -->
+<script>
+  const CURRENT_ADMIN_NAME = "[[${session.loginInfo.mname}]]";
+</script>
+<script src="/js/admin_app.js"></script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<!-- [원본] <html xmlns:th="http://www.thymeleaf.org"> -->
+<html lang="ko"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/base}">
+<head>
+    <!-- [원본] <meta charset="UTF-8"> -->
+    <!-- [원본] <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <!-- [원본] <title>부산도서관 - 메인</title> -->
+    <!-- [원본] <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <!-- [원본] <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"> -->
+    <!-- [원본] <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" /> -->
+
+    <style>
+        :root {
+            --lib-blue: #53a5ff;
+        }
+
+        /* 1. 기본 레이아웃 및 자석 스크롤 설정 */
+        html, body {
+            margin: 0; padding: 0;
+            height: 100%;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            background-color: #fff;
+            /* 스크롤바 숨기기 (Firefox, IE/Edge) */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* 크롬, 사파리, 엣지에서 스크롤바 숨기기 */
+        html::-webkit-scrollbar, body::-webkit-scrollbar {
+            display: none;
+        }
+
+        body {
+            font-family: 'Pretendard Variable', sans-serif;
+            overflow-y: scroll;
+        }
+
+        section {
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 2. 왼쪽 고정 점 (Scroll Dots) 스타일 */
+        .scroll-dots {
+            position: fixed;
+            top: 50%;
+            left: 30px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 2000;
+        }
+
+        .scroll-dots .dot {
+            width: 12px;
+            height: 12px;
+            background-color: rgba(255, 255, 255, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        /* [활성화 상태] - 선택 시 색상 전부 선명한 화이트로 */
+        .scroll-dots .dot.active,
+        .scroll-dots .dot:hover {
+            /* 기존: 테두리만 있는 느낌 제거 */
+            /* [수정] 선명한 화이트로 꽉 채우기 */
+            background-color: #ffffff;
+            border: none; /* 테두리는 깔끔하게 제거 */
+
+            transform: scale(1.4); /* 살짝 커지는 효과 유지 */
+            box-shadow: 0 0 10px #e5e5e5;
+        }
+
+
+        /* 3. Section 1 디자인 (메인 비주얼) */
+        #section1 {
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+            url('https://library.busan.go.kr/portal/img/main/visual_img01.jpg') no-repeat center center/cover;
+            color: white;
+            flex-direction: column;
+        }
+
+        .main-title { font-weight: 800; letter-spacing: -1px; }
+
+        /* [핵심] 레이어드 검색 캡슐 */
+        .search-capsule {
+            display: flex;
+            align-items: center;
+            width: 90%;
+            max-width: 930px;
+            height: 75px;
+            background: transparent;
+            overflow: visible;
+        }
+
+        .weather-box {
+            background: linear-gradient(to right, #4db3ff, var(--lib-blue));
+            color: white;
+            height: 100%;
+            min-width: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            padding: 0 15px;
+            border-top-left-radius: 50px;
+            border-bottom-left-radius: 50px;
+            z-index: 1;
+        }
+
+        .search-input-group {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            background-color: white;
+            border-radius: 50px;
+            padding: 0 30px;
+            align-items: center;
+            margin-left: -30px; /* 레이어 겹치기 */
+            z-index: 2;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .search-input {
+            border: none; outline: none;
+            width: 100%; font-size: 18px; color: #333;
+            background: transparent;
+        }
+
+        .search-btn {
+            background: none; border: none;
+            color: var(--lib-blue); font-size: 26px;
+            cursor: pointer;
+        }
+
+        /* 스크롤 가이드 가사 애니메이션 */
+        .scroll-down-guide {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.94);
+        }
+
+        .scroll-down-guide .arrow {
+            font-size: 24px;
+            animation: scrollDownAni 1.5s infinite;
+        }
+
+        @keyframes scrollDownAni {
+            0%, 100% { transform: translateY(0); opacity: 0.7; }
+            50% { transform: translateY(10px); opacity: 1; }
+        }
+
+        /* 4. Section 2 & 3 (공지사항 및 슬라이드) */
+        #section2 { background-color: #f8faff; }
+        #section3 { background-color: #ffffff; }
+        .card { border: none; border-radius: 20px; transition: 0.3s; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .badge-notice { background-color: #eef6ff; color: var(--lib-blue); }
+        .carousel-item img { height: 65vh; object-fit: cover; border-radius: 25px; }
+
+        /* base.html 푸터를 scroll-snap 대상으로 추가 */
+        footer { scroll-snap-align: start; scroll-snap-stop: always; }
+    </style>
+</head>
+<!-- [원본] <body> -->
+<body>
+
+<!-- layout:fragment="content" 로 base.html의 content 영역에 삽입 -->
+<div layout:fragment="content">
+
+<div class="scroll-dots" id="scrollDots">
+    <a href="#section1" class="dot active"></a>
+    <a href="#section2" class="dot"></a>
+    <a href="#section3" class="dot"></a>
+</div>
+
+<section id="section1">
+    <div class="text-center mb-5">
+        <h1 class="display-3 main-title">BUSAN LIBRARY</h1>
+        <p class="fs-5 opacity-75">부산의 미래를 담는 독서·문화·지식정보의 보고</p>
+    </div>
+
+    <form action="/book/booklist" method="get" class="search-capsule">
+        <div class="weather-box">
+            <span id="weather-icon" th:text="${weatherIcon}">☀️</span>
+            <span id="busan-text" th:text="'부산 ' + ${temp} + '°C'">부산 00°C</span>
+        </div>
+
+        <div class="search-input-group">
+            <input type="text" name="keyword" class="search-input"
+                   placeholder="찾으시는 도서의 정보를 입력하세요." required autofocus
+                   oninvalid="this.setCustomValidity('검색어를 입력해주세요.')"
+                   oninput="this.setCustomValidity('')">
+            <button type="submit" class="search-btn">
+                <i class="bi bi-search align-middle"></i>
+            </button>
+        </div>
+    </form>
+
+    <div class="scroll-down-guide">
+        <div class="text" style="font-size: 13px; letter-spacing: 2px;">SCROLL DOWN</div>
+        <i class="bi bi-chevron-down arrow"></i>
+    </div>
+</section>
+
+<section id="section2">
+    <div class="container">
+        <h2 class="fw-bold mb-5"><i class="bi bi-megaphone align-middle me-2"></i>도서관 소식</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card p-4 shadow-sm h-100">
+                    <span class="badge badge-notice mb-3 w-25">공지사항</span>
+                    <h5 class="fw-bold mb-3">[안내] 상반기 인문 예술 살롱 운영 안내</h5>
+                    <p class="text-muted small">인문학 특강에 시민 여러분을 초대합니다.</p>
+                    <div class="mt-auto text-end text-muted">03.17</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-4 shadow-sm h-100 border-primary border-top">
+                    <span class="badge badge-notice mb-3 w-25">문화행사</span>
+                    <h5 class="fw-bold mb-3">들락날락 영어랑 놀자 수강생 모집</h5>
+                    <p class="text-muted small">유아 및 초등학생 대상 영어 프로그램</p>
+                    <div class="mt-auto text-end text-muted">03.13</div>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-center justify-content-center">
+                <a href="#" class="btn btn-outline-primary rounded-circle p-4"><i class="bi bi-plus-lg fs-2"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="section3">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-5 text-start">공간 소개</h2>
+        <div id="libCarousel" class="carousel slide shadow-lg rounded-5" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active"><img src="https://library.busan.go.kr/portal/img/main/space_img01.jpg" class="d-block w-100"></div>
+                <div class="carousel-item"><img src="https://library.busan.go.kr/portal/img/main/space_img02.jpg" class="d-block w-100"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- [원본] <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+
+</div><!-- layout:fragment="content" 끝 -->
+
+<th:block layout:fragment="script">
+<script>
+    const dots = document.querySelectorAll('.dot');
+    const sections = document.querySelectorAll('section');
+    const dotsContainer = document.getElementById('scrollDots');
+
+    window.addEventListener('scroll', () => {
+        let current = "";
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (pageYOffset >= (sectionTop - sectionHeight / 3)) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        dots.forEach(dot => {
+            dot.classList.remove('active');
+            if (dot.getAttribute('href').includes(current)) {
+                dot.classList.add('active');
+            }
+        });
+
+        // 배경이 밝은 섹션2, 3에서는 점 색상을 어둡게 변경
+        if (current === 'section2' || current === 'section3') {
+            dotsContainer.classList.add('dots-dark');
+        } else {
+            dotsContainer.classList.remove('dots-dark');
+        }
+    });
+</script>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<body>
+<link rel="stylesheet" href="/css/busan-library-common.css">
+
+<div layout:fragment="content">
+    <div class="row mt-3 justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm mb-5">
+                <div class="card-header text-center py-3">
+                    <h4 class="mb-0 fw-bold">회원 가입</h4>
+                    <p class="text-muted small mb-0 mt-1">부산 도서관의 새 가족이 되어주세요.</p>
+                </div>
+                <div class="card-body p-4">
+                    <!-- 기존 action 유지 / id="joinForm" 추가(스크립트 연동용) -->
+                    <form action="/member/join" method="post" id="joinForm">
+
+                        <!-- 아이디 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">아이디</label>
+                            <div class="input-group">
+                                <input type="text" name="mid" id="mid" class="form-control" placeholder="4자 이상 입력" required>
+                                <button type="button" class="btn btn-outline-primary" id="checkIdBtn">중복확인</button>
+                            </div>
+                            <div id="idCheckMsg" class="mt-1" style="font-size: 0.85em; min-height: 1.2em;"></div>
+                        </div>
+
+                        <!-- 비밀번호 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">비밀번호</label>
+                            <input type="password" name="mpw" class="form-control" placeholder="안전한 비밀번호를 입력하세요" required>
+                        </div>
+
+                        <!-- 이름 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이름</label>
+                            <input type="text" name="mname" class="form-control" placeholder="성함" required>
+                        </div>
+
+                        <!-- 이메일 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이메일</label>
+                            <div class="input-group">
+                                <input type="email" name="email" id="email" class="form-control" placeholder="example@lib.com" required>
+                                <button type="button" class="btn btn-outline-primary" id="checkEmailBtn">중복확인</button>
+                            </div>
+                            <div id="emailCheckMsg" class="mt-1" style="font-size: 0.85em; min-height: 1.2em;"></div>
+                        </div>
+
+                        <!-- 지역 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">지역 선택</label>
+                            <select name="region" class="form-select" required>
+                                <option value="" th:selected="${dto == null || dto.region == null}">선택하세요</option>
+                                <option value="SEOUL" th:selected="${dto?.region == 'SEOUL'}">서울</option>
+                                <option value="BUSAN" th:selected="${dto?.region == 'BUSAN'}">부산</option>
+                                <option value="YANGSAN" th:selected="${dto?.region == 'YANGSAN'}">양산</option>
+                                <option value="DAEGU" th:selected="${dto?.region == 'DAEGU'}">대구</option>
+                                <option value="INCHEON" th:selected="${dto?.region == 'INCHEON'}">인천</option>
+                                <option value="GWANGJU" th:selected="${dto?.region == 'GWANGJU'}">광주</option>
+                                <option value="DAEJEON" th:selected="${dto?.region == 'DAEJEON'}">대전</option>
+                                <option value="ULSAN" th:selected="${dto?.region == 'ULSAN'}">울산</option>
+                                <option value="SEJONG" th:selected="${dto?.region == 'SEJONG'}">세종</option>
+                                <option value="GYEONGGI" th:selected="${dto?.region == 'GYEONGGI'}">경기</option>
+                                <option value="GANGWON" th:selected="${dto?.region == 'GANGWON'}">강원</option>
+                                <option value="CHUNGBUK" th:selected="${dto?.region == 'CHUNGBUK'}">충북</option>
+                                <option value="CHUNGNAM" th:selected="${dto?.region == 'CHUNGNAM'}">충남</option>
+                                <option value="JEONBUK" th:selected="${dto?.region == 'JEONBUK'}">전북</option>
+                                <option value="JEONNAM" th:selected="${dto?.region == 'JEONNAM'}">전남</option>
+                                <option value="GYEONGBUK" th:selected="${dto?.region == 'GYEONGBUK'}">경북</option>
+                                <option value="GYEONGNAM" th:selected="${dto?.region == 'GYEONGNAM'}">경남</option>
+                                <option value="JEJU" th:selected="${dto?.region == 'JEJU'}">제주</option>
+                            </select>
+                        </div>
+
+                        <input type="hidden" name="role" value="USER">
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg">회원가입 완료</button>
+                            <button type="reset" class="btn btn-link text-muted text-decoration-none">다시 쓰기</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-light text-center py-3">
+                    <span class="small text-muted">이미 계정이 있으신가요?</span>
+                    <a th:href="@{/member/login}" class="text-primary fw-bold text-decoration-none ms-1 small">로그인</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="script" th:inline="javascript">
+    /* 기존 로직 100% 동일 유지 */
+    let isIdChecked = false;
+    let isEmailChecked = false;
+
+    document.querySelector("#checkIdBtn").addEventListener("click", function() {
+        const mid = document.querySelector("#mid").value;
+        const msgArea = document.querySelector("#idCheckMsg");
+
+        if(mid.length < 4) {
+            alert("아이디는 4자 이상 입력해야 합니다.");
+            return;
+        }
+
+        fetch(`/member/checkId?mid=${mid}`)
+            .then(response => response.text())
+            .then(data => {
+                if(data === "exist") {
+                    msgArea.innerText = "이미 사용 중인 아이디입니다.";
+                    msgArea.style.color = "red";
+                    isIdChecked = false;
+                } else {
+                    msgArea.innerText = "사용 가능한 아이디입니다.";
+                    msgArea.style.color = "green";
+                    isIdChecked = true;
+                }
+            });
+    });
+
+    document.querySelector("#checkEmailBtn").addEventListener("click", function() {
+        const email = document.querySelector("#email").value;
+
+        if(!email.includes('@')) {
+            alert("올바른 이메일 형식이 아닙니다.");
+            return;
+        }
+
+        fetch(`/member/checkEmail?email=${email}`)
+            .then(res => res.text())
+            .then(data => {
+                if(data === "exist") {
+                    alert("이미 사용 중인 이메일입니다.");
+                    isEmailChecked = false;
+                } else {
+                    alert("사용 가능한 이메일입니다.");
+                    isEmailChecked = true;
+                }
+            })
+            .catch(err => console.error("에러 발생:", err));
+    });
+
+    document.querySelector("#joinForm").addEventListener("submit", function(e) {
+        if(!isIdChecked) {
+            e.preventDefault();
+            alert("아이디 중복 확인을 먼저 해주세요.");
+        } else if(!isEmailChecked) {
+            e.preventDefault();
+            alert("이메일 중복 확인을 먼저 해주세요.");
+        }
+    });
+</script>
+
+</body>
+</html>

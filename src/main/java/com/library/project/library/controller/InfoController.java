@@ -83,3 +83,20 @@ public class InfoController {
         return "redirect:/info/basic";
     }
 }
+
+/*
+ * ========== InfoController 설명 ==========
+ * - 역할: 도서관 정보(소개) 관련 화면 + 자료 현황 CRUD를 처리하는 컨트롤러
+ * - URL 패턴: /info/**
+ *
+ * [메서드]
+ * - getLibraryInfo(): GET /info/basic → 자료현황 페이지 (도서관 정보 + 통계 데이터)
+ * - organizationPage(): GET /info/organization → 조직 및 업무 페이지
+ * - facilitiesPage(): GET /info/facilities → 시설 현황 페이지
+ * - mapPage(): GET /info/map → 찾아오시는 길 페이지
+ * - donationPage(): GET /info/donation → 기증/납본 안내 페이지
+ * - registerGET(): GET /info/register → 자료 등록 페이지
+ * - registerPOST(): POST /info/register → 자료 현황 항목 등록 처리
+ * - modifyPOST(): POST /info/modify → 자료 현황 항목 수정 처리
+ * - remove(): POST /info/remove/{id} → 자료 현황 항목 삭제 처리
+ */

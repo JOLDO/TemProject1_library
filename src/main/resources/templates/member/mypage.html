@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<body>
+<div layout:fragment="content">
+    <div class="row mt-3" style="text-align:right">
+        <a th:href="@{/member/logout}" class="btn btn-outline-danger">로그아웃</a>
+    </div>
+    <div class="row mt-3">
+        <div class="col">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">내 정보 (My Profile)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3"><strong>아이디:</strong> [[${dto.mid}]]</div>
+                        <div class="col-md-3"><strong>이름:</strong> [[${dto.mname}]]</div>
+                        <div class="col-md-3"><strong>이메일:</strong> [[${dto.email}]]</div>
+                        <div class="col-md-3"><strong>지역:</strong> [[${dto.region}]]</div>
+                    </div>
+                    <div class="text-end mt-3">
+                        <a th:href="@{/member/modify(mid=${dto.mid})}" class="btn btn-outline-warning btn-sm">정보 수정</a>
+                    </div>
+                </div>
+            </div>
+
+<!--            <div class="card mb-4">-->
+<!--                <div class="card-header bg-light">-->
+<!--                    <strong>📚 대출 내역 (Loan List)</strong>-->
+<!--                </div>-->
+<!--                <div class="card-body">-->
+<!--                    <table class="table table-hover">-->
+<!--                        <thead>-->
+<!--                        <tr>-->
+<!--                            <th>도서명</th>-->
+<!--                            <th>대출일</th>-->
+<!--                            <th>반납예정일</th>-->
+<!--                            <th>상태</th>-->
+<!--                        </tr>-->
+<!--                        </thead>-->
+<!--                        <tbody>-->
+<!--                        <tr>-->
+<!--                            <td colspan="4" class="text-center text-muted">현재 대출 중인 도서가 없습니다.</td>-->
+<!--                        </tr>-->
+<!--                        </tbody>-->
+<!--                    </table>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="card mb-4">-->
+<!--                <div class="card-header bg-light">-->
+<!--                    <strong>❓ 문의 내역 (Inquiry List)</strong>-->
+<!--                </div>-->
+<!--                <div class="card-body">-->
+<!--                    <table class="table">-->
+<!--                        <thead>-->
+<!--                        <tr>-->
+<!--                            <th>번호</th>-->
+<!--                            <th>제목</th>-->
+<!--                            <th>작성일</th>-->
+<!--                            <th>답변여부</th>-->
+<!--                        </tr>-->
+<!--                        </thead>-->
+<!--                        <tbody>-->
+<!--                        <tr>-->
+<!--                            <td colspan="4" class="text-center text-muted">문의 내역이 존재하지 않습니다.</td>-->
+<!--                        </tr>-->
+<!--                        </tbody>-->
+<!--                    </table>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="card">-->
+<!--                <div class="card-header bg-light">-->
+<!--                    <strong>📅 예약 현황 (Reservation)</strong>-->
+<!--                </div>-->
+<!--                <div class="card-body">-->
+<!--                    <ul class="list-group list-group-flush">-->
+<!--                        <li class="list-group-item text-center text-muted">예약된 도서가 없습니다.</li>-->
+<!--                    </ul>-->
+<!--                </div>-->
+<!--            </div>-->
+
+        </div>
+    </div>
+
+</div>
+<script layout:fragment="script" th:inline="javascript">
+    // 마이페이지 접속 시 알림이 필요하다면 작성
+    console.log("My Library Page Loaded...");
+</script>
+
+</body>
+</html>

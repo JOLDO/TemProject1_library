@@ -109,26 +109,22 @@
             background-color: #0052cc;
         }
 
-        /* 폼 카드 디자인 */
+        /* 폼 카드 디자인 (너비 및 여백 최적화) */
         .form-card {
             border: 1px solid #e2e8f0;
             border-radius: 15px;
             background: #fff;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            /* 안내문 카드인 info-card의 패딩 30px와 동일하게 맞춤 */
+            padding: 30px !important;
         }
 
         .form-label { font-weight: 600; color: #2d3748; }
         .required { color: #e53e3e; margin-left: 4px; }
 
         #wishCollapse {
-            margin-top: 30px; /* 버튼과 폼 사이의 간격 (원하시는 만큼 조절 가능) */
-        }
-
-        /* [참고] 버튼과 폼 사이가 자연스럽게 보이도록 폼 카드의 그림자를 조절 */
-        .form-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 15px;
-            background: #fff;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* 조금 더 부드러운 그림자 */
+            margin-top: 30px;
+            margin-bottom: 50px;
         }
     </style>
 </head>
@@ -183,29 +179,30 @@
                 aria-expanded="false" id="toggleButton">
             비치희망도서 신청서 작성하기
         </button>
+
     </div>
 
     <div class="collapse" id="wishCollapse">
-        <div class="card card-body form-card p-4 p-md-5 mb-5 shadow-sm">
+        <div class="card card-body form-card mb-5 shadow-sm">
             <form th:action="@{/apply/wishBook/register}" method="post" enctype="multipart/form-data" id="wishBookForm">
                 <h5 class="mb-4 fw-bold text-dark border-bottom pb-3">신청자 정보</h5>
                 <div class="mb-3">
                     <label class="form-label">신청자 성명<span class="required">*</span></label>
-                    <input type="text" name="applicantName" class="form-control" placeholder="성명을 입력하세요.">
+                    <input id="wishApplicantName" type="text" name="wishApplicantName" class="form-control" placeholder="성명을 입력하세요.">
                 </div>
                 <div class="mb-4">
                     <label class="form-label">연락처<span class="required">*</span></label>
-                    <input type="tel" name="wishPhone" class="form-control" placeholder="010-0000-0000">
+                    <input id="wishPhone" type="tel" name="wishPhone" class="form-control" placeholder="010-0000-0000">
                 </div>
 
                 <h5 class="mb-4 fw-bold text-dark border-bottom pb-3 mt-5">도서 정보</h5>
                 <div class="mb-3">
                     <label class="form-label">도서명<span class="required">*</span></label>
-                    <input type="text" name="wishBookTitle" class="form-control" placeholder="도서명을 입력하세요.">
+                    <input id="wishBookTitle" type="text" name="wishBookTitle" class="form-control" placeholder="도서명을 입력하세요.">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">저자명<span class="required">*</span></label>
-                    <input type="text" name="wishAuthor" class="form-control" placeholder="저자명을 입력하세요.">
+                    <input id="wishAuthor" type="text" name="wishAuthor" class="form-control" placeholder="저자명을 입력하세요.">
                 </div>
                 <div class="mb-4">
                     <label class="form-label">출판사</label>
@@ -222,15 +219,44 @@
             </form>
         </div>
     </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script th:inline="javascript">
-    // 1. 아코디언 버튼 텍스트 제어
-    const collapseEl = document.getElementById('wishCollapse');
-    const toggleBtn = document.getElementById('toggleButton');
+    // 1. 서버 세션에서 로그인 여부 확인
+    const isLoggedIn = [[${session.loginUser != null}]];
 
+    const phoneInput = document.getElementById('wishPhone');
+
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let val = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 남기기
+            if (val.length > 3 && val.length <= 7) {
+                val = val.slice(0, 3) + '-' + val.slice(3);
+            } else if (val.length > 7) {
+                val = val.slice(0, 3) + '-' + val.slice(3, 7) + '-' + val.slice(7, 11);
+            }
+            e.target.value = val;
+        });
+    }
+
+    // 2. 주요 요소들 가져오기 (변수 선언 확인!)
+    const toggleBtn = document.getElementById('toggleButton');
+    const collapseEl = document.getElementById('wishCollapse');
+    const wishForm = document.getElementById('wishBookForm');
+    const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: false });
+
+    // 3. 버튼 클릭 이벤트 가로채기 (로그인 체크)
+    toggleBtn.addEventListener('click', function(e) {
+        if (!isLoggedIn) {
+            e.preventDefault();
+            e.stopPropagation();
+            alert("신청서 제출은 로그인 후 가능합니다.");
+            return;
+        }
+        bsCollapse.toggle();
+    });
+
+    // 버튼 텍스트 변경 로직
     collapseEl.addEventListener('show.bs.collapse', () => {
         toggleBtn.innerHTML = '닫기';
     });
@@ -238,51 +264,46 @@
         toggleBtn.innerHTML = '비치희망도서 신청서 작성하기';
     });
 
-    // 2. 폼 제출 유효성 검사 및 알림 기능
-    document.getElementById('wishBookForm').addEventListener('submit', function(e) {
-        // [체크리스트] name 속성 기준
-        const checkFields = [
-            { name: 'applicantName', label: '신청자 성명' },
-            { name: 'wishPhone', label: '연락처' },
-            { name: 'wishBookTitle', label: '도서명' },
-            { name: 'wishAuthor', label: '저자명' }
+    // 4. 폼 제출 시 유효성 체크 (반복문 활용 방식)
+    wishForm.addEventListener('submit', function(e) {
+        const checkList = [
+            { id: 'wishApplicantName', name: '신청자 성명' },
+            { id: 'wishPhone', name: '연락처' },
+            { id: 'wishBookTitle', name: '도서명' },
+            { id: 'wishAuthor', name: '저자명' }
         ];
 
-        // 필수 입력 공백 체크
-        for (const field of checkFields) {
-            const input = document.querySelector(`input[name="${field.name}"]`);
-            if (!input.value.trim()) {
-                alert(`${field.label} 항목을 입력해 주세요.`);
-                input.focus();
-                e.preventDefault(); // 제출 중단
-                return false;
-            }
-        }
+        for (let item of checkList) {
+            // id로 먼저 찾고 없으면 name으로 찾기
+            const element = document.getElementById(item.id) || document.getElementsByName(item.id)[0];
 
-        // 이미지 파일 확장자 체크 (이미지 선택 시에만 동작)
-        const fileInput = document.getElementById('wishBookImage');
-        if (fileInput.value) {
-            const ext = fileInput.value.split('.').pop().toLowerCase();
-            if (!['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
-                alert('이미지 파일(jpg, png 등)만 업로드 가능합니다.');
+            if (!element || !element.value.trim()) {
                 e.preventDefault();
-                return false;
+                alert(item.name + ' 항목을 입력해 주세요.');
+                if(element) element.focus();
+                return;
             }
         }
 
-        // 최종 제출 확인 알림
-        if (!confirm('작성하신 내용으로 비치희망도서를 신청하시겠습니까?')) {
+        if (!confirm("신청서를 제출하시겠습니까?")) {
             e.preventDefault();
-            return false;
+        } else {
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> 전송 중...';
         }
     });
 
-    // 서버에서 보낸 성공 메시지 처리 (RedirectAttributes용)
-    const successMsg = [[${message}]];
-    if (successMsg) {
-        alert(successMsg);
+
+
+    //서버에서 보낸 일회성 메시지
+    const serverMessage = [[${message}]];
+    if (serverMessage) {
+        alert(serverMessage);
     }
+
 </script>
 
 </body>
+
 </html>
