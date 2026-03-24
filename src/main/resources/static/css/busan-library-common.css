@@ -62,7 +62,7 @@ body {
   font-family: var(--font-main);
   font-size: 0.9375rem;      /* 15px */
   color: var(--color-text-main);
-  background: var(--color-bg-page);
+  /*background: var(--color-bg-page);*/
   line-height: 1.7;
   word-break: keep-all;
 }

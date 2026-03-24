@@ -201,14 +201,20 @@
             <a th:href="@{/member/join}">회원가입</a>
         </th:block>
         <th:block th:if="${session.loginInfo != null}">
-        <span class="member-name">
-            <span th:text="${session.loginInfo.mname}">홍길동</span>님
-<!--            <span class="badge-status">정상</span>-->
-        </span>
+            <span class="member-name">
+                <span th:text="${session.loginInfo.mname}">홍길동</span>님
+    <!--            <span class="badge-status">정상</span>-->
+            </span>
             <span class="divider">|</span>
             <a th:href="@{/member/logout}">로그아웃</a>
             <span class="divider">|</span>
             <a th:href="@{/member/mypage}">내 서재</a>
+
+            <!-- 관리자일 때만 보임 -->
+            <th:block th:if="${session.loginInfo.role == 'ADMIN'}">
+                <span class="divider">|</span>
+                <a th:href="@{/rentals}" class="text-danger fw-bold">관리자</a>
+            </th:block>
         </th:block>
     </div>
 </header>
@@ -268,7 +274,7 @@
 </nav>
 
 <th:block th:unless="${currentURI == '/'}">
-    <div id="page-title" class="d-flex align-items-center justify-content-center fw-bold fs-4" style="margin-top: 100px; height: 100px; background-color: #dc3545;" th:switch="${currentURI}">
+    <div id="page-title" class="d-flex align-items-center justify-content-center fw-bold fs-4" style="margin-top: 100px; height: 100px; background-color: #0d6efd; color:#ffffff;" th:switch="${currentURI}">
         <span th:case="'/book/booklist'" th:text="${param.sort != null and #strings.toString(param.sort) == 'regDate'} ? '새로 들어온 책'
          : (${param.sort != null and #strings.toString(param.sort) == 'rental'} ? '대출이 많은 책'
          : (${param.sort != null and #strings.toString(param.sort) == 'recommend'} ? '추천하는 책'
@@ -288,6 +294,25 @@
         <span th:case="'/info/facilities'">시설현황</span>
         <span th:case="'/info/guide'">이용안내</span>
         <span th:case="'/info/map'">찾아오시는길</span>
+        <!--<span th:case="/member/mypage'">내정보</span>
+        <span th:case="'/member/modify'">회원정보수정</span>
+        <span th:case="'/user_rentals'">대출내역</span>
+        <span th:case="'/member/myList'">문의내역</span>
+        <span th:case="'/member/applyMyWishBook'">희망도서</span>
+        <span th:case="'/member/myFacilityList'">시설예약</span>
+        <span th:case="'/mypage/apply-list'">행사강좌</span>-->
+
+        <span th:case="'/member/login'">로그인</span>
+        <span th:case="'/member/join'">회원가입</span>
+        <span th:case="'/member/find'">아이디/비밀번호 찾기</span>
+        <span th:case="'/member/mypage'">내 정보 관리</span>
+        <span th:case="'/member/modify'">회원 정보 수정</span>
+        <span th:case="'/user_rentalse'">대출내역</span>
+        <span th:case="'/member/inquiryList'">문의내역</span>
+        <span th:case="'/member/applyMyWishBook'">희망도서</span>
+        <span th:case="'/member/myFacilityList'">내 시설 예약 내역</span>
+        <span th:case="'/member/apply-list'">행사강좌</span>
+
         <span th:case="*">-</span>
     </div>
 </th:block>
