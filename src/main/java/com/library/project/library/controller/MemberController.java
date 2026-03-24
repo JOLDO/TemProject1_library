@@ -377,30 +377,29 @@ public class MemberController {
     }
 
 
-    @GetMapping("/myList")
+    // MemberController.java
+
+    @GetMapping("/inquiryList") // 📍 404 에러가 나는 그 주소로 정확히 맞춤
     public String myList(PageRequestDTO pageRequestDTO, Model model, Principal principal) {
         log.info(">>>> 내 문의 내역 페이지 접속 중...");
 
-        // 1. 로그인한 사용자 아이디 가져오기 (테스트 시 user1 사용)
+        // 1. 로그인 체크 (테스트용 user1)
         String writer = "user1";
         if (principal != null) {
             writer = principal.getName();
         }
 
-        log.info(">>>> 현재 필터링할 작성자 아이디: " + writer);
-
-        // 2. 서비스 호출 (인터페이스 순서: String mid, PageRequestDTO)
-        // 📍 만약 여기서 여전히 오류가 난다면 컨트롤러 상단에 'private final InquiryService inquiryService;'가 있는지 확인하세요!
+        // 2. 서비스 호출
         PageResponseDTO<InquiryListReplyCountDTO> responseDTO =
                 inquiryService.getMyInquiryList(writer, pageRequestDTO);
 
         model.addAttribute("responseDTO", responseDTO);
         model.addAttribute("writer", writer);
 
-        // 3. 리턴 경로 확인: templates/inquiry/myList.html 파일이 있어야 함
+        // 3. 리턴 경로 (HTML 파일 위치)
+        // src/main/resources/templates/inquiry/myList.html 가 있다면 아래가 맞음
         return "inquiry/myList";
     }
-
 }
 
 /*
