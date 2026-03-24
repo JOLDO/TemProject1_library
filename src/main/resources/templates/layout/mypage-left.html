@@ -3,6 +3,10 @@
 <body>
 <div th:fragment="mypageLeft(mid, activeMenu)">
     <style>
+        :root {
+            /* 메인 컬러 — 부산도서관 기본 톤 */
+            --color-primary: #0d6efd;
+        }
         /* ── mypage-left 사이드 메뉴 (부산도서관 스타일) ── */
         .mypage-nav {
             background: var(--color-bg-white);
@@ -13,6 +17,8 @@
             width: 100%;
             max-width: 220px;
         }
+
+
 
         .mypage-nav__title {
             font-family: var(--font-serif);
@@ -134,13 +140,13 @@
             희망도서 <span class="mypage-nav__dash">—</span>
         </a>
 
-        <a th:href="@{/apply/myFacilityList}"
+        <a th:href="@{/member/myFacilityList}"
            th:classappend="${activeMenu == 'facility'} ? ' active' : ''"
            class="mypage-nav__item">
             시설예약 <span class="mypage-nav__dash">—</span>
         </a>
 
-        <a th:href="@{/mypage/apply-list}"
+        <a th:href="@{/member/apply-list}"
            th:classappend="${activeMenu == 'event'} ? ' active' : ''"
            class="mypage-nav__item">
             행사강좌 <span class="mypage-nav__dash">—</span>
