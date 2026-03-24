@@ -11,6 +11,7 @@ public interface InquiryService {
     void modify(InquiryDTO inquiryDTO);
     void remove(Long ino);
 
+
     // 일반 목록 조회
     PageResponseDTO<InquiryDTO> list(PageRequestDTO pageRequestDTO);
 

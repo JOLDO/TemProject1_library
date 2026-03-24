@@ -97,6 +97,7 @@ public class InquiryServiceImpl implements InquiryService {
                 .build();
     }
 
+    
     // 3. 나의 문의 내역 조회 (댓글 개수 포함 버전)
     @Override
     public PageResponseDTO<InquiryListReplyCountDTO> getMyInquiryList(String mid, PageRequestDTO pageRequestDTO) {

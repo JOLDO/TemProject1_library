@@ -6,6 +6,7 @@ import com.library.project.library.dto.InquiryListReplyCountDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+
 public interface InquirySearch {
     // 기존 전체 목록
     Page<Inquiry> searchAll(String[] types, String keyword, Pageable pageable);

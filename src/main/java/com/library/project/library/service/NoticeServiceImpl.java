@@ -67,6 +67,7 @@ public class NoticeServiceImpl implements NoticeService {
         noticeRepository.deleteById(nno);
     }
 
+
     // 1. 일반 페이징 목록 (검색 포함)
     @Override
     public PageResponseDTO<NoticeDTO> list(PageRequestDTO pageRequestDTO) {
