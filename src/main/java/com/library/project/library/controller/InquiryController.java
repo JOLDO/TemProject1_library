@@ -97,7 +97,6 @@ public class InquiryController {
         return "inquiry/myList";
     }
 
-
     //로그인 회원 전용
     @GetMapping("/inquiry/register")
     public String registerInquiry(HttpSession session, Model model) {

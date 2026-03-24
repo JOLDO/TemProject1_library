@@ -105,7 +105,6 @@ public class InquiryServiceImpl implements InquiryService {
         // 페이징 정보 생성 (기본적으로 글 번호 'ino' 역순 정렬)
         Pageable pageable = pageRequestDTO.getPageable("ino");
 
-
         // Querydsl 레포지토리의 searchMyList 호출 (아이디 필터링)
         Page<InquiryListReplyCountDTO> result = inquiryRepository.searchMyList(pageable, mid);
 

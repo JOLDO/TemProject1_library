@@ -50,7 +50,6 @@ public class InquirySearchImpl extends QuerydslRepositorySupport implements Inqu
     }
 
 
-
     // 💡 새로 추가된 메서드: 내 글 목록용 (writer 아이디를 보냄)
     @Override
     public Page<InquiryListReplyCountDTO> searchMyList(Pageable pageable, String writer) {

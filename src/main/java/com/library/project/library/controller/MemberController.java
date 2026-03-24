@@ -193,7 +193,6 @@ public class MemberController {
         return memberService.checkEmail(email) ? "exist" : "ok";
     }
 
-
     @GetMapping("/myList")
     public String myList(PageRequestDTO pageRequestDTO, Model model, Principal principal) {
         log.info(">>>> 내 문의 내역 페이지 접속 중...");
