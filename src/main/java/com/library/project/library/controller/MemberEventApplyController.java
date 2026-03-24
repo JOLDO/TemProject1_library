@@ -13,7 +13,7 @@ import java.security.Principal;
 import java.util.List;
 
 @Controller
-@RequestMapping("/mypage")
+@RequestMapping("/member")
 @RequiredArgsConstructor
 @Log4j2
 public class MemberEventApplyController {
