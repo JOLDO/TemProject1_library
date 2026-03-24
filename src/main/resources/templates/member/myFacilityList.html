@@ -53,6 +53,10 @@
                             <label class="form-label font-bold text-primary mb-2">행사 내용</label>
                             <div id="modalEventContent" class="p-3 border bg-light" style="min-height:100px; white-space:pre-wrap;"></div>
                         </div>
+                        <div class="col-12">
+                            <label class="form-label font-bold text-primary mb-2">문의사항</label>
+                            <div id="modalInquiryContent" class="p-3 border bg-light" style="min-height:50px; white-space:pre-wrap;"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer" style="border-top: 1px solid var(--color-border-light);">
@@ -95,7 +99,7 @@
                     <td>
                         <a href="javascript:void(0);"
                            th:text="${dto.eventName}"
-                           th:onclick="'openModal(' + ${dto.ano} + ')'"
+                           th:onclick="|openModal(${dto.ano})|"
                            class="font-bold text-primary">행사명</a>
                     </td>
                     <td><span class="card__badge" style="margin-bottom:0;" th:text="${dto.facilityType}">강당</span></td>
@@ -121,39 +125,45 @@
             <span>※ 대관이 종료된 내역은 3개월 후 삭제됩니다.</span>
         </div>
 
-    </div> </div> <th:block layout:fragment="script">
+    </div>
+</div>
+
+<th:block layout:fragment="script">
     <script th:inline="javascript">
-        let applyModal;
-        document.addEventListener('DOMContentLoaded', function () {
-            // 모달 객체 초기화 확인
-            const modalElement = document.getElementById('applyModal');
-            if(modalElement) {
-                applyModal = new bootstrap.Modal(modalElement);
-            }
-        });
+        let applyModal = null; // 초기값 명시
 
         function openModal(ano) {
-            console.log("Fetching data for ano:", ano); // 디버깅용 로그
+            console.log("Fetching data for ano:", ano);
 
-            fetch('/apply/readApi?ano=' + ano)
+            // 모달 객체가 없으면 생성
+            if (!applyModal) {
+                applyModal = new bootstrap.Modal(document.getElementById('applyModal'));
+            }
+
+            fetch('/member/readApi?ano=' + ano)
                 .then(response => {
-                    if (!response.ok) throw new Error('네트워크 응답 에러');
+                    // 404나 500 에러 발생 시 여기서 잡힘
+                    if (!response.ok) throw new Error('서버 응답 오류 (Status: ' + response.status + ')');
                     return response.json();
                 })
                 .then(data => {
-                    // 1. 데이터 세팅
-                    document.getElementById('modalEventName').innerText = data.eventName;
+                    console.log("서버에서 받은 전체 데이터:", data); // [중요] F12 콘솔에서 필드명을 꼭 확인하세요!
+
+                    // 1. 텍스트 데이터 (데이터가 없을 때를 대비해 '정보 없음' 추가)
+                    document.getElementById('modalEventName').innerText = data.eventName || '제목 없음';
                     document.getElementById('modalAno').innerText = data.ano;
                     document.getElementById('modalApplicantName').innerText = data.applicantName || '정보 없음';
-                    document.getElementById('modalFacilityType').innerText = data.facilityType;
+                    document.getElementById('modalFacilityType').innerText = data.facilityType || '정보 없음';
 
-                    // 2. 날짜 가공
+                    // 2. 날짜 가공 (배열로 올 경우와 문자열로 올 경우 모두 대응)
+                    let dateStr = "";
                     if (Array.isArray(data.applyDate)) {
-                        const [year, month, day] = data.applyDate;
-                        document.getElementById('modalApplyDate').innerText = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        const [y, m, d] = data.applyDate;
+                        dateStr = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                     } else {
-                        document.getElementById('modalApplyDate').innerText = data.applyDate;
+                        dateStr = data.applyDate || '날짜 정보 없음';
                     }
+                    document.getElementById('modalApplyDate').innerText = dateStr;
 
                     // 3. 이용 시간 가공
                     let timeDetail = "";
@@ -161,17 +171,19 @@
                     if (rawTime === "오전") timeDetail = "오전 (09:00 ~ 12:00)";
                     else if (rawTime === "오후") timeDetail = "오후 (13:00 ~ 17:00)";
                     else if (rawTime === "야간") timeDetail = "야간 (18:00 ~ 22:00)";
-                    else timeDetail = rawTime;
+                    else timeDetail = rawTime || '시간 정보 없음';
 
                     document.getElementById('modalApplyTime').innerText = timeDetail;
-                    document.getElementById('modalEventContent').innerText = data.eventContent || '상세 내용 없음';
 
-                    // 4. 모달 열기
+                    // 4. 행사 내용, 문의 사항
+                    document.getElementById('modalEventContent').innerText = data.eventContent || '상세 내용이 없습니다.';
+                    document.getElementById('modalInquiryContent').innerText = data.inquiryContent || '문의사항이 없습니다.';
+
                     applyModal.show();
                 })
                 .catch(error => {
                     console.error('Error Details:', error);
-                    alert('상세 정보를 불러오는 중 오류가 발생했습니다. 개발자 도구(F12)를 확인해주세요.');
+                    alert('데이터를 가져오지 못했습니다. 서버 로그를 확인해 주세요.');
                 });
         }
     </script>

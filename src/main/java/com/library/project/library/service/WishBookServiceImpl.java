@@ -8,42 +8,58 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Log4j2
 @RequiredArgsConstructor
-@Transactional // 서비스단에는 트랜잭션 처리를 해주는 것이 안전합니다.
+@Transactional
 public class WishBookServiceImpl implements WishBookService {
 
     private final WishBookRepository wishBookRepository;
 
     @Override
     public Long register(WishBookDTO wishBookDTO) {
-
         log.info("Service: DB 저장을 위한 데이터 변환 중...");
 
         WishBookEntity entity = WishBookEntity.builder()
-                // 1. 필수 값 세팅 (가장 중요!)
-                .mid(wishBookDTO.getMid() != null ? wishBookDTO.getMid() : "user01") // 임시 ID 혹은 세션 ID
-                .status("신청중") // 기본 상태값 설정
-
-                // 2. 신청 데이터 (기존 코드)
+                .mid(wishBookDTO.getMid()) // 컨트롤러에서 세션 ID를 넘겨주므로 그대로 사용
+                .status("신청중")
                 .applicantName(wishBookDTO.getWishApplicantName())
                 .wishPhone(wishBookDTO.getWishPhone())
                 .wishBookTitle(wishBookDTO.getWishBookTitle())
                 .wishAuthor(wishBookDTO.getWishAuthor())
                 .wishPublisher(wishBookDTO.getWishPublisher())
-
-                // 3. 파일명 (있다면 세팅)
-                .fileName(wishBookDTO.getWishBookImage() != null ?
+                .fileName(wishBookDTO.getWishBookImage() != null && !wishBookDTO.getWishBookImage().isEmpty() ?
                         wishBookDTO.getWishBookImage().getOriginalFilename() : null)
                 .build();
 
-        // 4. 저장 실행
         WishBookEntity result = wishBookRepository.save(entity);
-
         log.info("Service: DB 저장 성공! 생성된 번호: " + result.getWno());
 
         return result.getWno();
+    }
+
+    // [추가] 내 신청 내역 조회 로직
+    @Override
+    public List<WishBookDTO> getList(String mid) {
+        log.info("Service: " + mid + " 사용자의 신청 내역 조회 중...");
+
+        // 1. Repository에서 mid로 엔티티 리스트 조회 (정렬: 최근순)
+        List<WishBookEntity> result = wishBookRepository.findByMidOrderByWnoDesc(mid);
+
+        // 2. Entity 리스트를 DTO 리스트로 변환 (Stream 활용)
+        return result.stream().map(entity -> WishBookDTO.builder()
+                .wno(entity.getWno())
+                .wishApplicantName(entity.getApplicantName())
+                .wishBookTitle(entity.getWishBookTitle())
+                .wishAuthor(entity.getWishAuthor())
+                .wishPublisher(entity.getWishPublisher())
+                .status(entity.getStatus()) // Entity에 status 필드가 있어야 합니다.
+                .regDate(entity.getRegDate()) // 등록일자
+                .build()
+        ).collect(Collectors.toList());
     }
 }
 

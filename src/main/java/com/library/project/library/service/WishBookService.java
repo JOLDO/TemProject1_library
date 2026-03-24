@@ -2,9 +2,13 @@ package com.library.project.library.service;
 
 import com.library.project.library.dto.WishBookDTO;
 
+import java.util.List;
+
 public interface WishBookService {
-    // 신청서를 등록하고 생성된 번호(wno)를 반환하는 메서드
     Long register(WishBookDTO wishBookDTO);
+
+    // 추가: 특정 사용자의 신청 내역을 가져오는 메서드
+    List<WishBookDTO> getList(String mid);
 }
 
 /*

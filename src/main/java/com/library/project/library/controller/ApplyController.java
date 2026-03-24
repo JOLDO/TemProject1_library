@@ -63,6 +63,25 @@ public class ApplyController {
         return "redirect:/apply/spaceReservation";
     }
 
+
+    // [추가] 상세 내역 조회를 위한 Ajax 전용 API
+    @ResponseBody // 페이지 이동이 아니라 '데이터(JSON)'만 보내겠다는 선언입니다.
+    @GetMapping("/member/readApi") // HTML의 fetch('/apply/readApi?ano=' + ano) 와 주소를 맞춰줍니다.
+    public ApplyDTO readApi(Long ano) {
+        log.info("시설 대관 상세 조회 요청 - 번호: " + ano);
+
+        // 1. 서비스에서 해당 번호(ano)의 데이터를 가져옵니다.
+        ApplyDTO applyDTO = applyService.getApply(ano);
+
+        // 2. 만약 데이터가 없으면 로그를 남깁니다.
+        if(applyDTO == null) {
+            log.error(ano + "번 신청 내역을 찾을 수 없습니다.");
+        }
+
+        // 3. 데이터를 JSON 형태로 브라우저에 던져줍니다.
+        return applyDTO;
+    }
+
     // 내 시설 예약 신청 내역 목록 (기존 코드 유지)
     @GetMapping("member/myFacilityList")
     public String getMyFacilityList(HttpSession session, Model model) {

@@ -86,9 +86,12 @@
 
 
         /* 3. Section 1 디자인 (메인 비주얼) */
+        .sectionBg{background: url(/images/main_bg_busanlib.jpg) no-repeat center center;
+            background-size: cover;}
+
         #section1 {
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
-            url('https://library.busan.go.kr/portal/img/main/visual_img01.jpg') no-repeat center center/cover;
+            /*background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+            url('https://library.busan.go.kr/portal/img/main/visual_img01.jpg') no-repeat center center/cover;*/
             color: white;
             flex-direction: column;
         }
@@ -170,8 +173,8 @@
         }
 
         /* 4. Section 2 & 3 (공지사항 및 슬라이드) */
-        #section2 { background-color: #f8faff; }
-        #section3 { background-color: #ffffff; }
+        /*#section2 { background-color: #f8faff; }*/
+        /*#section3 { background-color: #ffffff; }*/
         .card { border: none; border-radius: 20px; transition: 0.3s; }
         .card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .badge-notice { background-color: #eef6ff; color: var(--lib-blue); }
@@ -193,7 +196,7 @@
     <a href="#section3" class="dot"></a>
 </div>
 
-<section id="section1">
+<section id="section1" class="sectionBg">
     <div class="text-center mb-5">
         <h1 class="display-3 main-title">BUSAN LIBRARY</h1>
         <p class="fs-5 opacity-75">부산의 미래를 담는 독서·문화·지식정보의 보고</p>
@@ -222,7 +225,7 @@
     </div>
 </section>
 
-<section id="section2">
+<section id="section2" class="sectionBg">
     <div class="container">
         <h2 class="fw-bold mb-5"><i class="bi bi-megaphone align-middle me-2"></i>도서관 소식</h2>
         <div class="row g-4">
@@ -242,14 +245,14 @@
                     <div class="mt-auto text-end text-muted">03.13</div>
                 </div>
             </div>
-            <div class="col-md-4 d-flex align-items-center justify-content-center">
-                <a href="#" class="btn btn-outline-primary rounded-circle p-4"><i class="bi bi-plus-lg fs-2"></i></a>
-            </div>
+<!--            <div class="col-md-4 d-flex align-items-center justify-content-center">-->
+<!--                <a href="#" class="btn btn-outline-primary rounded-circle p-4"><i class="bi bi-plus-lg fs-2"></i></a>-->
+<!--            </div>-->
         </div>
     </div>
 </section>
 
-<section id="section3">
+<section id="section3" class="sectionBg">
     <div class="container text-center">
         <h2 class="fw-bold mb-5 text-start">공간 소개</h2>
         <div id="libCarousel" class="carousel slide shadow-lg rounded-5" data-bs-ride="carousel">

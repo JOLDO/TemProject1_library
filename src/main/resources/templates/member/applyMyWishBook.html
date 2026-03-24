@@ -54,9 +54,9 @@
             <tbody class="text-center">
             <tr th:each="book : ${wishList}">
                 <td th:text="${book.wno}">1</td>
-                <td class="text-start ps-4" th:text="${book.title}">자바의 정석</td>
-                <td th:text="${book.author}">남궁성</td>
-                <td th:text="${book.regDate}" class="text-muted">2026-03-23</td>
+                <td class="text-start ps-4" th:text="${book.wishBookTitle}">자바의 정석</td>
+                <td th:text="${book.wishAuthor}">남궁성</td>
+                <td th:text="${#temporals.format(book.regDate, 'yyyy-MM-dd')}" class="text-muted">2026-03-23</td>
                 <td>
                             <span class="badge rounded-pill px-3 py-2"
                                   th:classappend="${book.status == '신청중' ? 'bg-info' : (book.status == '처리완료' ? 'bg-success' : 'bg-danger')}"
