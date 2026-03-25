@@ -5,26 +5,39 @@
       layout:decorate="~{layout/base}">
 <body>
 <div layout:fragment="content">
-    <h2 class="mb-4 fw-bold">조직 & 업무</h2>
+
+    <div class="d-flex justify-content-center gap-2 mb-5">
+        <a th:href="@{/info}" class="btn btn-outline-dark btn-sm shadow-sm">👋 관장 인사말</a>
+        <a th:href="@{/info/history}" class="btn btn-outline-dark btn-sm shadow-sm">📜 도서관 연혁</a>
+        <a th:href="@{/info/organization}" class="btn btn-outline-dark btn-sm shadow-sm active">🏢 조직업무</a>
+        <a th:href="@{/info/guide}" class="btn btn-outline-dark btn-sm shadow-sm">📖 이용안내</a>
+        <a th:href="@{/info/facilities}" class="btn btn-outline-dark btn-sm shadow-sm">🏢 시설 현황</a>
+        <a th:href="@{/info/map}" class="btn btn-outline-dark btn-sm shadow-sm">📍 찾아오시는 길</a>
+    </div>
+
+    <h2 class="mb-4 fw-bold">🏢 조직 & 업무</h2>
+    <p class="text-muted">부산도서관의 체계적인 조직 구성과 주요 업무를 소개합니다.</p>
     <hr>
-    <div class="card shadow-sm border-0">
+
+    <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
         <ul class="list-group list-group-flush">
-            <li class="list-group-item p-4">
-                <h5 class="fw-bold text-primary">도서관장</h5>
-                <p class="mb-0 text-muted">도서관 운영 전반에 관한 정책 결정 및 총괄 관리</p>
+            <li class="list-group-item p-4 bg-light-subtle">
+                <h5 class="fw-bold text-primary mb-2">👤 도서관장</h5>
+                <p class="mb-0 text-dark">도서관 운영 전반에 관한 정책 결정 및 총괄 관리</p>
             </li>
             <li class="list-group-item p-4">
-                <h5 class="fw-bold text-primary">사서운영팀</h5>
+                <h5 class="fw-bold text-primary mb-2">📚 사서운영팀</h5>
                 <p class="mb-0 text-muted">도서 자료 수집, 분류, 대출 및 독서 문화 프로그램 기획</p>
             </li>
             <li class="list-group-item p-4">
-                <h5 class="fw-bold text-primary">시설지원팀</h5>
+                <h5 class="fw-bold text-primary mb-2">🛠️ 시설지원팀</h5>
                 <p class="mb-0 text-muted">도서관 건물 유지 보수 및 대관 시설 예약 관리</p>
             </li>
         </ul>
     </div>
+
     <div class="text-center mt-5">
-        <a th:href="@{/info}" class="btn btn-dark px-5">메인으로 돌아가기</a>
+        <a th:href="@{/}" class="btn btn-dark px-5 shadow-sm">🏠 메인으로 돌아가기</a>
     </div>
 </div>
 </body>

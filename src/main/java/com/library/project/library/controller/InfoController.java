@@ -8,7 +8,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/info")
@@ -18,61 +17,76 @@ public class InfoController {
 
     private final InfoService infoService;
 
-    // 1. [GET] 도서관 안내 메인 홈 (접속 주소: /info)
+    // 1. 도서관 안내 메인 (인사말)
     @GetMapping("")
-    public String mainHome() {
-        // 주소창이 /info 이더라도, 진짜 메인인 / 로 강제 이동시킵니다.
-        return "redirect:/";
+    public String greeting(Model model) {
+        log.info("인사말 페이지 접속...");
+        // 파일명이 greeting.html 이므로 경로를 맞춰줍니다.
+        return "info/greeting";
     }
 
-    // 2. [GET] 자료 현황 목록 페이지 (접속 주소: /info/basic)
+    // 2. 도서관 연혁
+    @GetMapping("/history")
+    public String history() {
+        return "info/history";
+    }
+
+    // 3. 조직 및 업무
+    @GetMapping("/organization")
+    public String organization() {
+        return "info/organization";
+    }
+
+    // 4. 이용 안내
+    @GetMapping("/guide")
+    public String guide() {
+        return "info/guide";
+    }
+
+    // 5. 시설 현황
+    @GetMapping("/facilities")
+    public String facilities() {
+        return "info/facilities";
+    }
+
+    // 6. 찾아오시는 길 (구글 지도 포함)
+    @GetMapping("/map")
+    public String map() {
+        return "info/map";
+    }
+
+    // 7. 자료 현황 목록 (CRUD 메인)
     @GetMapping("/basic")
     public String basic(Model model) {
-        log.info("자료 현황 페이지 접속...");
         model.addAttribute("stats", infoService.getLibraryStatistics());
         model.addAttribute("info", infoService.getStaticLibraryInfo());
         return "info/basic";
     }
 
-    // 3. [GET] 자료 등록 페이지 이동
+    // 8. 자료 등록/수정/삭제 로직
     @GetMapping("/register")
-    public void registerGET() {
-        log.info("자료 등록 페이지 이동...");
-    }
+    public void registerGET() {}
 
-    // 4. [POST] 자료 등록 처리
     @PostMapping("/register")
     public String registerPOST(LibraryStatsDTO dto) {
-        log.info("자료 등록 실행: " + dto);
         infoService.registerStat(dto);
-        // 등록 후에는 다시 목록으로 보냅니다.
         return "redirect:/info/basic";
     }
 
-    // 5. [GET] 자료 수정 페이지 이동 (ID값 필수)
     @GetMapping("/modify")
-    public String modifyGET(@RequestParam("id") Long id, Model model) {
-        log.info("수정 페이지 이동 ID: " + id);
+    public void modifyGET(@RequestParam("id") Long id, Model model) {
         model.addAttribute("stat", infoService.getStat(id));
-        model.addAttribute("info", infoService.getStaticLibraryInfo());
-        return "info/modify";
     }
 
-    // 6. [POST] 자료 수정 처리
     @PostMapping("/modify")
     public String modifyPOST(LibraryStatsDTO dto) {
-        log.info("자료 수정 실행: " + dto);
         infoService.modifyStat(dto);
-        // 수정 완료 후 목록으로 리다이렉트
         return "redirect:/info/basic";
     }
 
-    // 7. [POST] 자료 삭제 처리
     @PostMapping("/remove")
     public String removePOST(@RequestParam("statId") Long statId) {
-        log.info("자료 삭제 실행 ID: " + statId);
         infoService.removeStat(statId);
-        // 삭제 후 목록으로 리다이렉트
         return "redirect:/info/basic";
     }
 }

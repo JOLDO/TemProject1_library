@@ -5,96 +5,38 @@
       layout:decorate="~{layout/base}">
 <body>
 <div layout:fragment="content">
-    <h2 class="mb-4 fw-bold">기증 및 납본 안내</h2>
-    <p class="text-muted">소중한 자료 기증이 부산도서관의 자산이 됩니다.</p>
+
+    <div class="d-flex justify-content-center gap-2 mb-5">
+        <a th:href="@{/info}" class="btn btn-outline-dark btn-sm shadow-sm">👋 관장 인사말</a>
+        <a th:href="@{/info/history}" class="btn btn-outline-dark btn-sm shadow-sm">📜 도서관 연혁</a>
+        <a th:href="@{/info/organization}" class="btn btn-outline-dark btn-sm shadow-sm">🏢 조직업무</a>
+        <a th:href="@{/info/guide}" class="btn btn-outline-dark btn-sm shadow-sm">📖 이용안내</a>
+        <a th:href="@{/info/facilities}" class="btn btn-outline-dark btn-sm shadow-sm">🏢 시설 현황</a>
+        <a th:href="@{/info/map}" class="btn btn-outline-dark btn-sm shadow-sm">📍 찾아오시는 길</a>
+    </div>
+
+    <h2 class="mb-4 fw-bold">🤝 도서 기증 및 납본 안내</h2>
     <hr>
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body p-4">
-            <h5 class="fw-bold text-primary mb-3">📂 도서 기증 안내</h5>
-            <div class="row">
-                <div class="col-md-6 border-end">
-                    <h6 class="fw-bold text-success">기증 대상 자료</h6>
-                    <ul class="small">
-                        <li>학술적 가치가 있는 도서 및 자료</li>
-                        <li>지역사회 문화 보존에 기여하는 향토자료</li>
-                        <li>신간 도서 및 상태가 양호한 교양 도서</li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <h6 class="fw-bold text-danger">기증 제한 자료</h6>
-                    <ul class="small">
-                        <li>파손, 낙서, 오염이 심한 도서</li>
-                        <li>내용이 시대에 맞지 않는 수험서 및 잡지</li>
-                        <li>만화책, 홍보용 리플릿 등</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+    <div class="p-4 bg-light rounded shadow-sm">
+        <h4 class="fw-bold mb-3">✅ 기증 절차</h4>
+        <ol class="list-group list-group-numbered border-0">
+            <li class="list-group-item bg-transparent border-0">기증 의사 표시 (전화 또는 방문)</li>
+            <li class="list-group-item bg-transparent border-0">도서 상태 및 중복 여부 확인</li>
+            <li class="list-group-item bg-transparent border-0">기증 도서 인수 및 기증 증서 발급</li>
+        </ol>
+
+        <h4 class="fw-bold mt-5 mb-3">🚫 기증 제한 도서</h4>
+        <ul class="text-danger">
+            <li>훼손이 심하거나 오염된 도서</li>
+            <li>내용이 시의성에 맞지 않는 수험서 및 잡지</li>
+            <li>개인 복사물 및 스프링 제본 도서</li>
+        </ul>
     </div>
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body p-4">
-            <h5 class="fw-bold text-success mb-3">📝 자료 납본 안내</h5>
-            <p class="small text-muted">도서관법에 의거하여 부산 지역에서 발행되는 모든 자료는 부산도서관에 납본하셔야 합니다.</p>
-            <table class="table table-sm table-bordered text-center align-middle mt-3">
-                <thead class="table-light">
-                <tr>
-                    <th>납본 대상</th>
-                    <th>납본 부수</th>
-                    <th>제출 기한</th>
-                </tr>
-                </thead>
-                <tbody class="small">
-                <tr>
-                    <td>도서, 연속간행물, 악보 등</td>
-                    <td>정본 2부</td>
-                    <td>발행일로부터 30일 이내</td>
-                </tr>
-                <tr>
-                    <td>전자출판물 (CD, USB 등)</td>
-                    <td>정본 2부</td>
-                    <td>발행일로부터 30일 이내</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="card shadow-sm border-0 mb-5 bg-light">
-        <div class="card-body p-4 text-center">
-            <h5 class="fw-bold mb-4">🚀 처리 절차</h5>
-            <div class="d-flex justify-content-around align-items-center flex-wrap">
-                <div class="p-2">
-                    <span class="badge rounded-pill bg-primary px-3">1</span>
-                    <p class="mt-2 mb-0 fw-bold">자료 접수</p>
-                </div>
-                <div class="text-muted">▶</div>
-                <div class="p-2">
-                    <span class="badge rounded-pill bg-primary px-3">2</span>
-                    <p class="mt-2 mb-0 fw-bold">기증/납본 심사</p>
-                </div>
-                <div class="text-muted">▶</div>
-                <div class="p-2">
-                    <span class="badge rounded-pill bg-primary px-3">3</span>
-                    <p class="mt-2 mb-0 fw-bold">자료 등록/분류</p>
-                </div>
-                <div class="text-muted">▶</div>
-                <div class="p-2">
-                    <span class="badge rounded-pill bg-primary px-3">4</span>
-                    <p class="mt-2 mb-0 fw-bold">서가 배치 및 서비스</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="text-center">
-        <a th:href="@{/info}" class="btn btn-dark px-5 py-2 fw-bold">메인 홈페이지로 돌아가기</a>
+    <div class="text-center mt-5">
+        <a th:href="@{/}" class="btn btn-dark px-5 shadow-sm">메인으로 돌아가기</a>
     </div>
 </div>
-
-<script layout:fragment="script" th:inline="javascript">
-    console.log("기증/납본 안내 페이지 로드 완료");
-</script>
 </body>
 </html>
