@@ -20,7 +20,7 @@ public class MemberDTO {
     @Size(min = 4, max = 20)
     private String mid; // 로그인 아이디
 
-    @NotEmpty
+//    @NotEmpty
     private String mpw; // 비밀번호
 
     @NotEmpty
