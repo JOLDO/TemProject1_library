@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/base}">
+
+<div layout:fragment="content">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+            <h5 class="card-title mb-0 fw-bold">질문과 답변 (Q&A)</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th style="width: 10%">번호</th>
+                    <th style="width: 60%">제목</th>
+                    <th style="width: 15%">작성자</th>
+                    <th style="width: 15%">등록일</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="dto : ${responseDTO?.dtoList}">
+                    <td th:text="${dto.ino}"></td>
+                    <td>
+                        <a th:href="@{/inquiry/read(ino=${dto.ino})}"
+                           th:text="${dto.title}"
+                           class="text-decoration-none text-dark fw-medium"></a>
+                        <span class="badge rounded-pill bg-info ms-1"
+                              th:if="${dto.replyCount > 0}" th:text="${dto.replyCount}"></span>
+                    </td>
+                    <td th:text="${dto.writer}"></td>
+                    <td th:text="${#temporals.format(dto.regDate, 'yyyy-MM-dd')}" class="text-muted small"></td>
+                </tr>
+
+                <tr th:if="${responseDTO == null || #lists.isEmpty(responseDTO.dtoList)}">
+                    <td colspan="4" class="text-center py-5 text-muted">등록된 질문이 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="d-flex justify-content-center mt-4">
+                <ul class="pagination shadow-sm" th:if="${responseDTO != null && responseDTO.total > 0}">
+                    <li class="page-item" th:if="${responseDTO.prev}">
+                        <a class="page-link text-dark" th:data-num="${responseDTO.start - 1}">이전</a>
+                    </li>
+
+                    <th:block th:each="i : ${#numbers.sequence(responseDTO.start, responseDTO.end)}">
+                        <li th:class="${responseDTO.page == i} ? 'page-item active' : 'page-item'">
+                            <a class="page-link" th:data-num="${i}" th:text="${i}"></a>
+                        </li>
+                    </th:block>
+
+                    <li class="page-item" th:if="${responseDTO.next}">
+                        <a class="page-link text-dark" th:data-num="${responseDTO.end + 1}">다음</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="text-end mt-3">
+                <div th:if="${session.loginInfo != null}">
+                    <a th:href="@{/inquiry/register}" class="btn btn-primary px-4">질문하기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        // 📍 [추가 포인트 2] 페이지 클릭 이벤트
+        document.querySelector(".pagination")?.addEventListener("click", function (e) {
+            e.preventDefault();
+            const target = e.target;
+            if (target.tagName !== 'A') return;
+
+            const num = target.getAttribute("data-num");
+            // 문의사항 리스트 경로로 이동
+            self.location = `/inquiry/list?page=${num}`;
+        }, false);
+
+        console.log("Inquiry List Page Loaded");
+
+        const result = [[${result}]];
+        if(result) {
+            alert(result);
+        }
+    </script>
+</th:block>
+</html>

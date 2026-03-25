@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<body>
+<link rel="stylesheet" href="/css/busan-library-common.css">
+
+<div layout:fragment="content">
+    <div class="row mt-3 justify-content-center">
+        <div class="col-md-6">
+
+            <!-- 아이디 찾기 카드 -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header text-center py-3">
+                    <h5 class="mb-0 fw-bold">아이디 찾기</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/member/find-id}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이름</label>
+                            <input type="text" name="mname" class="form-control"
+                                   placeholder="가입 시 등록한 성함" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이메일</label>
+                            <input type="email" name="email" class="form-control"
+                                   placeholder="example@lib.com" required>
+                        </div>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">아이디 찾기</button>
+                        </div>
+                    </form>
+
+                    <!-- 결과 메시지 -->
+                    <div th:if="${foundMid}" class="mt-4 alert alert-success text-center shadow-sm">
+                        찾으시는 아이디는 [ <strong th:text="${foundMid}" class="text-primary"></strong> ] 입니다.
+                    </div>
+                    <div th:if="${errorId}" class="mt-4 alert alert-danger text-center shadow-sm">
+                        일치하는 정보가 없습니다. 다시 확인해주세요.
+                    </div>
+                </div>
+                <div class="card-footer bg-light text-center py-3">
+                    <a th:href="@{/member/login}" class="text-decoration-none text-muted small me-3">로그인</a>
+                    <span class="text-muted small">|</span>
+                    <a th:href="@{/member/find-pw-page}" class="text-decoration-none text-muted small ms-3">비밀번호 찾기</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="script" th:inline="javascript">
+</script>
+</body>
+</html>

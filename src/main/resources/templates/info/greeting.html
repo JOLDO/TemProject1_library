@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<body>
+<div layout:fragment="content">
+    <h2 class="mb-4 fw-bold">관장 인사말</h2>
+    <hr>
+    <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
+        <div class="container-fluid py-5 text-center">
+            <h3 class="fw-bold text-primary mb-4">"지식과 문화가 살아 숨쉬는 공간, 부산도서관입니다."</h3>
+            <p class="fs-5 mt-4">안녕하세요. 우리 도서관 방문을 진심으로 환영합니다.</p>
+            <p class="fs-5">저희 도서관은 지역 주민 여러분의 지식 탐구와 문화적 성장을 돕기 위해<br>
+                최선을 다하고 있습니다. 언제나 편안하게 머물다 가실 수 있는 공간이 되겠습니다.</p>
+            <p class="text-end fw-bold mt-5 fs-4">— 부산도서관장 올림 —</p>
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a th:href="@{/info}" class="btn btn-dark px-5">메인으로 돌아가기</a>
+    </div>
+</div>
+</body>
+</html>

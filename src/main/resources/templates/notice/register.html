@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<div layout:fragment="content">
+    <div class="container-fluid px-4">
+        <h2 class="mt-4 fw-bold">공지사항 등록</h2>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a th:href="@{/}">홈</a></li>
+            <li class="breadcrumb-item">참여마당</li>
+            <li class="breadcrumb-item active">공지사항 등록</li>
+        </ol>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="fas fa-edit me-2"></i>새 공지사항 작성</h5>
+            </div>
+            <div class="card-body p-4">
+                <form action="/notice/register" method="post" id="registerForm">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">제목</label>
+                        <input class="form-control form-control-lg" type="text" name="title" placeholder="공지사항 제목을 입력하세요" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">내용</label>
+                        <textarea class="form-control" rows="10" name="content" placeholder="내용을 입력하세요" required></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">작성자</label>
+                        <input class="form-control" type="text" name="writer" placeholder="작성자 성함" required>
+                    </div>
+
+                    <div class="mb-4 p-4 bg-light rounded-3 border">
+                        <label class="form-label fw-bold d-block mb-3">
+                            <i class="fas fa-paperclip me-1"></i> 첨부 파일 (이미지)
+                        </label>
+                        <div class="d-flex uploadResult gap-3 mb-3" style="flex-wrap: wrap"></div>
+
+                        <div class="uploadHidden"></div>
+
+                        <button type="button" class="btn btn-outline-primary uploadFileBtn">
+                            <i class="fas fa-plus me-1"></i> 파일 추가하기
+                        </button>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 border-top pt-4">
+                        <button type="button" class="btn btn-primary submitBtn px-5">등록하기</button>
+                        <button type="reset" class="btn btn-outline-secondary px-4">다시 쓰기</button>
+                        <a th:href="@{/notice/list}" class="btn btn-light px-4">목록으로</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal uploadModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold">파일 업로드</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <input type="file" name="files" class="form-control" multiple>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-primary uploadBtn px-4">업로드 실행</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/upload.js"></script>
+</div>
+
+<script layout:fragment="script" th:inline="javascript">
+    // 1. 유효성 검사 에러 처리
+    const errors = [[${errors}]]
+    if(errors) {
+        let errorMsg = ''
+        for (let i = 0; i < errors.length; i++) {
+            errorMsg += `${errors[i].field} : ${errors[i].code}\n`
+        }
+        alert(errorMsg)
+    }
+
+    // 2. 모달 및 업로드 로직
+    const uploadModal = new bootstrap.Modal(document.querySelector(".uploadModal"))
+    const uploadResult = document.querySelector(".uploadResult")
+
+    // [파일 추가하기] 버튼
+    document.querySelector(".uploadFileBtn").addEventListener("click", function (e) {
+        e.preventDefault();
+        uploadModal.show();
+    }, false)
+
+    // 모달 내 [업로드 실행] 버튼
+    document.querySelector(".uploadBtn").addEventListener("click", function (e){
+        const formData = new FormData();
+        const fileInput = document.querySelector("input[name='files']")
+
+        for(let i = 0; i < fileInput.files.length; i++) {
+            formData.append("files", fileInput.files[i])
+        }
+
+        // upload.js의 함수 호출
+        uploadToServer(formData).then(result => {
+            result.forEach(fileInfo => showUploadFile(fileInfo))
+            uploadModal.hide()
+        }).catch(e => {
+            uploadModal.hide()
+        })
+    }, false)
+
+    // 3. 미리보기 이미지 카드 생성
+    function showUploadFile({uuid, fileName, link}) {
+        const str = `
+            <div class="card border-0 shadow-sm" style="width: 150px;">
+                <div class="card-header bg-light d-flex justify-content-between p-2">
+                    <span class="text-truncate small">${fileName}</span>
+                    <button type="button" class="btn btn-sm text-danger p-0" onclick="removeFile('${uuid}','${fileName}',this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="card-body p-2 text-center">
+                    <img src="/view/${link}" data-src="${uuid}_${fileName}" class="img-fluid rounded" style="height: 80px; object-fit: cover;">
+                </div>
+            </div>`
+        uploadResult.insertAdjacentHTML('beforeend', str)
+    }
+
+    // 4. 파일 삭제 처리
+    function removeFile(uuid, fileName, obj) {
+        const targetDiv = obj.closest(".card")
+        removeFileToServer(uuid, fileName).then(data => {
+            targetDiv.remove()
+        })
+    }
+
+    // 5. 📍 [최종 등록] 버튼 클릭 시 요청하신 로직 통합
+    document.querySelector(".submitBtn").addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // 첨부된 이미지 파일명을 숨겨서 보낼 공간
+        const target = document.querySelector(".uploadHidden");
+
+        // uploadResult 영역 내 모든 이미지 태그 선택
+        const uploadFiles = uploadResult.querySelectorAll("img");
+
+        let str = '';
+
+        for(let i = 0; i < uploadFiles.length; i++) {
+            const uploadFile = uploadFiles[i];
+            const imgLink = uploadFile.getAttribute("data-src");
+
+            // 📍 서버 DTO의 List<String> fileNames 필드와 매칭
+            str += `<input type='hidden' name='fileNames' value="${imgLink}">`;
+        }
+
+        target.innerHTML = str; // 생성된 hidden 태그들을 주입
+
+        // 실제 폼 전송
+        document.querySelector("#registerForm").submit();
+    })
+</script>
+
+</html>

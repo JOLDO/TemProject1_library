@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<div layout:fragment="content">
+    <div class="container-fluid px-4">
+        <h2 class="mt-4 fw-bold">공지사항 수정/삭제</h2>
+
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body">
+                <form th:action="@{/notice/modify}" method="post" id="f1">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">글번호</label>
+                        <input type="text" name="nno" class="form-control bg-light" th:value="${dto.nno}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">제목</label>
+                        <input type="text" name="title" class="form-control" th:value="${dto.title}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">내용</label>
+                        <textarea name="content" class="form-control" rows="10">[[${dto.content}]]</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">작성자</label>
+                        <input type="text" name="writer" class="form-control bg-light" th:value="${dto.writer}" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">파일 첨부</label>
+                        <input type="file" name="files" class="form-control" multiple>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col d-flex flex-wrap" id="uploadResult">
+                            <th:block th:each="fileName:${dto.fileNames}">
+                                <div class="card shadow-sm m-2 p-1" style="width: 150px;">
+                                    <img class="card-img-top" th:src="|/view/${fileName}|" th:data-src="${fileName}">
+                                    <div class="card-body p-2 text-center">
+                                        <button type="button" class="btn btn-danger btn-sm w-100" th:onclick="removeFile('[[${fileName}]]', this)">삭제</button>
+                                    </div>
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+
+                    <div id="uploadHidden">
+                        <th:block th:each="fileName:${dto.fileNames}">
+                            <input type="hidden" name="fileNames" th:value="${fileName}">
+                        </th:block>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-secondary listBtn">목록</button>
+                        <button type="button" class="btn btn-primary modBtn">수정하기</button>
+                        <button type="button" class="btn btn-danger removeBtn">삭제하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="script" th:inline="javascript">
+    const link = [[${pageRequestDTO.getLink()}]];
+    const formObj = document.querySelector("#f1");
+    const uploadResult = document.querySelector("#uploadResult");
+    const uploadHidden = document.querySelector("#uploadHidden");
+
+    // Axios 라이브러리 로드 (필요시 - base layout에 없다면 추가)
+    // <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+// 1. 파일 선택 시 비동기 업로드 처리
+document.querySelector("input[name='files']").addEventListener("click", function(e){
+e.preventDefault();
+
+// 📍 파일 첨부 창을 띄웁니다.
+const inputFile = document.createElement("input");
+inputFile.type = "file";
+inputFile.multiple = true;
+inputFile.click();
+
+inputFile.onchange = function(e){
+const files = inputFile.files;
+const formData = new FormData();
+
+for (let i = 0; i < files.length; i++) {
+formData.append("files", files[i]);
+}
+
+// UploadController의 /uploadPOST로 데이터 전송 (Axios)
+axios.post('/upload', formData, {
+headers: {
+'Content-Type': 'multipart/form-data'
+}
+}).then(res => {
+const arr = res.data;
+console.log(arr);
+
+// 미리보기 및 hidden input 생성 메서드 호출
+appendResult(arr);
+});
+}
+});
+
+// 2. 미리보기 및 hidden input 생성 메서드
+function appendResult(arr){
+for(let fileInfo of arr){
+// 📍 미리보기 card 생성
+const div = document.createElement("div");
+div.className = "card shadow-sm m-2 p-1";
+div.style.width = "150px";
+
+// 이미지 URL 설정
+const imgUrl = fileInfo.image ? `/view/s_${fileInfo.uuid}_${fileInfo.fileName}` : `/assets/img/file-icon.png`;
+
+div.innerHTML = `
+<img class="card-img-top" src="${imgUrl}" data-src="${fileInfo.uuid}_${fileInfo.fileName}">
+<div class="card-body p-2 text-center">
+    <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeFile('${fileInfo.uuid}_${fileInfo.fileName}', this)">삭제</button>
+</div>
+`;
+uploadResult.appendChild(div);
+
+// 📍 서버로 보낼 hidden input 생성 (이게 없으면 수정 시 파일 정보가 안 갑니다!)
+const hidden = document.createElement("input");
+hidden.type = "hidden";
+hidden.name = "fileNames";
+hidden.value = `${fileInfo.uuid}_${fileInfo.fileName}`;
+uploadHidden.appendChild(hidden);
+}
+}
+
+// 3. 첨부파일 삭제 버튼 처리 (미리보기 화면 & Hidden 영역 모두 삭제)
+function removeFile(fileName, btn){
+// 📍 미리보기 card 삭제
+btn.closest(".card").remove();
+
+// 📍 Hidden 영역의 input 삭제
+const hiddenInput = uploadHidden.querySelector(`input[value='${fileName}']`);
+hiddenInput.remove();
+}
+
+// 4. 수정 버튼 클릭 시 제출
+document.querySelector(".modBtn").addEventListener("click", function(e){
+e.preventDefault();
+e.stopPropagation();
+
+formObj.action = "/notice/modify?" + link;
+formObj.method = "post";
+formObj.submit();
+});
+
+// 5. 삭제 버튼 클릭 시 제출
+document.querySelector(".removeBtn").addEventListener("click", function(e){
+e.preventDefault();
+e.stopPropagation();
+
+formObj.action = "/notice/remove";
+formObj.method = "post";
+formObj.submit();
+});
+
+// 6. 목록 버튼 클릭 시 이동
+document.querySelector(".listBtn").addEventListener("click", function(e){
+e.preventDefault();
+e.stopPropagation();
+
+self.location = "/notice/list?" + link;
+});
+</script>
+</html>

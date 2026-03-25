@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/base}">
+
+<div layout:fragment="content">
+    <div class="row mt-3">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    질문 등록하기 (Q&A)
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/inquiry/register}" method="post">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">제목</span>
+                            <input type="text" name="title" class="form-control" placeholder="제목을 입력하세요" required>
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">내용</span>
+                            <textarea class="form-control col-sm-5" rows="5" name="content" required></textarea>
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">작성자</span>
+                            <input type="text" name="writer" class="form-control" placeholder="작성자" required>
+                        </div>
+
+                        <div class="my-4">
+                            <div class="float-end">
+                                <button type="submit" class="btn btn-primary">등록하기</button>
+                                <button type="reset" class="btn btn-secondary">다시쓰기</button>
+                                <a th:href="@{/inquiry/list}" class="btn btn-info text-white">목록으로</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        // 에러가 있을 경우 경고창 띄우기
+        const errors = [[${errors}]]
+        if(errors) {
+            alert("입력 데이터를 확인해주세요!")
+        }
+    </script>
+</th:block>
+</html>

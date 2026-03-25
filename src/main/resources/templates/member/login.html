@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<body>
+<link rel="stylesheet" href="/css/busan-library-common.css">
+
+<div layout:fragment="content">
+    <div class="row mt-5 justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-0 pt-4 text-center">
+                    <h3 class="fw-bold text-primary">Library Login</h3>
+                    <p class="text-muted small">도서관 서비스를 위해 로그인해 주세요.</p>
+                </div>
+                <div class="card-body p-4">
+                    <!-- th:action을 사용하여 CSRF 토큰 자동 생성 유도 -->
+                    <form th:action="@{/member/login}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">아이디</label>
+                            <input type="text" name="mid" class="form-control form-control-lg"
+                                   placeholder="ID를 입력하세요"
+                                   th:value="${savedMid}"
+                                   required autofocus>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">비밀번호</label>
+                            <input type="password" name="mpw" class="form-control form-control-lg"
+                                   placeholder="Password" required>
+                        </div>
+
+                        <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe"
+                               th:checked="${savedMid != null && !savedMid.isEmpty()}">
+                        <label class="form-check-label small text-muted" for="rememberMe">아이디 저장</label>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg fw-bold">로그인</button>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <!--<a th:href="@{/member/find}" class="text-decoration-none text-muted small">아이디 찾기</a>
+                            <span class="text-muted mx-2 small">|</span>
+                            <a th:href="@{/member/find}" class="text-decoration-none text-muted small">비밀번호 찾기</a>-->
+                            <a th:href="@{/member/find}" class="text-decoration-none text-muted small">아이디 찾기</a>
+                            <span>|</span>
+                            <a th:href="@{/member/find-pw-page}" class="text-decoration-none text-muted small">비밀번호 찾기</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer bg-light border-0 py-3 text-center">
+                    <span class="small text-muted">아직 회원이 아니신가요?</span>
+                    <a th:href="@{/member/join}" class="text-primary fw-bold text-decoration-none ms-1 small">회원가입</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="script" th:inline="javascript">
+    /* 컨트롤러에서 전달받는 결과/에러 메시지 처리 */
+    /*const result = [[${result}]];
+    const error = [[${error}]];*/
+    const result = /*[[${result}]]*/ null;
+    const error = /*[[${error}]]*/ null;
+
+    // 1. 알림 메시지 통합 처리
+    window.onload = function() {
+        if(result === 'success') {
+            alert("회원가입이 완료되었습니다! 로그인 해주세요.");
+        } else if(result === 'pwChanged') {
+            alert("비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
+        }
+
+        // 2. 로그인 에러 처리 (보안을 위해 구체적 사유 대신 통합 메시지 권장)
+        if(error) {
+            alert("아이디 또는 비밀번호를 확인해주세요.");
+        }
+
+        // 3. 로그아웃 확인
+        const logout = /*[[${logout}]]*/ null;
+        if (logout) { alert("정상적으로 로그아웃 되었습니다."); }
+    };
+</script>
+</body>
+</html>

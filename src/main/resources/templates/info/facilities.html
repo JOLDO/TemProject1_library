@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<body>
+<div layout:fragment="content">
+    <h2 class="mb-4 fw-bold">시설 현황</h2>
+    <p class="text-muted">부산도서관의 층별 주요 시설 및 보유 장비 안내입니다.</p>
+    <hr>
+
+    <div class="mb-5">
+        <h4 class="border-start border-primary border-4 ps-2 mb-4 fw-bold text-dark">■ 층별 주요 시설 안내</h4>
+        <div class="table-responsive shadow">
+            <table class="table table-bordered text-center align-middle mb-0">
+                <thead class="table-primary text-white">
+                <tr>
+                    <th style="width: 20%">위치</th>
+                    <th style="width: 45%">주요 시설</th>
+                    <th style="width: 35%">특이사항 / 보유 장비</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="fw-bold bg-light">지하 1층</td>
+                    <td>극장</td>
+                    <td class="text-primary fw-bold">그랜드 피아노 보유</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold bg-light">1층</td>
+                    <td>회의실, 전시실</td>
+                    <td>전시 및 대관 서비스</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold bg-light">2층</td>
+                    <td>세미나실(2개), 소극장(1개), 다목적홀(1개)</td>
+                    <td>문화 강연 및 소규모 공연</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold bg-light">3층</td>
+                    <td>스튜디오(1개), 조리실(1개), 문화교실(1개)</td>
+                    <td>디지털 콘텐츠 제작 및 실습</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold bg-light">4층</td>
+                    <td>옥상정원(1개), 유아실(1개)</td>
+                    <td>야외 휴식 공간 및 영유아 전용</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a th:href="@{/info}" class="btn btn-dark px-4 shadow-sm">🏠 메인으로 돌아가기</a>
+    </div>
+</div>
+
+<script layout:fragment="script" th:inline="javascript">
+    console.log("지하 1층(극장/그랜드피아노) 포함 시설 현황 업데이트 완료");
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<div layout:fragment="content">
+    <div class="container-fluid px-4">
+        <h2 class="mt-4 fw-bold">공지사항 리스트</h2>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a th:href="@{/}">홈</a></li>
+            <li class="breadcrumb-item">참여마당</li>
+            <li class="breadcrumb-item active">공지사항</li>
+        </ol>
+
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <p class="text-muted small mb-0">
+                        총 <span class="text-primary fw-bold" th:text="${responseDTO != null ? responseDTO.total : 0}">0</span>건의 게시물이 있습니다.
+                    </p>
+
+                    <div th:if="${session.loginInfo != null && session.loginInfo.role == 'ADMIN'}">
+                        <a th:href="@{/notice/register}" class="btn btn-primary px-4">공지사항 등록</a>
+                    </div>
+                </div>
+
+                <table class="table table-hover border-top align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th style="width: 10%">번호</th>
+                        <th style="width: 60%">제목</th>
+                        <th style="width: 15%">작성자</th>
+                        <th style="width: 15%" class="text-center">작성일</th>
+                    </tr>
+                    </thead>
+                    <tbody th:with="link = ${pageRequestDTO != null ? pageRequestDTO.getLink() : ''}">
+                    <tr th:each="dto : ${responseDTO?.dtoList}">
+                        <td th:text="${dto.nno}"></td>
+                        <td>
+                            <div th:if="${dto.noticeImages != null && !#lists.isEmpty(dto.noticeImages)}" class="d-inline-block me-2">
+                                <img th:src="|/display/s_${dto.noticeImages[0].uuid}_${dto.noticeImages[0].fileName}|"
+                                     class="rounded shadow-sm"
+                                     style="width: 45px; height: 45px; object-fit: cover;"
+                                     alt="썸네일">
+                            </div>
+
+                            <a th:href="|@{/notice/read(nno=${dto.nno})}&${link}|"
+                               class="text-decoration-none text-dark fw-medium">
+                                <span th:text="${dto.title}"></span>
+                                <span class="badge rounded-pill bg-info ms-1"
+                                      th:if="${dto.replyCount > 0}" th:text="${dto.replyCount}"></span>
+                            </a>
+                        </td>
+                        <td th:text="${dto.writer}"></td>
+                        <td class="text-center text-muted small"
+                            th:text="${#temporals.format(dto.regDate, 'yyyy-MM-dd')}"></td>
+                    </tr>
+
+                    <tr th:if="${responseDTO == null || #lists.isEmpty(responseDTO.dtoList)}">
+                        <td colspan="4" class="text-center py-5 text-muted">등록된 공지사항이 없습니다.</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-center mt-4">
+                    <ul class="pagination shadow-sm" th:if="${responseDTO != null}">
+                        <li class="page-item" th:if="${responseDTO.prev}">
+                            <a class="page-link text-dark" th:data-num="${responseDTO.start - 1}">이전</a>
+                        </li>
+
+                        <th:block th:each="i : ${#numbers.sequence(responseDTO.start, responseDTO.end)}">
+                            <li th:class="${responseDTO.page == i} ? 'page-item active' : 'page-item'">
+                                <a class="page-link" th:data-num="${i}" th:text="${i}"></a>
+                            </li>
+                        </th:block>
+
+                        <li class="page-item" th:if="${responseDTO.next}">
+                            <a class="page-link text-dark" th:data-num="${responseDTO.end + 1}">다음</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script layout:fragment="script" th:inline="javascript">
+    // 페이지네이션 클릭 이벤트
+    document.querySelector(".pagination")?.addEventListener("click", function (e) {
+        e.preventDefault();
+        const target = e.target;
+        if (target.tagName !== 'A') return;
+
+        const num = target.getAttribute("data-num");
+        self.location = `/notice/list?page=${num}`;
+    }, false);
+
+    // 알림창 로직
+    const result = [[${result}]];
+    if (result) {
+        if(result === 'modified') alert("수정되었습니다.");
+        else if(result === 'removed') alert("삭제되었습니다.");
+        else alert(result + "번 공지사항이 등록되었습니다.");
+    }
+</script>
+</html>

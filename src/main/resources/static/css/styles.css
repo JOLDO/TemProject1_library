@@ -1,0 +1,309 @@
+/* 메인 콘텐츠 너비: 모바일 100%, PC 70% 중앙 정렬 */
+.main-content {
+    width: 80%;
+}
+
+mark {
+    font: inherit;
+    line-height: inherit;
+    background-color: #fff3cd;
+    padding: 0;
+    margin: 0;
+    display: inline;
+    border: none;
+    outline: none;
+}
+
+/* 추천하기 버튼 배경 흰색 */
+.btn-outline-danger {
+    background-color: #fff;
+}
+
+.btn-outline-danger:focus,
+.btn-outline-danger:active,
+.btn-danger:focus,
+.btn-danger:active {
+    outline: none;
+    box-shadow: none;
+}
+
+/* flex 안에서 말줄임 동작하려면 부모에 min-width: 0 필요 */
+.list-group-item .flex-grow-1 {
+    min-width: 0;
+}
+
+
+/* 배지 크기 */
+.list-group-item .book-actions .badge {
+    font-size: 1rem;
+    padding: 0.5em 0.9em;
+}
+
+/* 추천하기 버튼 크기 */
+.list-group-item .book-actions .recommend-btn {
+    font-size: 1.1rem;
+    padding: 0.5em 1em;
+}
+
+/* 텍스트 크기 */
+.list-group-item h5 { font-size: 1.3rem; }
+.list-group-item p  { font-size: 1.1rem; }
+.list-group-item small { font-size: 1rem; }
+.list-group-item .book-actions .text-muted { font-size: 1rem !important; font-variant-numeric: tabular-nums; }
+
+/* list-group hover/active 색상 커스텀 */
+.list-group-item-action:hover,
+.list-group-item-action:focus {
+    background-color: #fff3cd;
+    border-color: #ffc107;
+}
+
+.list-group-item-action.active {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+}
+
+/* 모달 공통: Bootstrap 소형 화면 덮어쓰기 방지 */
+#bookDetailModal .modal-dialog {
+    max-width: 80% !important;
+    width: 80%;
+    margin: 5vh auto !important;
+}
+
+#recommendModal .modal-dialog {
+    max-width: 50% !important;
+    margin: 5vh auto !important;
+}
+
+/* 모바일: 이미지+배지/버튼 위, 텍스트 아래 */
+@media (max-width: 767px) {
+    .list-group-item .d-flex.w-100 {
+        flex-wrap: wrap;
+    }
+
+    .list-group-item .book-image-wrap {
+        order: 1;
+    }
+
+    .list-group-item .book-actions {
+        order: 2;
+        flex-grow: 1;
+    }
+
+    .list-group-item .flex-grow-1 {
+        order: 3;
+        flex: 0 0 100%;
+        border-top: 1px solid #dee2e6;
+        padding-top: 0.5rem;
+        margin-top: 0.5rem;
+    }
+}
+
+/* =========================================
+   base2 헤더 / 사이드바
+========================================= */
+
+header {
+    border-bottom: 1px solid #ddd;
+    background-color: #fff;
+    position: relative;
+}
+
+/* 햄버거 버튼 - 기본 숨김 */
+.hamburger {
+    display: none;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 200;
+}
+
+/* 사이드바 */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 300;
+}
+
+.sidebar-overlay.open {
+    display: block;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 280px;
+    height: 100vh;
+    background: #fff;
+    z-index: 400;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+    padding: 20px 0;
+    box-shadow: -4px 0 16px rgba(0,0,0,0.15);
+}
+
+.sidebar.open {
+    right: 0;
+}
+
+.sidebar-close {
+    display: block;
+    margin-left: auto;
+    margin-right: 20px;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+    color: #333;
+}
+
+.sidebar-menu {
+    margin-top: 10px;
+}
+
+.sidebar-tap {
+    display: block;
+    padding: 14px 24px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.sidebar-tap:hover {
+    background: #f5f5f5;
+}
+
+.sidebar-sub {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: #f9f9f9;
+}
+
+.sidebar-sub.open {
+    max-height: 300px;
+}
+
+.sidebar-sub li a {
+    display: block;
+    padding: 10px 36px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.sidebar-sub li a:hover {
+    color: #0d6efd;
+}
+
+@media (min-width: 1025px) {
+    .sidebar,
+    .sidebar-overlay {
+        display: none !important;
+    }
+}
+
+@media (max-width: 1024px) {
+    .header-nav-item,
+    .header-nav-content {
+        display: none !important;
+    }
+
+    .header-nav:hover .header-nav-content {
+        max-height: 0 !important;
+        padding: 0 !important;
+        border-top: none !important;
+    }
+
+    .hamburger {
+        display: block;
+    }
+}
+
+/* 헤더 커스텀 nav */
+.header-nav {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    justify-content: center;
+    height: 100px /*60px*/;
+    align-items: center;
+    width: fit-content;
+}
+
+.header-nav-item {
+    position: relative;
+}
+
+.header-nav:hover .header-nav-content {
+    max-height: 50vh;
+    padding: 0;
+    border-top: 2px solid #0d6efd;
+}
+
+.header-nav-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 60;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.1s ease-in-out, padding 0.1s ease-in-out;
+    padding: 0;
+}
+
+.header-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-self: stretch;
+    padding: 15px;
+    align-items: center;
+}
+
+.header-inner a {
+    text-decoration: none;
+    color: black;
+}
+
+.header-inner a:hover {
+    color: red;
+}
+
+.header-inner-active {
+    background-color: #f0f4ff;
+    border-radius: 8px;
+}
+
+.spanTap {
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 1rem 1.5rem;
+    display: block;
+    cursor: default;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.spanTap-active {
+    color: #0d6efd;
+    transform: scale(1.1);
+}

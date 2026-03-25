@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/base}">
+
+<div layout:fragment="content">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-person-badge me-2"></i>
+                <span th:text="${writer}">사용자</span>님의 문의 내역
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-light border mb-4">
+                <p class="mb-0 text-muted">
+                    작성하신 문의가 총 <strong class="text-primary" th:text="${responseDTO.total}">0</strong>건 있습니다.
+                </p>
+            </div>
+
+            <table class="table table-hover">
+                <thead class="table-light">
+                <tr class="text-center">
+                    <th style="width: 10%">번호</th>
+                    <th style="width: 60%">제목</th>
+                    <th style="width: 15%">작성자</th>
+                    <th style="width: 15%">등록일</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="dto : ${responseDTO.dtoList}" class="text-center">
+                    <td th:text="${dto.ino}"></td>
+                    <td class="text-start">
+                        <a th:href="@{/inquiry/read(ino=${dto.ino})}"
+                           th:text="${dto.title}"
+                           class="text-decoration-none text-dark fw-bold"></a>
+                        <span class="badge bg-info rounded-pill ms-1"
+                              th:if="${dto.replyCount > 0}"
+                              th:text="${dto.replyCount}"></span>
+                    </td>
+                    <td th:text="${dto.writer}"></td>
+                    <td th:text="${#temporals.format(dto.regDate, 'yyyy-MM-dd')}"></td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(responseDTO.dtoList)}">
+                    <td colspan="4" class="text-center py-5">
+                        <p class="text-muted mb-0">작성하신 문의 내역이 없습니다.</p>
+                        <a th:href="@{/inquiry/register}" class="btn btn-sm btn-outline-primary mt-2">첫 문의 작성하기</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a th:href="@{/inquiry/list}" class="btn btn-secondary">전체 목록으로</a>
+                <a th:href="@{/inquiry/register}" class="btn btn-primary">새 질문하기</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        console.log("My Inquiry List Page Loaded for: " + [[${writer}]]);
+    </script>
+</th:block>
+</html>

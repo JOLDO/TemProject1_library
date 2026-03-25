@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+<link rel="stylesheet" href="/css/busan-library-common.css">
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container section">
+        <div class="row">
+
+            <!-- left 메뉴 -->
+            <div class="col-md-3 d-none d-md-block">
+                <div th:replace="~{layout/mypage-left :: mypageLeft(${dto.mid}, 'mypage')}"></div>
+            </div>
+
+            <!-- 본문 내용 -->
+            <div class="col-md-9 col-12">
+<!--                <div class="card shadow-sm mb-5">-->
+                <div class="mb-5">
+                    <!--<div class="card-header text-center py-3">
+                        <h4 class="mb-0 fw-bold">내정보</h4>
+                        <p class="text-muted small mb-0 mt-1">회원 정보를 확인하실 수 있습니다.</p>
+                    </div>-->
+
+                    <div class="section-title text-left mb-40">
+                        <span class="section-title__en">MY INFORMATION</span>
+                        <h2 class="section-title__ko">내 정보 관리</h2>
+                        <p class="section-title__desc">부산도서관에 등록된 회원님의 소중한 개인정보를 확인하고 수정하실 수 있습니다.</p>
+                    </div>
+
+                    <div class="card-body p-4">
+
+                        <!-- 내 정보 테이블 -->
+                        <div class="table-wrap shadow-sm rounded">
+                            <table class="table mb-0" style="border-top: 1px solid var(--color-border-light);">
+                                <tbody>
+                                <tr>
+                                    <th class="font-bold text-primary"
+                                        style="width: 25%; background-color: var(--color-bg-light);">
+                                        아이디
+                                    </th>
+                                    <td th:text="${dto.mid}">-</td>
+                                </tr>
+                                <tr>
+                                    <th class="font-bold text-primary"
+                                        style="background-color: var(--color-bg-light);">
+                                        이름
+                                    </th>
+                                    <td th:text="${dto.mname}">-</td>
+                                </tr>
+                                <tr>
+                                    <th class="font-bold text-primary"
+                                        style="background-color: var(--color-bg-light);">
+                                        이메일
+                                    </th>
+                                    <td th:text="${dto.email}">-</td>
+                                </tr>
+                                <tr>
+                                    <th class="font-bold text-primary"
+                                        style="background-color: var(--color-bg-light);">
+                                        지역
+                                    </th>
+                                    <td th:text="${dto.region}">-</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 정보 수정 버튼 -->
+                        <div class="d-flex justify-content-center gap-2 mt-3">
+                            <a th:href="@{/member/modify}" class="btn btn-warning fw-bold text-dark">정보 수정</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="script" th:inline="javascript">
+    console.log("My Library Page Loaded...");
+</script>
+</body>
+</html>

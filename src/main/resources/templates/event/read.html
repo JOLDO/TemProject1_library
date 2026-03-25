@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<div layout:fragment="content">
+    <style>
+        .poster-wrapper {
+            width: 100%;
+            max-width: 300px;
+            height: 420px;
+            background-color: #f1f3f5;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #eee;
+            cursor: pointer;
+            margin: 0 auto;
+            transition: transform 0.2s;
+        }
+        .poster-wrapper:hover { transform: scale(1.02); }
+        .poster-wrapper img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        .info-table { border-top: 2px solid #003366; width: 100%; }
+        .info-row { display: flex; border-bottom: 1px solid #eee; }
+        .info-label { width: 120px; background: #f9f9f9; padding: 15px; font-weight: 600; font-size: 15px; color: #555; flex-shrink: 0; display: flex; align-items: center; }
+        .info-value {
+            flex: 1;
+            padding: 15px;
+            font-size: 15px;
+            color: #1a1a1a;
+            line-height: 1.8;
+            word-break: break-all;
+        }
+
+        .content-text {
+            white-space: pre-wrap;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            margin: 0;
+            display: block;
+        }
+
+        .modal-content { background: none; border: none; }
+        .detail-container { max-width: 900px; margin-top: 30px; margin-bottom: 50px; }
+    </style>
+
+    <div class="container detail-container p-4 p-md-5 bg-white shadow rounded-3">
+        <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom border-2" style="border-color: #003366 !important;">
+            <h1 class="h4 mb-0 fw-bold" th:text="${dto.title}">행사 제목</h1>
+            <div th:if="${dto.category != 'M'}" th:with="today=${#temporals.createToday()}">
+                <span th:if="${dto.eventDate != null and dto.eventDate.toLocalDate() >= today}" class="badge rounded-pill px-3 py-2" style="background-color: #eef2f7; color: #003366;">신청가능</span>
+                <span th:unless="${dto.eventDate != null and dto.eventDate.toLocalDate() >= today}" class="badge rounded-pill px-3 py-2 border text-muted" style="background-color: #f2f2f2;">마감</span>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-12 text-center" th:if="${dto.category == 'G' or dto.category == 'M'}">
+                <div class="poster-wrapper shadow-sm mx-auto" data-bs-toggle="modal" data-bs-target="#imageModal">
+                    <img th:if="${dto.imageName != null and dto.imageName != ''}" th:src="${dto.imageName}" alt="행사 포스터">
+                    <div th:unless="${dto.imageName != null and dto.imageName != ''}" class="no-image text-muted">
+                        <div style="font-size: 40px;">🖼️</div>
+                        <div class="small">이미지 준비중</div>
+                    </div>
+                </div>
+                <p class="text-muted mt-2" style="font-size: 13px;">* 이미지를 클릭하면 크게 볼 수 있습니다.</p>
+            </div>
+
+            <div class="col-12">
+                <div class="info-table shadow-sm rounded-1 overflow-hidden">
+                    <div class="info-row">
+                        <div class="info-label">카테고리</div>
+                        <div class="info-value" th:text="${dto.category}">카테고리</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">일시</div>
+                        <div class="info-value" th:text="${dto.eventDate != null ? #temporals.format(dto.eventDate, 'yyyy-MM-dd HH:mm') : '-'}">일시</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">장소</div>
+                        <div class="info-value" th:text="${dto.place}">장소</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">비고</div>
+                        <div class="info-value" th:text="${dto.extraInfo != null and dto.extraInfo != '' ? dto.extraInfo : '-'}">비고</div>
+                    </div>
+                    <div class="info-row" style="border-bottom: 2px solid #eee;">
+                        <div class="info-label" style="align-items: flex-start; padding-top: 15px;">내용</div>
+                        <div class="info-value">
+                            <p class="content-text" th:text="${dto.content}">내용</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center gap-2 pt-4 border-top">
+            <button type="button" class="btn btn-outline-secondary px-4 py-2" onclick="history.back();">목록으로</button>
+            <th:block th:if="${dto.category != 'M'}" th:with="today=${#temporals.createToday()}">
+                <button th:if="${dto.eventDate != null and dto.eventDate.toLocalDate() >= today}" type="button" class="btn btn-primary px-4 py-2" id="applyBtn" style="background-color: #003366; border: none;">신청하기</button>
+                <button th:unless="${dto.eventDate != null and dto.eventDate.toLocalDate() >= today}" type="button" class="btn btn-secondary px-4 py-2" disabled style="background-color: #ccc; border: none;">접수마감</button>
+            </th:block>
+        </div>
+    </div>
+
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-body p-0 text-center">
+                    <img th:if="${dto.imageName != null and dto.imageName != ''}" th:src="${dto.imageName}"
+                         class="img-fluid rounded shadow-lg" data-bs-dismiss="modal" style="cursor: zoom-out; max-height: 90vh;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        const applyBtn = document.getElementById('applyBtn');
+        if (applyBtn) {
+            applyBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const eventId = [[${dto.id}]];
+                if (confirm('이 행사에 신청하시겠습니까?')) {
+                    fetch('/event/apply', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ eventId: eventId })
+                    })
+                        .then(res => {
+                            if (res.status === 401) {
+                                if (confirm('로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?')) {
+                                    location.href = '/member/login';
+                                }
+                            } else if (res.ok) {
+                                alert('신청이 완료되었습니다!');
+                                location.reload();
+                            } else if (res.status === 409) {
+                                alert('이미 신청하신 행사입니다.');
+                            } else {
+                                alert('신청 처리 중 오류가 발생했습니다.');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error:', err);
+                            alert('서버 통신 오류가 발생했습니다.');
+                        });
+                }
+            });
+        }
+    </script>
+</th:block>
+</html>

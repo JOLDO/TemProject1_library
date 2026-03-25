@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<!--
+    booklist.html
+
+    [렌더링 전략]
+    최초 진입 / 새로고침 → Thymeleaf(서버)가 HTML 완성해서 내려줌 (깜빡임 없음)
+    페이지 전환 / 검색 / 정렬 → JS(axios)가 데이터만 받아서 리스트 영역만 교체
+
+    [Thymeleaf 주요 속성 설명]
+    th:each     : 배열/리스트를 반복해서 HTML 태그를 여러 개 생성 (Java의 for-each와 동일)
+    th:text     : 태그 안의 텍스트를 서버 데이터로 채움
+    th:src      : <img>의 src 속성을 서버 데이터로 채움
+    th:attr     : 여러 속성을 한 번에 서버 데이터로 설정 (data-* 속성 등에 사용)
+    th:classappend  : 기존 class에 조건에 따라 추가 클래스를 붙임
+    th:if       : 조건이 true일 때만 해당 태그를 렌더링
+    th:onclick  : onclick 이벤트에 서버 데이터를 끼워넣을 때 사용
+    #temporals.format : 날짜/시간 타입을 원하는 형식의 문자열로 변환
+    #numbers.sequence : 숫자 범위를 순서대로 생성 (예: 1,2,3,...,10)
+    ?: ''       : 값이 null이면 빈 문자열로 대체 (null 안전 처리)
+-->
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<body>
+<!-- layout:fragment="content": base.html의 content 영역에 이 블록이 삽입됨 -->
+<div layout:fragment="content">
+
+    <!-- =============================================
+         검색 영역
+    ============================================= -->
+    <div class="row mt-3 mx-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">검색 및 필터</h5>
+
+                    <form action="/book/booklist" method="get">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="keyword" placeholder="검색어를 입력하세요">
+                            <input type="hidden" name="sort" th:value="${param.sort}">
+                            <button class="btn btn-outline-primary" type="submit">검색</button>
+                            <!-- type="button": form submit을 일으키지 않음. JS clearBtn 이벤트에서 처리 -->
+                            <button class="btn btn-outline-secondary clearBtn" type="button">초기화</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =============================================
+         정렬 영역
+    ============================================= -->
+    <div class="row content mt-3 mx-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <span>책 목록</span>
+                        <span th:if="${param.keyword != null and  !#strings.isEmpty(param.keyword)}">["[[${param.keyword}]]" 검색 결과]</span>
+                    </div>
+
+                    <!--<div class="dropdown">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                th:text="${#strings.toString(param.sort) == 'regDate' ? '최신 등록순' :
+                                           #strings.toString(param.sort) == 'pubdate' ? '최신 발행순' :
+                                           #strings.toString(param.sort) == 'bookTitle' ? '제목 가나다순' :
+                                           #strings.toString(param.sort) == 'recommend' ? '최다 추천순' :
+                                           #strings.toString(param.sort) == 'rental' ? '최다 대여순' : '정렬 기준'}"></button>
+
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item sort-item" th:href="@{/book/booklist(keyword=${param.keyword}, sort='regDate')}">최신 등록순</a></li>
+                            <li><a class="dropdown-item sort-item" th:href="@{/book/booklist(keyword=${param.keyword}, sort='pubdate')}">최신 발행순</a></li>
+                            <li><a class="dropdown-item sort-item" th:href="@{/book/booklist(keyword=${param.keyword}, sort='bookTitle')}">제목 가나다순</a></li>
+                            <li><a class="dropdown-item sort-item" th:href="@{/book/booklist(keyword=${param.keyword}, sort='recommend')}">최다 추천순</a></li>
+                            <li><a class="dropdown-item sort-item" th:href="@{/book/booklist(keyword=${param.keyword}, sort='rental')}">최다 대여순</a></li>
+                        </ul>
+                    </div>-->
+                </div>
+
+                <!-- =============================================
+                    리스트 영역
+                ============================================= -->
+                <div class="card-body">
+
+                    <div class="list-group">
+
+<!--                        <th:block th:if="${responseDTO != null and responseDTO.dtoList != null and !#lists.isEmpty(responseDTO.dtoList)}">-->
+                        <th:block th:if="${responseDTO != null and responseDTO.dtoList != null and !responseDTO.dtoList.isEmpty}">
+                            <div class="list-group-item list-group-item-action"
+                                th:each="dto : ${responseDTO.dtoList}"
+                                th:data-id="${dto.id}">
+                                <!--가로로 배열 가로 가득 채우고 배열 요소들 간의 간격3 위쪽에서부터 배열-->
+                                <div class="d-flex w-100 gap-3">
+
+                                    <!-- 왼쪽: 책 표지 이미지 -->
+                                    <!-- ?: '' : bookImage가 null이면 빈 문자열로 대체 -->
+                                    <div class="book-image-wrap d-flex align-items-center">
+                                        <!--height:auto 세로는 원본 비율에 맞게 지정-->
+                                        <img th:src="${dto.bookImage ?: ''}" alt="책 표지" style="width:150px; height:auto;">
+                                    </div>
+
+                                    <!-- 가운데: 제목 / 저자 / 출판사 (왼쪽과 오른쪽 사이의 공간을 가득 채움)-->
+                                    <div class="flex-grow-1 align-item-center">
+                                        <!--text-truncate는 말줄임-->
+                                        <h5 class="mb-1 text-truncate" th:text="${dto.bookTitle}"></h5>
+                                        <p class="mb-1 text-muted text-truncate" th:text="${dto.author ?: ''}"></p>
+                                        <small class="text-muted text-truncate d-block" th:text="${dto.publisher ?: ''}"></small>
+                                    </div>
+
+                                    <!-- 오른쪽: 대여 상태 / 추천 버튼 / 날짜 -->
+                                    <!--d-flex flex-column 세로로 배열 : align은 가로 justify는 세로 between은 양 끝-->
+                                    <!--flex-shrink는 부족한 공간에서 줄어들 비율 예) 300공간에 200, 200이라면 100을 비율로 나눠서 줄임 기본은 1이고 0을 하면 안줄인다는 뜻-->
+                                    <div class="d-flex flex-column align-items-end justify-content-between book-actions flex-shrink-0">
+                                        <!--flex-colum으로 인해 align은 가로이므로 오른쪽 정렬이고 가로세로 간격 1만큼 세로만 주고 싶으면 row-gap 가로만 주고 싶으면 column-gap-->
+                                        <!--d-flex는 가로로 배치이고 d-flex flex-column은 세로로 배치-->
+                                        <div class="d-flex flex-column align-items-end gap-1">
+
+                                            <!-- 대여 상태 뱃지 + 예약 중 뱃지 + 대여 중 뱃지 (가로 배치) -->
+                                            <div class="d-flex gap-1" th:id="'badge-wrap-' + ${dto.id}">
+                                                <span class="badge bg-info text-dark" th:if="${dto.rentedByMe != null and dto.rentedByMe and session.loginInfo != null}" th:text="'대여 중'"></span>
+                                                <span class="badge bg-warning text-dark" th:if="${dto.requestPending != null and dto.requestPending and session.loginInfo != null}" th:text="'예약 중'"></span>
+                                                <span class="badge"
+                                                      th:classappend="${dto.status.name() == 'AVAILABLE'} ? 'bg-success' : 'bg-secondary'"
+                                                      th:text="${dto.status.name() == 'AVAILABLE'} ? '대여 가능' : '대여 불가'"></span>
+                                            </div>
+
+                                            <th:block th:if="${session.loginInfo != null}">
+                                                <button class="btn btn-sm recommend-btn"
+                                                        th:classappend="${dto.recommended} ? 'btn-danger' : 'btn-outline-danger'"
+                                                        th:data-id="${dto.id}"
+                                                        th:text="${dto.recommended} ? '♥ 추천됨' : '♡ 추천하기'"></button>
+                                            </th:block>
+                                        </div>
+
+                                        <div class="text-end text-muted" style="font-size:0.8rem;">
+                                            <div th:text="'발행일 ' + (${dto.pubdate} != null ? ${#temporals.format(dto.pubdate, 'yyyy-MM-dd')} : '-')"></div>
+                                            <div th:text="'등록일 ' + (${dto.regDate} != null ? ${#temporals.format(dto.regDate, 'yyyy-MM-dd')} : '-')"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+
+                        <!-- 데이터가 없는 경우: 안내 문구 표시 -->
+                        <th:block th:unless="${responseDTO != null and responseDTO.dtoList != null and !responseDTO.dtoList.isEmpty}">
+                            <div class="text-center text-muted py-4">
+                                <th:block th:if="${param.keyword != null and !param.keyword.isEmpty()}">
+                                    <!--param.keyword는 쿼리스트링의 keyword값을 읽어옴 -->
+                                    <p>"<span th:text="${param.keyword}"></span>"에 대한 검색 결과가 없습니다.</p>
+                                    <a th:href="@{/book/booklist}" class="btn btn-outline-secondary btn-sm">전체 목록 보기</a>
+                                </th:block>
+                                <th:block th:unless="${param.keyword != null and !param.keyword.isEmpty()}">
+                                    <p>검색 결과가 없습니다.</p>
+                                </th:block>
+                            </div>
+                        </th:block>
+
+                    </div><!-- /.list-group -->
+
+
+                    <!-- ─────────────────────────────────────────────
+                         페이지네이션
+                         #numbers.sequence(start, end): start부터 end까지 숫자 목록 생성
+                         th:classappend: 현재 페이지 번호와 같으면 'active' 클래스 추가
+                         th:onclick: 클릭 시 JS loadList() 호출 (|...| 는 Thymeleaf 문자열 결합 문법)
+                    ───────────────────────────────────────────── -->
+                    <div class="d-flex justify-content-center mt-4">
+                        <!--flex-wrap는 화면 부족하면 자동으로 줄바꿈-->
+                        <ul class="pagination flex-wrap">
+                            <th:block th:if="${responseDTO != null and responseDTO.dtoList != null}">
+
+                                <!-- [이전] 버튼: 이전 페이지 그룹이 있을 때만 표시 -->
+                                <li class="page-item" th:if="${responseDTO.prev}">
+                                    <a class="page-link"
+                                       th:href="@{/book/booklist(page=${responseDTO.start - 1}, keyword=${param.keyword}, sort=${param.sort})}">이전</a>
+                                </li>
+
+                                <!-- 페이지 번호 버튼들: start ~ end 범위만큼 생성 -->
+                                <li class="page-item"
+                                    th:each="i : ${#numbers.sequence(responseDTO.start, responseDTO.end)}"
+                                    th:classappend="${responseDTO.page == i} ? 'active' : ''">
+                                    <a class="page-link"
+                                       th:href="@{/book/booklist(page=${i}, keyword=${param.keyword}, sort=${param.sort})}">[[${i}]]</a>
+                                </li>
+
+                                <!-- [다음] 버튼: 다음 페이지 그룹이 있을 때만 표시 -->
+                                <li class="page-item" th:if="${responseDTO.next}">
+                                    <a class="page-link"
+                                       th:href="@{/book/booklist(page=${responseDTO.end + 1}, keyword=${param.keyword}, sort=${param.sort})}">다음</a>
+                                </li>
+
+                            </th:block>
+                        </ul>
+                    </div>
+
+                </div><!-- /.card-body -->
+            </div><!-- /.card -->
+        </div>
+    </div>
+
+
+    <!-- =============================================
+         추천 완료 / 취소 확인 모달
+
+         JS에서 추천 버튼 클릭 후 API 응답이 오면
+         modal-title-text, modal-body-text를 채우고 modal.show()로 표시
+    ============================================= -->
+    <!--fade는 서서히 나타나고 없어지는 효과-->
+    <!--tabindex=-1이 있으면 esc로 모달 닫기 가능-->
+    <div class="modal fade" id="recommendModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!-- JS에서 '추천 완료 ♥' 또는 '추천 취소 ♡' 텍스트를 넣음 -->
+                    <h5 class="modal-title" id="modal-title-text"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- JS에서 결과 메시지를 넣음 -->
+                    <p id="modal-body-text"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =============================================
+         책 상세정보 모달
+    ============================================= -->
+    <div class="modal fade" id="bookDetailModal" tabindex="-1">
+        <!--모달의 위치 지정-->
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!-- JS: detail-book-title에 책 제목을 채움 -->
+                    <h5 class="modal-title" id="detail-book-title">책 상세정보</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <!-- 상단: 책 표지 + 기본 정보 테이블 -->
+                    <div class="d-flex gap-4">
+
+                        <!-- 책 표지 이미지: JS에서 src를 채움 -->
+                        <div class="align-self-center flex-shrink-0">
+                            <img id="detail-book-image" src="" alt="책 표지"
+                                 style="width:130px; height:auto;">
+                        </div>
+
+                        <!-- 기본 정보 테이블: JS에서 각 <td>에 텍스트를 채움 -->
+                        <div class="flex-grow-1 align-self-center">
+                            <table class="table table-sm table-borderless mb-0">
+                                <tbody>
+                                    <tr>
+                                        <!--fw는 font-weight다-->
+                                        <th class="text-muted fw-normal" style="width:70px;">저자</th>
+                                        <td id="detail-author"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted fw-normal">출판사</th>
+                                        <td id="detail-publisher"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted fw-normal">발행일</th>
+                                        <td id="detail-pubdate"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted fw-normal">ISBN</th>
+                                        <td id="detail-isbn"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-muted fw-normal">상태</th>
+                                        <!-- JS에서 대여 가능 여부에 따라 뱃지 색상도 변경 -->
+                                        <td><span id="detail-status" class="badge"></span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 하단: 책 소개 텍스트 -->
+                    <!-- white-space:pre-wrap: 줄바꿈(\n)을 무시 안하고 줄바꿈함 -->
+                    <!--hr태그는 가로 구분선-->
+                    <hr>
+                    <h6 class="fw-semibold">책 소개</h6>
+                    <p id="detail-description" class="text-muted" style="white-space:pre-wrap; font-size:0.9rem;"></p>
+                </div>
+
+                <div class="modal-footer">
+                    <!-- 대여 가능이면 '대여하기'(초록), 불가면 '닫기'(회색)으로 JS가 변경 -->
+                    <button type="button" id="detail-action-btn" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- axios 라이브러리: CDN으로 불러옴. 비동기 HTTP 요청에 사용 -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script th:src="@{/js/booklist.js}"></script>
+</div>
+
+<!--
+    layout:fragment="script": base.html의 </body> 직전에 이 블록이 삽입됨
+    → DOM이 모두 로드된 후 JS가 실행되므로 document.querySelector 등이 안전하게 동작함
+-->
+<script layout:fragment="script" th:inline="javascript">
+    const loginInfo = [[${session.loginInfo}]];
+</script>
+
+</body>
+</html>

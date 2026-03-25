@@ -6,6 +6,7 @@ buildscript {
     }
 }
 //순서1 queryDsl
+
 plugins {
     id 'java'
 //    id 'org.springframework.boot' version '4.0.3'
@@ -14,11 +15,9 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'com.library.project'
+group = 'com.busanit501'
 version = '0.0.1-SNAPSHOT'
-description = 'library'
-
-
+description = 'springBoot-0226'
 
 java {
     toolchain {
@@ -46,6 +45,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.modelmapper:modelmapper:3.1.1'
 
     //1 롬복, 테스트 환경에서 동작하기.
     testCompileOnly 'org.projectlombok:lombok'
@@ -76,6 +76,19 @@ dependencies {
     // 6
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.7.0'
+
+    //7
+    // 원본 이미지 -> 작은 이미지 변환 도구,
+    // https://mvnrepository.com/artifact/net.coobird/thumbnailator
+//    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.20'
+    // Source: https://mvnrepository.com/artifact/net.coobird/thumbnailator
+    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.21'
+
+    // 8
+    // 스프링 시큐리티, 버전.
+    // Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
+//    implementation("org.springframework.boot:spring-boot-starter-security:3.5.11")
+
 
 //    순서3 queryDsl
     annotationProcessor(

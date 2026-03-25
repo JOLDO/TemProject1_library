@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <link rel="stylesheet" href="/css/busan-library-common.css">
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container section">
+        <div class="row">
+
+        <!-- left 메뉴 -->
+        <div class="col-md-3 d-none d-md-block">
+            <div th:replace="~{layout/mypage-left :: mypageLeft(${dto.mid}, 'modify')}"></div>
+        </div>
+
+        <!-- 본문 내용 -->
+        <div class="col-md-9 col-12">
+            <div class="mb-5">
+            <!--<div class="card shadow-sm mb-5">-->
+                <!--<div class="card-header text-center py-3">
+                    <h4 class="mb-0 fw-bold">회원 정보 수정</h4>
+                    <p class="text-muted small mb-0 mt-1">소중한 정보를 안전하게 관리하세요.</p>
+                </div>-->
+                <div class="section-title text-left mb-40">
+                    <span class="section-title__en">MODIFY PROFILE</span>
+                    <h2 class="section-title__ko">회원 정보 수정</h2>
+                    <p class="section-title__desc">안전한 서비스 이용을 위해 회원님의 정보를 최신으로 유지해 주세요.</p>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/member/modify}" method="post">
+
+                        <!-- 아이디 (수정 불가) -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted">아이디</label>
+                            <input type="text" name="mid" class="form-control bg-light" th:value="${dto.mid}" readonly>
+                            <div class="form-text small">아이디는 변경할 수 없습니다.</div>
+                        </div>
+
+                        <!-- 비밀번호 (표시용 readonly + 변경 버튼) -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">비밀번호</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control bg-light" value="••••••••" readonly>
+                                <button type="button" class="btn btn-secondary"
+                                        data-bs-toggle="modal" data-bs-target="#pwModal">
+                                    비밀번호 변경
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 실제 비밀번호 전달용 hidden input (변경 시에만 값이 들어감) -->
+                        <input type="hidden" name="mpw" id="mpwInput">
+
+                        <!-- 이름 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이름</label>
+                            <input type="text" name="mname" class="form-control" th:value="${dto.mname}" required>
+                        </div>
+
+                        <!-- 이메일 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">이메일</label>
+                            <input type="email" name="email" class="form-control" th:value="${dto.email}" required>
+                        </div>
+
+                        <!-- 지역 -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">지역</label>
+                            <select name="region" class="form-select">
+                                <option value="" th:selected="${dto == null || dto.region == null}">선택하세요</option>
+                                <option value="SEOUL" th:selected="${dto?.region == 'SEOUL'}">서울</option>
+                                <option value="BUSAN" th:selected="${dto?.region == 'BUSAN'}">부산</option>
+                                <option value="YANGSAN" th:selected="${dto?.region == 'YANGSAN'}">양산</option>
+                                <option value="DAEGU" th:selected="${dto?.region == 'DAEGU'}">대구</option>
+                                <option value="INCHEON" th:selected="${dto?.region == 'INCHEON'}">인천</option>
+                                <option value="GWANGJU" th:selected="${dto?.region == 'GWANGJU'}">광주</option>
+                                <option value="DAEJEON" th:selected="${dto?.region == 'DAEJEON'}">대전</option>
+                                <option value="ULSAN" th:selected="${dto?.region == 'ULSAN'}">울산</option>
+                                <option value="SEJONG" th:selected="${dto?.region == 'SEJONG'}">세종</option>
+                                <option value="GYEONGGI" th:selected="${dto?.region == 'GYEONGGI'}">경기</option>
+                                <option value="GANGWON" th:selected="${dto?.region == 'GANGWON'}">강원</option>
+                                <option value="CHUNGBUK" th:selected="${dto?.region == 'CHUNGBUK'}">충북</option>
+                                <option value="CHUNGNAM" th:selected="${dto?.region == 'CHUNGNAM'}">충남</option>
+                                <option value="JEONBUK" th:selected="${dto?.region == 'JEONBUK'}">전북</option>
+                                <option value="JEONNAM" th:selected="${dto?.region == 'JEONNAM'}">전남</option>
+                                <option value="GYEONGBUK" th:selected="${dto?.region == 'GYEONGBUK'}">경북</option>
+                                <option value="GYEONGNAM" th:selected="${dto?.region == 'GYEONGNAM'}">경남</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2 mt-5">
+                            <button type="submit" class="btn btn-warning fw-bold text-dark">수정 완료</button>
+                            <!-- <button type="button" class="btn btn-outline-secondary"
+                                    onclick="location.href='/member/mypage'">취소</button> -->
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+    <!-- 비밀번호 변경 모달 → content 안에 있어야 해요! -->
+    <div class="modal fade" id="pwModal" tabindex="-1" aria-labelledby="pwModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="pwModalLabel">비밀번호 변경</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">새 비밀번호</label>
+                        <input type="password" id="newPw" class="form-control"
+                               placeholder="새 비밀번호 입력" minlength="4">
+                        <!--<div class="form-text text-success small">
+                            * 영문(대소문자), 숫자, 특수문자(!@#$%^&*) 혼용 9~20자
+                        </div>-->
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">새 비밀번호 확인</label>
+                        <input type="password" id="newPwConfirm" class="form-control"
+                               placeholder="새 비밀번호 다시 입력">
+                    </div>
+                    <div id="pwError" class="text-danger small" style="display:none;">
+                        비밀번호가 일치하지 않습니다.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-warning fw-bold" onclick="applyNewPw()">변경 적용</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div> <!-- layout:fragment="content" 끝 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+
+<script layout:fragment="script" th:inline="javascript">
+    /* 1. 에러 처리 */
+    const errors = /*[[${errors}]]*/ null;
+    if(errors && errors.length > 0) {
+        alert("입력값이 올바르지 않습니다. 다시 확인해주세요.");
+    }
+
+    /* 2. 모달 닫힐 때 입력값 초기화 */
+    document.getElementById('pwModal').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('newPw').value = '';
+        document.getElementById('newPwConfirm').value = '';
+        document.getElementById('pwError').style.display = 'none';
+    });
+
+    /* 3. 비밀번호 변경 적용 */
+    function applyNewPw() {
+        const newPw = document.getElementById('newPw').value;
+        const newPwConfirm = document.getElementById('newPwConfirm').value;
+        const pwError = document.getElementById('pwError');
+
+        if (newPw.length < 4) {
+            pwError.textContent = '비밀번호는 최소 4자 이상이어야 합니다.';
+            pwError.style.display = 'block';
+            return;
+        }
+
+        if (newPw !== newPwConfirm) {
+            pwError.textContent = '비밀번호가 일치하지 않습니다.';
+            pwError.style.display = 'block';
+            return;
+        }
+
+        // hidden input에 새 비밀번호 세팅
+        document.getElementById('mpwInput').value = newPw;
+        pwError.style.display = 'none';
+
+        // 모달 닫기
+        bootstrap.Modal.getInstance(document.getElementById('pwModal')).hide();
+
+        alert('비밀번호가 변경되었습니다. 수정 완료 버튼을 눌러 저장하세요.');
+    }
+
+    /* 4. 비밀번호 찾기에서 넘어온 경우 모달 자동으로 열기 */
+    const verifiedMid = [[${verifiedMid}]];
+    if (verifiedMid) {
+        const pwModal = new bootstrap.Modal(document.getElementById('pwModal'));
+        pwModal.show();
+    }
+</script>
+</body>
+</html>
