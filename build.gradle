@@ -87,7 +87,7 @@ dependencies {
     // 8
     // 스프링 시큐리티, 버전.
     // Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-//    implementation("org.springframework.boot:spring-boot-starter-security:3.5.11")
+    implementation("org.springframework.boot:spring-boot-starter-security:3.5.11")
 
 
 //    순서3 queryDsl
