@@ -22,6 +22,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
 
+    // 회원가입
     @Override
     public Long register(MemberDTO memberDTO) {
         log.info("MemberServiceImpl - register: " + memberDTO);
@@ -55,7 +56,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void modify(MemberDTO memberDTO) {
+    /*public void modify(MemberDTO memberDTO) {
         log.info("MemberServiceImpl - modify: " + memberDTO);
 
         Optional<Member> result = memberRepository.findByMid(memberDTO.getMid());
@@ -64,6 +65,19 @@ public class MemberServiceImpl implements MemberService {
         // 엔티티의 change 메서드를 사용하여 데이터 수정 (Dirty Checking)
 //        member.change(memberDTO.getMname(), memberDTO.getEmail(), memberDTO.getRegion());
         member.change(memberDTO.getMname(), memberDTO.getEmail(), memberDTO.getRegion(), memberDTO.getMpw());
+
+        memberRepository.save(member);
+    }*/
+    // MemberServiceImpl.modify() - mpw가 null/빈값이면 기존 비밀번호 유지
+    public void modify(MemberDTO memberDTO) {
+        Member member = memberRepository.findByMid(memberDTO.getMid()).orElseThrow();
+
+        String pw = (memberDTO.getMpw() != null && !memberDTO.getMpw().isEmpty())
+                ? memberDTO.getMpw()     // 새 비밀번호 사용
+                : member.getMpw();       // 기존 비밀번호 유지
+
+        member.change(memberDTO.getMname(), memberDTO.getEmail(), memberDTO.getRegion(), pw);
+        memberRepository.save(member);
     }
 
     @Override

@@ -169,6 +169,7 @@
             </ul>
             <!-- 로그인한 회원만 보이는 내 서재 메뉴 -->
             <ul class="header-inner list-unstyled d-flex flex-column gap-4 col-2" data-index="5" th:if="${session.loginInfo != null}">
+                <li><a href="/member/mypage">내정보</a></li>
                 <li><a href="/member/modify">회원정보수정</a></li>
                 <li><a href="/user_rentals">대출내역</a></li>
                 <li><a href="/member/inquiryList">문의내역</a></li>
@@ -215,7 +216,7 @@
         <th:block th:if="${session.loginInfo != null}">
     <span class="member-name">
         <span th:text="${session.loginInfo.mname}">홍길동</span>님
-        <span class="badge-status">정상</span>
+        <!--<span class="badge-status">정상</span>-->
     </span>
             <span class="divider">|</span>
             <!-- ADMIN이면 관리자 페이지 버튼 추가 -->
