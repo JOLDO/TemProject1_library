@@ -46,10 +46,10 @@ public class CustomServletConfig implements WebMvcConfigurer {
 //                        "/member/modify", // 정보수정
                         "/member/**",           // 회원 모든페이지
                         "/user_rentals",        // 나의 대출내역
-//                        "/",        // 나의 문의내역
-//                        "/",                     // 나의 희망도서
-                        "/apply/myFacilityList", // 나의 시설예약
-                        "/mypage/apply-list"    // 나의 행사강좌
+                        "/member/inquiryList",     // 나의 문의내역
+                        "/member/applyMyWishBookk", // 나의 희망도서
+                        "/member/myFacilityList", // 나의 시설예약
+                        "/member/apply-list"    // 나의 행사강좌
 
                 )
                 .excludePathPatterns(
@@ -59,8 +59,13 @@ public class CustomServletConfig implements WebMvcConfigurer {
                         "/member/checkId",    // 우리가 만든 아이디 중복 체크 허용
                         "/member/checkEmail", // 이메일 중복 체크 허용
                         "/member/find",
+                        "/member/find-id",
+                        "/member/find-pw-page",
                         "/member/find-pw",
+                        "/member/reset-pw",
                         "/member/change-pw",
+                        "/member/checkId",
+//                        "/member/reset-pw",
                         "/js/**",
                         "/css/**",
                         "/favicon.ico"

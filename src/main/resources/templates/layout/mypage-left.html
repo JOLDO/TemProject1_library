@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<!--<head>
+    <link rel="stylesheet" th:href="@{/css/mypage-style.css}">
+</head>-->
 <body>
 <div th:fragment="mypageLeft(mid, activeMenu)">
     <style>
@@ -134,7 +137,7 @@
             문의내역 <span class="mypage-nav__dash">—</span>
         </a>
 
-        <a th:href="@{/member/wishList}"
+        <a th:href="@{/member/applyMyWishBook}"
            th:classappend="${activeMenu == 'wish'} ? ' active' : ''"
            class="mypage-nav__item">
             희망도서 <span class="mypage-nav__dash">—</span>

@@ -1,0 +1,102 @@
+:root {
+    /* 메인 컬러 — 부산도서관 기본 톤 */
+    --color-primary: #0d6efd;
+}
+/* ── mypage-left 사이드 메뉴 (부산도서관 스타일) ── */
+.mypage-nav {
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    width: 100%;
+    max-width: 220px;
+}
+
+
+
+.mypage-nav__title {
+    font-family: var(--font-serif);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    padding: 18px 20px 14px 20px;
+    border-bottom: 2px solid var(--color-text-main);
+    letter-spacing: 0.03em;
+}
+
+.mypage-nav__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--color-border-light);
+    color: var(--color-text-sub);
+    font-size: 0.9375rem;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.mypage-nav__item:last-child {
+    border-bottom: none;
+}
+
+.mypage-nav__item:hover {
+    background: var(--color-bg-light);
+    color: var(--color-primary);
+    padding-left: 24px;
+}
+
+.mypage-nav__item.active {
+    background: var(--color-bg-light);
+    color: var(--color-primary);
+    font-weight: 700;
+    border-left: 3px solid var(--color-primary);
+    padding-left: 17px;
+}
+
+.mypage-nav__dash {
+    color: var(--color-border);
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.mypage-nav__item.active .mypage-nav__dash {
+    color: var(--color-primary);
+}
+
+/* ── 반응형 ── */
+@media (max-width: 768px) {
+    .mypage-nav {
+        max-width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        border-radius: var(--radius-sm);
+        margin-bottom: 20px;
+    }
+
+    .mypage-nav__title {
+        width: 100%;
+        font-size: 1rem;
+        padding: 12px 16px 10px 16px;
+    }
+
+    .mypage-nav__item {
+        flex: 1 1 45%;
+        padding: 10px 14px;
+        font-size: 0.875rem;
+        border-bottom: 1px solid var(--color-border-light);
+        border-right: 1px solid var(--color-border-light);
+    }
+
+    .mypage-nav__item:hover {
+        padding-left: 16px;
+    }
+
+    .mypage-nav__item.active {
+        border-left: 3px solid var(--color-primary);
+        padding-left: 11px;
+    }
+
+    .mypage-nav__dash { display: none; }
+}
