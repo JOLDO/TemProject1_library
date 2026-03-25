@@ -64,8 +64,6 @@ public class MemberServiceImpl implements MemberService {
         // 엔티티의 change 메서드를 사용하여 데이터 수정 (Dirty Checking)
 //        member.change(memberDTO.getMname(), memberDTO.getEmail(), memberDTO.getRegion());
         member.change(memberDTO.getMname(), memberDTO.getEmail(), memberDTO.getRegion(), memberDTO.getMpw());
-
-        memberRepository.save(member);
     }
 
     @Override
