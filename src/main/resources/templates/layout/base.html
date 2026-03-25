@@ -222,7 +222,7 @@
             <!-- ADMIN이면 관리자 페이지 버튼 추가 -->
             <th:block th:if="${session.loginInfo.role == 'ADMIN'}">
                 <a th:href="@{/rentals}"
-                   style="color:#dc3545;font-weight:700;">
+                   style="color:#1a4e8c;font-weight:700;">
                     관리자 페이지
                 </a>
                 <span class="divider">|</span>
@@ -230,12 +230,6 @@
             <a th:href="@{/member/logout}">로그아웃</a>
             <span class="divider">|</span>
             <a th:href="@{/member/mypage}">내 서재</a>
-
-            <!-- 관리자일 때만 보임 -->
-            <th:block th:if="${session.loginInfo.role == 'ADMIN'}">
-                <span class="divider">|</span>
-                <a th:href="@{/rentals}" class="text-danger fw-bold">관리자</a>
-            </th:block>
         </th:block>
     </div>
 </header>
