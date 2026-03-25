@@ -187,17 +187,17 @@ function updateStats(list) {
 
 // ── 연장 2단계 확인 ───────────────────────────────────
 
-// 1단계: [연장] 클릭 → [확인][취소] 로 교체
 function showRenewConfirm(rentalId) {
     const area = document.getElementById(`renew-area-${rentalId}`);
     if (!area) return;
     area.innerHTML = `
-    <span style="font-size:0.72rem;color:var(--text-mid);margin-right:4px;">연장할까요?</span>
+    <span style="font-size:0.72rem;color:#666;margin-right:4px;">연장할까요?</span>
     <button class="btn-action ba-renew"
       onclick="event.stopPropagation();renewBook(${rentalId})">
       <i class="bi bi-check-lg"></i> 확인
     </button>
-    <button class="btn-action" style="background:rgba(255,255,255,0.06);color:var(--text-mid);"
+    <button class="btn-action"
+      style="background:#f0f0f0;color:#666;border:1px solid #ddd;"
       onclick="event.stopPropagation();cancelRenew(${rentalId})">
       취소
     </button>
@@ -221,12 +221,14 @@ async function renewBook(rentalId) {
     try {
         await apiPost(`/renew/${rentalId}`, {});
         toast('연장이 완료되었습니다! (+14일)', 'success');
-        loadMyRentals();
+        loadMyRentals();  // 성공 시만 새로고침
     } catch (e) {
         toast(e.message, 'error');
-        loadMyRentals();
+        // 실패 시 loadMyRentals 제거 → 카드 그대로 유지
+        cancelRenew(rentalId);  // 연장 버튼으로 복원만
     }
 }
+
 
 
 // ── 상세 모달 ─────────────────────────────────────────
@@ -267,14 +269,17 @@ function closeModal(e) {
 
 
 // ── INIT ──────────────────────────────────────────────
-(function init() {
-    document.getElementById('username-display').textContent = CURRENT_MEMBER_NAME;
-    document.getElementById('greeting-name').textContent    = CURRENT_MEMBER_NAME;
+document.addEventListener('DOMContentLoaded', function() {
+    const usernameEl = document.getElementById('username-display');
+    if (usernameEl) usernameEl.textContent = CURRENT_MEMBER_NAME;
 
-    // ADMIN이면 관리자 페이지 링크 표시
+    const greetEl = document.getElementById('greeting-name');
+    if (greetEl) greetEl.textContent = CURRENT_MEMBER_NAME + '님의 대출 현황';
+
     if (CURRENT_MEMBER_ROLE === 'ADMIN') {
-        document.getElementById('admin-link').style.display = 'flex';
+        const adminLink = document.getElementById('admin-link');
+        if (adminLink) adminLink.style.display = 'flex';
     }
 
     loadMyRentals();
-})();
+});

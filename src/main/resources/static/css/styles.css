@@ -209,14 +209,14 @@ header {
     color: #0d6efd;
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 1200px) {
     .sidebar,
     .sidebar-overlay {
         display: none !important;
     }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1199px) {
     .header-nav-item,
     .header-nav-content {
         display: none !important;
@@ -286,7 +286,7 @@ header {
 }
 
 .header-inner a:hover {
-    color: red;
+    color: #0d6efd;
 }
 
 .header-inner-active {

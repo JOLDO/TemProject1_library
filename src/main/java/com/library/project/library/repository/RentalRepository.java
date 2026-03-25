@@ -24,16 +24,7 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
 """)
     List<Object[]> findMostRentedBooks();
 
-    // ─────────────────────────────────────────────────────────────────
     // 회원이 현재 대여중인 isbn 목록 (배치 조회용)
-    //
-    // [용도] BookServiceImpl.list()에서 리스트 화면의 "대여 중" 뱃지 표시에 사용
-    //        → 내가 빌린 책에 또 예약 거는 것을 방지하기 위해 프론트에서 버튼 비활성화
-    //
-    // [JPQL 설명]
-    // 전달받은 isbn 목록(IN절) 중에서 해당 회원이 RENTED 상태인 isbn만 반환
-    // Set으로 변환 후 contains()로 O(1) 조회 → 쿼리 1번으로 전체 리스트 처리
-    // ─────────────────────────────────────────────────────────────────
     @Query("""
         SELECT r.book.isbn
         FROM Rental r
@@ -65,5 +56,4 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
  * - findByBook_IdAndStatus(): 특정 도서의 특정 상태 대출 조회 → 이미 대출된 책인지 중복 체크
  * - findMostRentedBooks(): 도서별 대출 횟수 집계 (내림차순) → 인기 도서 통계
  * - countTodayRentals(): 특정 회원의 오늘 대출 횟수 → 하루 3권 제한 체크
- * - findRentedIsbnsByMemberIdAndIsbnIn(): 회원이 대여중인 isbn 배치 조회 → 리스트 "대여 중" 뱃지 + 예약 버튼 비활성화
  */

@@ -83,8 +83,8 @@ public class RentalService {
         }
 
         rental.increaseRenewCount();
-        rental.returnBook(); // 기존 종료
-
+        // rental.returnBook(); ← 이 줄 삭제!
+        rental.setDueDate(rental.getDueDate().plusDays(14)); // ← 14일 연장
     }
 
     // 도서 반납

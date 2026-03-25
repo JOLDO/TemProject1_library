@@ -54,6 +54,10 @@ public class Member extends BaseEntity {
         this.region = region;
         this.mpw = mpw;
     }
+    // Member 엔티티 클래스 내부에 추가
+    public Role getRole() {
+        return this.role;
+    }
 
 
 

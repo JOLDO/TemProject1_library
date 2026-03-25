@@ -34,11 +34,8 @@ public class CustomServletConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 관리자 인터셉터
-        registry.addInterceptor(new AdminCheckInterceptor())
-                .addPathPatterns(
-                        "/rentals",
-                        "/notice/register"
-                );
+//        registry.addInterceptor(new AdminCheckInterceptor())
+//                .addPathPatterns("/rentals");
         // 일반유저 인터셉터
         registry.addInterceptor(new LoginCheckInterceptor()) // 인터셉터 클래스 이름 확인!
                 .addPathPatterns( // 로그인이 필요한 주소들 "/todo/**"

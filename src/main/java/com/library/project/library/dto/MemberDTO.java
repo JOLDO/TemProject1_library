@@ -3,16 +3,14 @@ package com.library.project.library.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Data
 @Builder
 @AllArgsConstructor
+@Getter
 @NoArgsConstructor
 public class MemberDTO {
 
@@ -22,7 +20,7 @@ public class MemberDTO {
     @Size(min = 4, max = 20)
     private String mid; // 로그인 아이디
 
-    @NotEmpty
+//    @NotEmpty
     private String mpw; // 비밀번호
 
     @NotEmpty

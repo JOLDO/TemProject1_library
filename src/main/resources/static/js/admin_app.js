@@ -557,7 +557,86 @@ async function loadStats() {
     }
 }
 
+// ════════════════════════════════════════════════════
+//  회원 검색
+// ════════════════════════════════════════════════════
+/** 회원 선택 → 대출 목록 조회 자동 입력 */
+// ════════════════════════════════════════════════════
+//  회원 검색 (수정된 버전)
+// ════════════════════════════════════════════════════
+async function searchMembers() {
+    // 1. input에서 값을 가져올 때 trim()으로 앞뒤 공백 및 불필요한 문자 제거
+    const keywordInput = document.getElementById('member-search-keyword');
+    const keyword = keywordInput.value.trim();
 
+    if (!keyword) {
+        toast('아이디를 입력하세요', 'warn');
+        return;
+    }
+
+    const resultWrap = document.getElementById('member-search-result');
+    const tbody      = document.getElementById('member-search-tbody');
+
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:20px;">
+        <span class="spinner-sm" style="width:18px;height:18px;border-width:2px;"></span>
+    </td></tr>`;
+    resultWrap.style.display = 'block';
+
+    try {
+        // 주소를 조합할 때 백틱(`)을 사용하고, 경로 앞에 슬래시(/)가 하나만 있는지 확인
+        const url = `/member/searchByMid?mid=${encodeURIComponent(keyword)}`;
+        console.log("요청 URL:", url); // 브라우저 콘솔에서 :1이 붙는지 여기서 확인 가능
+
+        const res = await fetch(url);
+
+        if (!res.ok) {
+            throw new Error(`서버 응답 오류 (상태코드: ${res.status})`);
+        }
+
+        const data = await res.json();
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state" style="padding:24px;">
+                <i class="bi bi-person-x"></i><p>해당 아이디의 회원이 없습니다</p>
+            </div></td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = data.map(m => `
+        <tr>
+            <td class="td-mono" style="color:var(--muted);">#${m.id}</td>
+            <td class="td-mono">${m.mid   || '—'}</td>
+            <td class="td-book">${m.mname || '—'}</td>
+            <td class="td-muted">${m.email || '—'}</td>
+            <td>
+                <span class="badge-s ${m.role === 'ADMIN' ? 'bs-overdue' : 'bs-rented'}">
+                    ${m.role || '—'}
+                </span>
+            </td>
+            <td>
+                <button class="btn-sm-action bsa-detail"
+                    onclick="selectMember(${m.id}, '${m.mname}')">
+                    <i class="bi bi-check2"></i> 선택
+                </button>
+            </td>
+        </tr>`).join('');
+    } catch (e) {
+        console.error("상세 에러:", e);
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
+            <i class="bi bi-exclamation-circle"></i><p>${e.message}</p>
+        </div></td></tr>`;
+        toast('검색 실패: ' + e.message, 'error');
+    }
+}
+
+
+function selectMember(id, name) {
+    // 검색된 회원의 ID를 대출 현황 조회창에 자동으로 넣어줍니다.
+    document.getElementById('list-member-id').value = id;
+    toast(`${name} 회원이 선택되었습니다.`, 'success');
+    // 자동으로 목록 조회까지 실행
+    loadRentals();
+}
 // ════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════

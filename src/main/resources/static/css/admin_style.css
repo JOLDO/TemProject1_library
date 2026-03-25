@@ -94,6 +94,21 @@ body {
     border-left-color: var(--accent);
     font-weight: 500;
 }
+/* 🚀 여기서부터 추가하세요: a 태그로 만든 버튼 스타일 */
+.sb-nav a.sb-btn {
+    text-decoration: none !important;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    /* 글자 색상을 더 밝게 (rgba 흰색 45% -> 80%) */
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* 마우스 올렸을 때 더 밝게 */
+.sb-nav a.sb-btn:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.1);
+}
 .sb-footer {
     padding: 14px 22px;
     border-top: 1px solid rgba(255,255,255,0.07);
@@ -460,3 +475,4 @@ td { padding: 12px 16px; font-size: 0.84rem; vertical-align: middle; }
 
 .bs-pending { background: var(--amber-lt); color: var(--amber); }
 .bs-pending::before { background: var(--amber); }
+

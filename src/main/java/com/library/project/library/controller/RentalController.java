@@ -1,11 +1,14 @@
 package com.library.project.library.controller;
 
+import com.library.project.library.dto.MemberDTO;
 import com.library.project.library.dto.rentalDto.RentalRequestDTO;
 import com.library.project.library.dto.rentalDto.RentalResponseDTO;
 import com.library.project.library.dto.rentalDto.ReturnRequestDTO;
 import com.library.project.library.service.RentalService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,9 +20,17 @@ public class RentalController {
 
     private final RentalService rentalService;
 
-    @GetMapping("/rental")
-    public String rentalPage() {
-        return "rental/rental";
+
+     @GetMapping("/rentals")
+    public String rentalList(HttpSession session, Model model) {
+        // 인터셉터가 이미 체크했지만 이중 안전장치
+        MemberDTO loginInfo = (MemberDTO) session.getAttribute("loginInfo");
+
+        // 관리자 정보 활용 가능
+        model.addAttribute("admin", loginInfo.getMname());
+
+        // 본인 로직 작성
+        return "/rentals";
     }
 
     /**

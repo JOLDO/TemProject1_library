@@ -2,7 +2,10 @@ package com.library.project.library.repository;
 
 import com.library.project.library.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -22,6 +25,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // 비밀번호 찾기(본인확인): 아이디와 이메일이 일치하는 회원 조회
     Optional<Member> findByMidAndEmail(String mid, String email);
 
+
+    @Query("select m from Member m where m.mid like %:keyword%")
+    List<Member> searchByKeyword(@Param("keyword") String keyword);
 }
 
 /*

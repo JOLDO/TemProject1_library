@@ -58,9 +58,7 @@
             </div>
 
             <div class="text-end mt-3">
-                <div th:if="${session.loginInfo != null}">
-                    <a th:href="@{/inquiry/register}" class="btn btn-primary px-4">질문하기</a>
-                </div>
+                <a th:href="@{/inquiry/register}" class="btn btn-primary px-4">질문하기</a>
             </div>
         </div>
     </div>
@@ -69,14 +67,12 @@
 
 <th:block layout:fragment="script">
     <script th:inline="javascript">
-        // 📍 [추가 포인트 2] 페이지 클릭 이벤트
         document.querySelector(".pagination")?.addEventListener("click", function (e) {
             e.preventDefault();
             const target = e.target;
             if (target.tagName !== 'A') return;
 
             const num = target.getAttribute("data-num");
-            // 문의사항 리스트 경로로 이동
             self.location = `/inquiry/list?page=${num}`;
         }, false);
 

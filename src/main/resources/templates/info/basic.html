@@ -6,66 +6,64 @@
 <body>
 <div layout:fragment="content">
 
-    <div class="d-flex justify-content-start gap-2 mb-4 flex-wrap">
-        <a th:href="@{/info/greeting}" class="btn btn-outline-secondary shadow-sm">👋 관장 인사말</a>
-        <a th:href="@{/info/history}" class="btn btn-outline-secondary shadow-sm">📜 도서관 연혁</a>
-        <a th:href="@{/info/guide}" class="btn btn-outline-secondary shadow-sm">📖 이용안내</a>
-        <a th:href="@{/info/facilities}" class="btn btn-outline-secondary shadow-sm">🏢 시설 현황</a>
-        <a th:href="@{/info/map}" class="btn btn-outline-secondary shadow-sm">📍 찾아오시는 길</a>
-    </div>
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-bold text-dark m-0">📊 도서 자료 현황</h2>
-        <a th:href="@{/info/donation}" class="btn btn-link text-decoration-none text-primary fw-bold">
-            도서 기증/납본 절차 안내 >
+    <div class="d-flex justify-content-center gap-2 mb-5">
+        <a th:href="@{/info}" class="btn btn-outline-dark btn-sm shadow-sm">
+            👋 관장 인사말
+        </a>
+        <a th:href="@{/info/history}" class="btn btn-outline-dark btn-sm shadow-sm">
+            📜 도서관 연혁
+        </a>
+        <a th:href="@{/info/organization}" class="btn btn-outline-dark btn-sm shadow-sm">
+            🏢 조직업무
+        </a>
+        <a th:href="@{/info/guide}" class="btn btn-outline-dark btn-sm shadow-sm">
+            📖 이용안내
+        </a>
+        <a th:href="@{/info/facilities}" class="btn btn-outline-dark btn-sm shadow-sm">
+            🏢 시설 현황
+        </a>
+        <a th:href="@{/info/map}" class="btn btn-outline-dark btn-sm shadow-sm">
+            📍 찾아오시는 길
         </a>
     </div>
-    <hr class="mb-4">
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <table class="table table-hover text-center align-middle mb-0">
-                <thead class="table-light">
-                <tr>
-                    <th style="width: 30%" class="py-3">구분</th>
-                    <th style="width: 40%">장서량 (권/매)</th>
-                    <th style="width: 30%">관리</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="stat : ${stats}">
-                    <td class="fw-bold text-secondary" th:text="${stat.categoryName}">일반도서</td>
-                    <td class="fw-bold" th:text="${#numbers.formatInteger(stat.itemCount, 0, 'COMMA')}">0</td>
-                    <td>
-                        <div class="d-flex justify-content-center gap-2">
-                            <a th:href="@{/info/modify(id=${stat.statId})}" class="btn btn-success btn-sm px-3">수정</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0">📊 도서 자료 현황</h2>
+        <a th:href="@{/info/donation}" class="text-decoration-none fw-bold text-primary">도서 기증/납본 절차 안내 ></a>
+    </div>
 
-                            <form th:action="@{/info/remove/{id}(id=${stat.statId})}" method="post" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                                <button type="submit" class="btn btn-danger btn-sm px-3">삭제</button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                <tr th:if="${#lists.isEmpty(stats)}">
-                    <td colspan="3" class="py-5 text-muted small">
-                        현재 등록된 자료 현황 데이터가 없습니다.<br>
-                        우측 하단의 '새 자료 등록하기' 버튼을 이용해 주세요.
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+    <div class="table-responsive shadow-sm rounded border">
+        <table class="table table-hover text-center align-middle mb-0">
+            <thead class="table-light">
+            <tr>
+                <th style="width: 40%">구분</th>
+                <th style="width: 30%">장서량 (권/매)</th>
+                <th style="width: 30%">관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="stat : ${stats}">
+                <td class="fw-bold" th:text="${stat.categoryName}">구분</td>
+                <td th:text="${#numbers.formatInteger(stat.itemCount, 0, 'COMMA')}">0</td>
+                <td>
+                    <div class="btn-group">
+                        <a th:href="@{/info/modify(id=${stat.statId})}" class="btn btn-success btn-sm px-3">수정</a>
+                        <form th:action="@{/info/remove}" method="post" style="display:inline;">
+                            <input type="hidden" name="statId" th:value="${stat.statId}">
+                            <button type="submit" class="btn btn-danger btn-sm px-3" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 
     <div class="d-flex justify-content-between mt-5">
-        <a th:href="@{/info}" class="btn btn-dark px-4 shadow-sm">🏠 메인 홈페이지로</a>
+        <a th:href="@{/}" class="btn btn-dark px-4 shadow-sm">🏠 메인 홈페이지로</a>
         <a th:href="@{/info/register}" class="btn btn-primary px-4 shadow-sm">➕ 새 자료 등록하기</a>
     </div>
-</div>
 
-<script layout:fragment="script" th:inline="javascript">
-    /* 페이지 로딩 시 콘솔 확인용 */
-    console.log("부산도서관 자료현황(Basic) 페이지 로드 완료");
-</script>
+</div>
 </body>
 </html>

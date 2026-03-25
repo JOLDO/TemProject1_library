@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/member")
@@ -31,6 +34,22 @@ public class MemberController {
 
     private final MemberService memberService;
     private final InquiryService inquiryService;
+
+    @GetMapping("/searchByMid")
+    @ResponseBody
+// MemberDTO -> List<MemberDTO> 로 변경
+    public ResponseEntity<List<MemberDTO>> searchByMid(@RequestParam String mid) {
+        try {
+            // 서비스에서 검색 결과 리스트를 가져옵니다.
+            List<MemberDTO> list = memberService.searchMembers(mid);
+
+            // 결과가 없어도 빈 리스트 [] 를 보냅니다.
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            e.printStackTrace(); // 서버 콘솔에서 진짜 에러 확인용
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     // =====================================================================
     // 1. 회원가입 화면 (GET) - join.html 연결
@@ -482,27 +501,35 @@ public class MemberController {
 
 
 
-    // MemberController.java
+    // =====================================================================
+    // 18. 나의 문의 내역 (GET) - 세션 방식 적용
+    // =====================================================================
+    @GetMapping("/inquiryList")
+    public String myList(PageRequestDTO pageRequestDTO, Model model, HttpSession session) {
+        log.info(">>>> [MemberController] 내 문의 내역 페이지 접속 중...");
 
-    @GetMapping("/inquiryList") // 📍 404 에러가 나는 그 주소로 정확히 맞춤
-    public String myList(PageRequestDTO pageRequestDTO, Model model, Principal principal) {
-        log.info(">>>> 내 문의 내역 페이지 접속 중...");
+        // 1. 세션에서 로그인 정보 꺼내기
+        MemberDTO loginInfo = (MemberDTO) session.getAttribute("loginInfo");
 
-        // 1. 로그인 체크 (테스트용 user1)
-        String writer = "user1";
-        if (principal != null) {
-            writer = principal.getName();
+        // 2. 비로그인 체크 (인터셉터가 있지만 안전을 위해 추가)
+        if (loginInfo == null) {
+            log.info(">>>> 로그인 정보 없음 -> 로그인 페이지로 이동");
+            return "redirect:/member/login?dest=/member/inquiryList";
         }
 
-        // 2. 서비스 호출
+        String mid = loginInfo.getMid();
+        String mname = loginInfo.getMname();
+
+        log.info(">>>> 조회 아이디(mid): " + mid);
+
+        // 3. 서비스 호출 (Querydsl의 searchMyList가 이 mid를 사용해 내 글만 가져옵니다)
         PageResponseDTO<InquiryListReplyCountDTO> responseDTO =
-                inquiryService.getMyInquiryList(writer, pageRequestDTO);
+                inquiryService.getMyInquiryList(mid, pageRequestDTO);
 
         model.addAttribute("responseDTO", responseDTO);
-        model.addAttribute("writer", writer);
+        model.addAttribute("writer", mname); // 화면에 표시될 이름
 
-        // 3. 리턴 경로 (HTML 파일 위치)
-        // src/main/resources/templates/inquiry/myList.html 가 있다면 아래가 맞음
+        // 4. HTML 경로: src/main/resources/templates/inquiry/myList.html
         return "inquiry/myList";
     }
     /*public String myList(HttpSession session, PageRequestDTO pageRequestDTO, Model model) {

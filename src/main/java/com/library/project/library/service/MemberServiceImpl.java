@@ -9,7 +9,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -20,6 +22,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
 
+    // 회원가입
     @Override
     public Long register(MemberDTO memberDTO) {
         log.info("MemberServiceImpl - register: " + memberDTO);
@@ -53,7 +56,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void modify(MemberDTO memberDTO) {
+    /*public void modify(MemberDTO memberDTO) {
         log.info("MemberServiceImpl - modify: " + memberDTO);
 
         Optional<Member> result = memberRepository.findByMid(memberDTO.getMid());
@@ -63,6 +66,17 @@ public class MemberServiceImpl implements MemberService {
 //        member.change(memberDTO.getMname(), memberDTO.getEmail(), memberDTO.getRegion());
         member.change(memberDTO.getMname(), memberDTO.getEmail(), memberDTO.getRegion(), memberDTO.getMpw());
 
+        memberRepository.save(member);
+    }*/
+    // MemberServiceImpl.modify() - mpw가 null/빈값이면 기존 비밀번호 유지
+    public void modify(MemberDTO memberDTO) {
+        Member member = memberRepository.findByMid(memberDTO.getMid()).orElseThrow();
+
+        String pw = (memberDTO.getMpw() != null && !memberDTO.getMpw().isEmpty())
+                ? memberDTO.getMpw()     // 새 비밀번호 사용
+                : member.getMpw();       // 기존 비밀번호 유지
+
+        member.change(memberDTO.getMname(), memberDTO.getEmail(), memberDTO.getRegion(), pw);
         memberRepository.save(member);
     }
 
@@ -127,6 +141,23 @@ public class MemberServiceImpl implements MemberService {
         member.change(member.getMname(), member.getEmail(), member.getRegion(), newPw);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<MemberDTO> searchMembers(String keyword) {
+        // 1. 반환 타입을 List<Member>로 받았으므로 바로 stream 사용 가능
+        return memberRepository.searchByKeyword(keyword)
+                .stream()
+                .map(m -> {
+                    MemberDTO dto = modelMapper.map(m, MemberDTO.class);
+
+                    // 이제 m은 Member 객체이므로 getRole() 호출이 가능합니다!
+                    if (m.getRole() != null) {
+                        dto.setRole(m.getRole().name());
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 
 }
 

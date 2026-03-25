@@ -350,10 +350,11 @@ document.querySelector('.clearBtn').addEventListener('click', function (e) {
 function clearSearch() {
     // 검색어 초기화
     document.querySelector('input[name="keyword"]').value = '';
-    document.querySelector('.dropdown-toggle').textContent = '정렬 기준';
+    // document.querySelector('.dropdown-toggle').textContent = '정렬 기준';
 
-    // 검색어 없이 1페이지로 서버에 요청
-    window.location.href = '/book/booklist';
+    // 검색어 없이 1페이지로 서버에 요청 (현재 sort 유지)
+    const sort = new URLSearchParams(window.location.search).get('sort') || '';
+    window.location.href = '/book/booklist?sort=' + sort;
 }
 
 async function insertRecomm(bookId) {

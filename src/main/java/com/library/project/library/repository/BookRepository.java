@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Long>, BookSearch {
 
@@ -37,8 +38,8 @@ public interface BookRepository extends JpaRepository<Book, Long>, BookSearch {
 
     // 모달에서 isbn 기준 전체 권 목록 조회 (권별 상태 표시용) - 현재 미사용
     // List<Book> findAllByIsbn(String isbn);
-    // 같은 isbn 중 특정 status인 권 하나만 가져오기 (예약 시 AVAILABLE인 실제 권 매칭용)
-    java.util.Optional<Book> findFirstByIsbnAndStatus(String isbn, BookStatus status);
+    // 예약 승인 시 해당 ISBN의 AVAILABLE인 권 하나를 가져오기
+    Optional<Book> findFirstByIsbnAndStatus(String isbn, BookStatus status);
 }
 
 /*
@@ -50,5 +51,4 @@ public interface BookRepository extends JpaRepository<Book, Long>, BookSearch {
  * [메서드]
  * - existsByIsbnAndStatus(): 특정 isbn의 책 중 해당 status인 게 있는지 확인 → 단건 대여 가능 여부 체크 (BookServiceImpl.getBook())
  * - findAvailableIsbnIn(): isbn 목록을 IN 쿼리로 한 번에 조회하여 AVAILABLE인 isbn만 반환 → 목록 화면 배치 조회 최적화 (BookServiceImpl.list())
- * - findFirstByIsbnAndStatus(): 같은 isbn 중 특정 status인 권 하나 조회 → 예약 시 AVAILABLE인 실제 권 매칭용
  */

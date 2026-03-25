@@ -44,13 +44,8 @@ public class BookServiceImpl implements BookService {
     @Override
     public PageResponseDTO<BookDTO> list(PageRequestDTO pageRequestDTO, Long memberId) {
         String keyword = pageRequestDTO.getKeyword();
-
-        // 한글 검색 지원을 위해 검색어를 두 가지 형태로 변환
-        // keywordNor: 자모 분리 정규화 (예: "스프링" → "ㅅㅡㅍㄹㅣㅇ")
-        // keywordCho: 초성만 추출       (예: "ㅅㅍㄹ" → "ㅅㅍㄹ")
-        //             단, 키워드가 순수 초성(ㄱ~ㅎ)일 때만 사용 (일반 단어면 null)
         String keywordNor = koreanDecomposer.toNormal(pageRequestDTO.getKeyword());
-        String keywordCho = isChosungOnly(keyword)
+        String keywordCho = koreanDecomposer.isChosungOnly(keyword)
                 ? koreanDecomposer.toChosung(keyword)
                 : null;
 
@@ -139,8 +134,9 @@ public class BookServiceImpl implements BookService {
         dto.setStatus(bookRepository.existsByIsbnAndStatus(book.getIsbn(), BookStatus.AVAILABLE)
                 ? BookStatus.AVAILABLE
                 : BookStatus.RENTED);
+        // ISBN 기준으로 예약 여부 확인 (book_id는 대표 id와 실제 예약 id가 다를 수 있으므로)
         dto.setRequestPending(memberId != null
-        ? bookRequestRepository.existsByMember_IdAndBook_IdAndStatus(memberId, bookId, RequestStatus.PENDING)
+        ? !bookRequestRepository.findBookIsbnsByMemberIdAndBookIsbnInAndStatus(memberId, List.of(book.getIsbn()), RequestStatus.PENDING).isEmpty()
         : false);
         dto.setRecommended(memberId != null ? recommendRepository.existsByBook_IdAndMember_Id(book.getId(), memberId) : null);
         // 내가 이 isbn의 책을 현재 대여중인지 확인
@@ -167,16 +163,7 @@ public class BookServiceImpl implements BookService {
         recommendRepository.deleteByBook_IdAndMember_Id(bookId, memberId);
     }
 
-    // 키워드가 순수 초성(ㄱ~ㅎ)으로만 이루어져 있는지 확인
-    // 예: "ㄷㅁㅇ" → true, "데미안" → false, "ㄷ미안" → false
-    private boolean isChosungOnly(String text) {
-        if (text == null || text.isBlank()) return false;
-        for (char c : text.toCharArray()) {
-            if (c >= 'ㄱ' && c <= 'ㅎ') continue;
-            return false;
-        }
-        return true;
-    }
+
 
 
     //-----------------------api관련(사용x)

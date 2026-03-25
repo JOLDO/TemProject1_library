@@ -4,7 +4,6 @@ package com.library.project.library.controller;
 import com.library.project.library.dto.LibraryStatsDTO;
 import com.library.project.library.service.InfoService;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,94 +17,70 @@ public class InfoController {
 
     private final InfoService infoService;
 
-    // 1. [GET] 도서관 메인 홈 (접속 주소: /info)
+    // 1. 관장 인사말 (greeting.html)
     @GetMapping("")
-    public String mainHome(Model model) {
-        log.info("도서관 메인 홈페이지 접속...");
-        model.addAttribute("info", infoService.getStaticLibraryInfo());
-        return "redirect:/";
+    public String greeting() {
+        return "info/greeting";
     }
 
-    // 2. [GET] 자료현황 표 (접속 주소: /info/basic)
+    // 2. 도서관 연혁 (history.html)
+    @GetMapping("/history")
+    public String history() {
+        return "info/history";
+    }
+
+    // 3. 조직 및 업무 (organization.html)
+    @GetMapping("/organization")
+    public String organization() {
+        return "info/organization";
+    }
+
+    // 4. 이용 안내 (guide.html)
+    @GetMapping("/guide")
+    public String guide() {
+        return "info/guide";
+    }
+
+    // 5. 시설 현황 (facilities.html)
+    @GetMapping("/facilities")
+    public String facilities() {
+        return "info/facilities";
+    }
+
+    // 6. 찾아오시는 길 (map.html)
+    @GetMapping("/map")
+    public String map() {
+        return "info/map";
+    }
+
+    // ★ 7. 기증 및 납본 안내 (donation.html) - 새로 추가됨!
+    @GetMapping("/donation")
+    public String donation() {
+        log.info("기증 및 납본 안내 페이지 접속...");
+        return "info/donation";
+    }
+
+    // 8. 자료 현황 목록 (basic.html)
     @GetMapping("/basic")
-    public String getLibraryInfo(Model model) {
-        log.info("자료현황(표) 페이지 접속...");
-        model.addAttribute("info", infoService.getStaticLibraryInfo());
+    public String basic(Model model) {
         model.addAttribute("stats", infoService.getLibraryStatistics());
         return "info/basic";
     }
 
-    // 3. [GET] 관장 인사말
-    @GetMapping("/greeting")
-    public String greetingPage(Model model) {
-        log.info("인사말 페이지 이동...");
-        model.addAttribute("info", infoService.getStaticLibraryInfo());
-        return "info/greeting";
-    }
-
-    // 4. [GET] 도서관 연혁
-    @GetMapping("/history")
-    public String historyPage(Model model) {
-        log.info("연혁 페이지 이동...");
-        model.addAttribute("info", infoService.getStaticLibraryInfo());
-        return "info/history";
-    }
-
-    // 5. [GET] 이용안내 (신규 추가)
-    @GetMapping("/guide")
-    public String guidePage(Model model) {
-        log.info("이용안내 페이지 이동...");
-        model.addAttribute("info", infoService.getStaticLibraryInfo());
-        return "info/guide"; // templates/info/guide.html 호출
-    }
-
-    // 6. [GET] 조직 및 업무
-    @GetMapping("/organization")
-    public String organizationPage(Model model) {
-        model.addAttribute("info", infoService.getStaticLibraryInfo());
-        return "info/organization";
-    }
-
-    // 7. [GET] 시설 현황
-    @GetMapping("/facilities")
-    public String facilitiesPage(Model model) {
-        model.addAttribute("info", infoService.getStaticLibraryInfo());
-        return "info/facilities";
-    }
-
-    // 8. [GET] 찾아오시는 길
-    @GetMapping("/map")
-    public String mapPage(Model model) {
-        model.addAttribute("info", infoService.getStaticLibraryInfo());
-        return "info/map";
-    }
-
-    // 9. [GET] 기증·납본 안내
-    @GetMapping("/donation")
-    public String donationPage(Model model) {
-        model.addAttribute("info", infoService.getStaticLibraryInfo());
-        return "info/donation";
-    }
-
-    // ---------------------------------------------------------
-    // 데이터 조작(CRUD) 기능
-    // ---------------------------------------------------------
-
-    @GetMapping("/modify")
-    public String modifyGET(@RequestParam("id") Long id, Model model) {
-        log.info("수정 페이지 이동 ID: " + id);
-
-        // 인터페이스명인 getStat으로 호출하세요!
-        model.addAttribute("stat", infoService.getStat(id));
-        model.addAttribute("info", infoService.getStaticLibraryInfo());
-
-        return "info/modify";
-    }
+    // 9. 자료 등록 페이지
+    @GetMapping("/register")
+    public void registerGET() {}
 
     @PostMapping("/register")
     public String registerPOST(LibraryStatsDTO dto) {
         infoService.registerStat(dto);
         return "redirect:/info/basic";
+    }
+
+    // 10. 자료 수정 페이지
+    @GetMapping("/modify")
+    public void modifyGET(@RequestParam("id") Long id, Model model) {
+        model.addAttribute("stat", infoService.getStat(id));
     }
 
     @PostMapping("/modify")
@@ -114,10 +89,10 @@ public class InfoController {
         return "redirect:/info/basic";
     }
 
-    @PostMapping("/remove/{id}")
-    public String remove(@PathVariable("id") Long id) {
-        log.info("삭제 요청 ID: " + id);
-        infoService.removeStat(id);
+    // 11. 자료 삭제 처리
+    @PostMapping("/remove")
+    public String removePOST(@RequestParam("statId") Long statId) {
+        infoService.removeStat(statId);
         return "redirect:/info/basic";
     }
 }

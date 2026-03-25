@@ -9,9 +9,10 @@
         <div class="card-header bg-primary text-white">
             <h5 class="card-title mb-0">
                 <i class="bi bi-person-badge me-2"></i>
-                <span th:text="${writer}">사용자</span>님의 문의 내역
+                <span th:text="${writer != null ? writer : '사용자'}">사용자</span>님의 문의 내역
             </h5>
         </div>
+
         <div class="card-body">
             <div class="alert alert-light border mb-4">
                 <p class="mb-0 text-muted">
@@ -19,20 +20,20 @@
                 </p>
             </div>
 
-            <table class="table table-hover">
+            <table class="table table-hover mt-3">
                 <thead class="table-light">
                 <tr class="text-center">
                     <th style="width: 10%">번호</th>
-                    <th style="width: 60%">제목</th>
+                    <th style="width: 55%">제목</th>
                     <th style="width: 15%">작성자</th>
-                    <th style="width: 15%">등록일</th>
+                    <th style="width: 20%">등록일</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="dto : ${responseDTO.dtoList}" class="text-center">
                     <td th:text="${dto.ino}"></td>
                     <td class="text-start">
-                        <a th:href="@{/inquiry/read(ino=${dto.ino})}"
+                        <a th:href="| @{/inquiry/read(ino=${dto.ino})} & ${pageRequestDTO.link} |"
                            th:text="${dto.title}"
                            class="text-decoration-none text-dark fw-bold"></a>
                         <span class="badge bg-info rounded-pill ms-1"
@@ -40,10 +41,10 @@
                               th:text="${dto.replyCount}"></span>
                     </td>
                     <td th:text="${dto.writer}"></td>
-                    <td th:text="${#temporals.format(dto.regDate, 'yyyy-MM-dd')}"></td>
+                    <td th:text="${#temporals.format(dto.regDate, 'yyyy-MM-dd HH:mm')}"></td>
                 </tr>
 
-                <tr th:if="${#lists.isEmpty(responseDTO.dtoList)}">
+                <tr th:if="${responseDTO.total == 0}">
                     <td colspan="4" class="text-center py-5">
                         <p class="text-muted mb-0">작성하신 문의 내역이 없습니다.</p>
                         <a th:href="@{/inquiry/register}" class="btn btn-sm btn-outline-primary mt-2">첫 문의 작성하기</a>
@@ -53,16 +54,48 @@
             </table>
 
             <div class="d-flex justify-content-between mt-4">
-                <a th:href="@{/inquiry/list}" class="btn btn-secondary">전체 목록으로</a>
-                <a th:href="@{/inquiry/register}" class="btn btn-primary">새 질문하기</a>
+                <a th:href="@{/inquiry/list}" class="btn btn-secondary">
+                    <i class="bi bi-list"></i> 전체 목록으로
+                </a>
+                <a th:href="@{/inquiry/register}" class="btn btn-primary">
+                    <i class="bi bi-pencil-square"></i> 새 질문하기
+                </a>
             </div>
 
-        </div>
-    </div>
-</div>
+            <div class="float-end mt-3">
+                <ul class="pagination flex-wrap" th:if="${responseDTO.total > 0}">
+                    <li class="page-item" th:if="${responseDTO.prev}">
+                        <a class="page-link" th:data-num="${responseDTO.start - 1}">Previous</a>
+                    </li>
+                    <th:block th:each="i: ${#numbers.sequence(responseDTO.start, responseDTO.end)}">
+                        <li th:class="${responseDTO.page == i} ? 'page-item active' : 'page-item'">
+                            <a class="page-link" th:data-num="${i}">[[${i}]]</a>
+                        </li>
+                    </th:block>
+                    <li class="page-item" th:if="${responseDTO.next}">
+                        <a class="page-link" th:data-num="${responseDTO.end + 1}">Next</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div></div></div>
 
 <th:block layout:fragment="script">
     <script th:inline="javascript">
+        // 페이징 이동을 위한 스크립트
+        document.querySelector(".pagination")?.addEventListener("click", function (e) {
+            e.preventDefault();
+            const target = e.target;
+            if (target.tagName !== 'A') return;
+            const num = target.getAttribute("data-num");
+            const formObj = document.createElement("form");
+            formObj.innerHTML = `<input type='hidden' name='page' value='${num}'>`;
+            document.body.appendChild(formObj);
+            formObj.action = "/member/inquiryList"; // 주소 확인 필요
+            formObj.method = "get";
+            formObj.submit();
+        }, false);
+
         console.log("My Inquiry List Page Loaded for: " + [[${writer}]]);
     </script>
 </th:block>

@@ -3,6 +3,8 @@ package com.library.project.library.service;
 import com.library.project.library.dto.MemberDTO;
 import com.library.project.library.entity.Member;
 
+import java.util.List;
+
 public interface MemberService {
     // 회원가입 (반환값은 생성된 id)
     Long register(MemberDTO memberDTO);
@@ -26,6 +28,8 @@ public interface MemberService {
     String findId(String mname, String email);           // 1. 아이디 찾기
     boolean checkMemberForPw(String mid, String email);    // 2. 비번 찾기 전 확인
     void updatePassword(String mid, String newPw);         // 3. 비번 변경 (암호화 없이)
+
+    List<MemberDTO> searchMembers(String keyword);
 
 }
 

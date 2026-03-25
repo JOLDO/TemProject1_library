@@ -42,6 +42,17 @@ public class KoreanDecomposer {
 
         return sb.toString();
     }
+
+    // 키워드가 순수 초성(ㄱ~ㅎ)으로만 이루어져 있는지 확인
+    // 예: "ㄷㅁㅇ" → true, "데미안" → false, "ㄷ미안" → false
+    public boolean isChosungOnly(String text) {
+        if (text == null || text.isBlank()) return false;
+        for (char c : text.toCharArray()) {
+            if (c >= 'ㄱ' && c <= 'ㅎ') continue;
+            return false;
+        }
+        return true;
+    }
 }
 
 /*

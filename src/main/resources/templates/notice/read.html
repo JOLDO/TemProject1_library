@@ -29,7 +29,10 @@
 
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     <a th:href="|@{/notice/list}?${pageRequestDTO.getLink()}|" class="btn btn-secondary px-4">목록</a>
-                    <a th:href="|@{/notice/modify(nno=${dto.nno})}&${pageRequestDTO.getLink()}|" class="btn btn-primary px-4">수정</a>
+
+                    <th:block th:if="${session.loginInfo != null && session.loginInfo.role == 'ADMIN'}">
+                        <a th:href="|@{/notice/modify(nno=${dto.nno})}&${pageRequestDTO.getLink()}|" class="btn btn-primary px-4">수정</a>
+                    </th:block>
                 </div>
             </div>
         </div>
