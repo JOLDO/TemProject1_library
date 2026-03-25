@@ -17,53 +17,57 @@ public class InfoController {
 
     private final InfoService infoService;
 
-    // 1. 도서관 안내 메인 (인사말)
+    // 1. 관장 인사말 (greeting.html)
     @GetMapping("")
-    public String greeting(Model model) {
-        log.info("인사말 페이지 접속...");
-        // 파일명이 greeting.html 이므로 경로를 맞춰줍니다.
+    public String greeting() {
         return "info/greeting";
     }
 
-    // 2. 도서관 연혁
+    // 2. 도서관 연혁 (history.html)
     @GetMapping("/history")
     public String history() {
         return "info/history";
     }
 
-    // 3. 조직 및 업무
+    // 3. 조직 및 업무 (organization.html)
     @GetMapping("/organization")
     public String organization() {
         return "info/organization";
     }
 
-    // 4. 이용 안내
+    // 4. 이용 안내 (guide.html)
     @GetMapping("/guide")
     public String guide() {
         return "info/guide";
     }
 
-    // 5. 시설 현황
+    // 5. 시설 현황 (facilities.html)
     @GetMapping("/facilities")
     public String facilities() {
         return "info/facilities";
     }
 
-    // 6. 찾아오시는 길 (구글 지도 포함)
+    // 6. 찾아오시는 길 (map.html)
     @GetMapping("/map")
     public String map() {
         return "info/map";
     }
 
-    // 7. 자료 현황 목록 (CRUD 메인)
+    // ★ 7. 기증 및 납본 안내 (donation.html) - 새로 추가됨!
+    @GetMapping("/donation")
+    public String donation() {
+        log.info("기증 및 납본 안내 페이지 접속...");
+        return "info/donation";
+    }
+
+    // 8. 자료 현황 목록 (basic.html)
     @GetMapping("/basic")
     public String basic(Model model) {
         model.addAttribute("stats", infoService.getLibraryStatistics());
-        model.addAttribute("info", infoService.getStaticLibraryInfo());
         return "info/basic";
     }
 
-    // 8. 자료 등록/수정/삭제 로직
+    // 9. 자료 등록 페이지
     @GetMapping("/register")
     public void registerGET() {}
 
@@ -73,6 +77,7 @@ public class InfoController {
         return "redirect:/info/basic";
     }
 
+    // 10. 자료 수정 페이지
     @GetMapping("/modify")
     public void modifyGET(@RequestParam("id") Long id, Model model) {
         model.addAttribute("stat", infoService.getStat(id));
@@ -84,6 +89,7 @@ public class InfoController {
         return "redirect:/info/basic";
     }
 
+    // 11. 자료 삭제 처리
     @PostMapping("/remove")
     public String removePOST(@RequestParam("statId") Long statId) {
         infoService.removeStat(statId);
