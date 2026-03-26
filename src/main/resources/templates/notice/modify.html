@@ -11,6 +11,9 @@
         <div class="card mb-4 border-0 shadow-sm">
             <div class="card-body">
                 <form th:action="@{/notice/modify}" method="post" id="f1">
+                    <input type="hidden" name="page" th:value="${pageRequestDTO.page}">
+                    <input type="hidden" name="size" th:value="${pageRequestDTO.size}">
+
                     <div class="mb-3">
                         <label class="form-label fw-bold">글번호</label>
                         <input type="text" name="nno" class="form-control bg-light" th:value="${dto.nno}" readonly>
@@ -30,7 +33,7 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">파일 첨부</label>
-                        <input type="file" name="files" class="form-control" multiple>
+                        <input type="file" name="uploadFiles" class="form-control" multiple>
                     </div>
 
                     <div class="row mt-3">
@@ -39,7 +42,8 @@
                                 <div class="card shadow-sm m-2 p-1" style="width: 150px;">
                                     <img class="card-img-top" th:src="|/view/${fileName}|" th:data-src="${fileName}">
                                     <div class="card-body p-2 text-center">
-                                        <button type="button" class="btn btn-danger btn-sm w-100" th:onclick="removeFile('[[${fileName}]]', this)">삭제</button>
+                                        <button type="button" class="btn btn-danger btn-sm w-100"
+                                                th:onclick="removeFile([[${fileName}]], this)">삭제</button>
                                     </div>
                                 </div>
                             </th:block>
@@ -69,106 +73,88 @@
     const uploadResult = document.querySelector("#uploadResult");
     const uploadHidden = document.querySelector("#uploadHidden");
 
-    // Axios 라이브러리 로드 (필요시 - base layout에 없다면 추가)
-    // <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    // 1. 목록 버튼 클릭 시 이동 (페이징 정보 유지)
+    document.querySelector(".listBtn").addEventListener("click", function(e){
+        e.preventDefault();
+        self.location = "/notice/list?" + link;
+    }, false);
 
-// 1. 파일 선택 시 비동기 업로드 처리
-document.querySelector("input[name='files']").addEventListener("click", function(e){
-e.preventDefault();
+    // 2. 수정 버튼 클릭 시 제출
+    document.querySelector(".modBtn").addEventListener("click", function(e){
+        e.preventDefault();
 
-// 📍 파일 첨부 창을 띄웁니다.
-const inputFile = document.createElement("input");
-inputFile.type = "file";
-inputFile.multiple = true;
-inputFile.click();
+        formObj.action = "/notice/modify?" + link;
+        formObj.method = "post";
+        formObj.submit();
+    }, false);
 
-inputFile.onchange = function(e){
-const files = inputFile.files;
-const formData = new FormData();
+    // 3. 삭제 버튼 클릭 시 제출
+    document.querySelector(".removeBtn").addEventListener("click", function(e){
+        e.preventDefault();
 
-for (let i = 0; i < files.length; i++) {
-formData.append("files", files[i]);
-}
+        if(!confirm("정말 삭제하시겠습니까?")) return;
 
-// UploadController의 /uploadPOST로 데이터 전송 (Axios)
-axios.post('/upload', formData, {
-headers: {
-'Content-Type': 'multipart/form-data'
-}
-}).then(res => {
-const arr = res.data;
-console.log(arr);
+        formObj.action = "/notice/remove";
+        formObj.method = "post";
+        formObj.submit();
+    }, false);
 
-// 미리보기 및 hidden input 생성 메서드 호출
-appendResult(arr);
-});
-}
-});
+    // 4. 파일 선택 및 비동기 업로드 처리 (Axios 기반)
+    document.querySelector("input[name='uploadFiles']").addEventListener("change", function(e){
+        const files = e.target.files;
+        if(files.length === 0) return;
 
-// 2. 미리보기 및 hidden input 생성 메서드
-function appendResult(arr){
-for(let fileInfo of arr){
-// 📍 미리보기 card 생성
-const div = document.createElement("div");
-div.className = "card shadow-sm m-2 p-1";
-div.style.width = "150px";
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            formData.append("files", files[i]);
+        }
 
-// 이미지 URL 설정
-const imgUrl = fileInfo.image ? `/view/s_${fileInfo.uuid}_${fileInfo.fileName}` : `/assets/img/file-icon.png`;
+        // 📍 /upload 컨트롤러로 전송
+        axios.post('/upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        }).then(res => {
+            appendResult(res.data);
+        }).catch(err => {
+            alert("파일 업로드에 실패했습니다.");
+        });
+    }, false);
 
-div.innerHTML = `
-<img class="card-img-top" src="${imgUrl}" data-src="${fileInfo.uuid}_${fileInfo.fileName}">
-<div class="card-body p-2 text-center">
-    <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeFile('${fileInfo.uuid}_${fileInfo.fileName}', this)">삭제</button>
-</div>
-`;
-uploadResult.appendChild(div);
+    // 5. 미리보기 및 hidden input 생성 메서드
+    function appendResult(arr){
+        for(let fileInfo of arr){
+            const fileName = fileInfo.uuid + "_" + fileInfo.fileName;
 
-// 📍 서버로 보낼 hidden input 생성 (이게 없으면 수정 시 파일 정보가 안 갑니다!)
-const hidden = document.createElement("input");
-hidden.type = "hidden";
-hidden.name = "fileNames";
-hidden.value = `${fileInfo.uuid}_${fileInfo.fileName}`;
-uploadHidden.appendChild(hidden);
-}
-}
+            const div = document.createElement("div");
+            div.className = "card shadow-sm m-2 p-1";
+            div.style.width = "150px";
 
-// 3. 첨부파일 삭제 버튼 처리 (미리보기 화면 & Hidden 영역 모두 삭제)
-function removeFile(fileName, btn){
-// 📍 미리보기 card 삭제
-btn.closest(".card").remove();
+            const imgUrl = fileInfo.image ? `/view/s_${fileName}` : `/assets/img/file-icon.png`;
 
-// 📍 Hidden 영역의 input 삭제
-const hiddenInput = uploadHidden.querySelector(`input[value='${fileName}']`);
-hiddenInput.remove();
-}
+            div.innerHTML = `
+                <img class="card-img-top" src="${imgUrl}" data-src="${fileName}">
+                <div class="card-body p-2 text-center">
+                    <button type="button" class="btn btn-danger btn-sm w-100"
+                            onclick="removeFile('${fileName}', this)">삭제</button>
+                </div>`;
+            uploadResult.appendChild(div);
 
-// 4. 수정 버튼 클릭 시 제출
-document.querySelector(".modBtn").addEventListener("click", function(e){
-e.preventDefault();
-e.stopPropagation();
+            const hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = "fileNames";
+            hidden.value = fileName;
+            uploadHidden.appendChild(hidden);
+        }
+    }
 
-formObj.action = "/notice/modify?" + link;
-formObj.method = "post";
-formObj.submit();
-});
+    // 6. 첨부파일 삭제 (전역 함수로 선언하여 th:onclick 및 일반 onclick 대응)
+    window.removeFile = function(fileName, btn){
+        if(!confirm("해당 파일을 삭제하시겠습니까?")) return;
 
-// 5. 삭제 버튼 클릭 시 제출
-document.querySelector(".removeBtn").addEventListener("click", function(e){
-e.preventDefault();
-e.stopPropagation();
-
-formObj.action = "/notice/remove";
-formObj.method = "post";
-formObj.submit();
-});
-
-// 6. 목록 버튼 클릭 시 이동
-document.querySelector(".listBtn").addEventListener("click", function(e){
-e.preventDefault();
-e.stopPropagation();
-
-self.location = "/notice/list?" + link;
-});
+        // 미리보기 카드 삭제
+        btn.closest(".card").remove();
+        // Hidden input 삭제
+        const targetInput = uploadHidden.querySelector(`input[value='${fileName}']`);
+        if(targetInput) targetInput.remove();
+    }
 </script>
 </html>
