@@ -23,12 +23,12 @@ public class BookController {
     private final SessionHelper sessionHelper;
 
     @GetMapping("/book/booklist")
-    public void list(PageRequestDTO pageRequestDTO, Model model, HttpSession session) {
-        MemberDTO memberInfo = sessionHelper.getMemberInfo(session);
+    public void list(PageRequestDTO pageRequestDTO, Model model, HttpSession session) { //size와, page가 각각 10과 1로 기본 세팅된 dto를 읽어옴(쿼리스트링이 없어도 기본값이 정해져 있음)
+        MemberDTO memberInfo = sessionHelper.getMemberInfo(session);    //로그인 정보 조회 (비로그인이면 null), 책 리스트는 회원, 비회원 상관없이 확인 할수 있게 사용
         PageResponseDTO<BookDTO> responseDTO = bookService.list(
-                pageRequestDTO
+                pageRequestDTO  //데이터를 읽어오며 request를 세팅 할거임
                 , memberInfo == null ? null : memberInfo.getId());
-        model.addAttribute("responseDTO", responseDTO);
+        model.addAttribute("responseDTO", responseDTO); //html에서 페이지네이션을 적용하여 사용하기 위해
     }
 }
 

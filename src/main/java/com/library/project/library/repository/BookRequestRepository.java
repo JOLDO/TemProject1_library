@@ -24,7 +24,8 @@ public interface BookRequestRepository extends JpaRepository<BookRequest, Long> 
     boolean existsByMember_IdAndBook_IdAndStatus(Long memberId, Long bookId, RequestStatus status);
 
     @Query("SELECT br.book.isbn FROM BookRequest br WHERE br.member.id = :memberId AND br.book.isbn IN :bookIsbns AND br.status = :status")
-    List<String> findBookIsbnsByMemberIdAndBookIsbnInAndStatus(@Param("memberId")Long memberId, @Param("bookIsbns")List<String> bookIsbns, @Param("status")RequestStatus status);
+    List<String> findBookIsbnsByMemberIdAndBookIsbnInAndStatus(
+            @Param("memberId")Long memberId, @Param("bookIsbns")List<String> bookIsbns, @Param("status")RequestStatus status);
 
     // 회원의 특정 ISBN 도서 PENDING 예약 삭제
     @Modifying

@@ -36,7 +36,6 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final RecommendRepository recommendRepository;
     private final ModelMapper modelMapper;
-    private final KoreanDecomposer koreanDecomposer;
     private final MemberRepository memberRepository;
     private final BookRequestRepository bookRequestRepository;
     private final RentalRepository rentalRepository;
@@ -44,49 +43,42 @@ public class BookServiceImpl implements BookService {
     @Override
     public PageResponseDTO<BookDTO> list(PageRequestDTO pageRequestDTO, Long memberId) {
         String keyword = pageRequestDTO.getKeyword();
-        String keywordNor = koreanDecomposer.toNormal(pageRequestDTO.getKeyword());
-        String keywordCho = koreanDecomposer.isChosungOnly(keyword)
-                ? koreanDecomposer.toChosung(keyword)
-                : null;
-
-        // Pageable: 페이지 번호, 페이지 크기, 기본 정렬 기준을 담은 객체
-        // "id" 기준 내림차순 = 최신 등록순 (정렬 드롭다운 기본값과는 별개로 페이징 처리에 사용)
-        Pageable pageable = pageRequestDTO.getPageable("id");
-
-        // 정렬 드롭다운에서 선택한 sort 값 (id / pubdate / bookTitle / recommend / rental)
+        Pageable pageable = pageRequestDTO.getPageable();   //페이지네이션 설정(page, size) 정렬 없이
         String sort = pageRequestDTO.getSort();
 
         // QueryDSL로 구현된 커스텀 메서드: isbn 중복 제거 + 검색 + 정렬 + 페이징을 한 번에 처리
-        Page<Book> result = bookRepository.searchDistinctAll(keyword, keywordNor, keywordCho, sort, pageable);
+        Page<Book> result = bookRepository.searchDistinctAll(keyword, sort, pageable);
 
         // 현재 페이지의 책 목록
         List<Book> books = result.getContent();
 
         // ── 배치 조회: 책 목록 전체의 isbn/id를 한꺼번에 IN 쿼리로 조회 ──────────
         // stream().map()으로 books 리스트에서 isbn/id만 추출해서 리스트로 만듦
-        List<Long> bookIds = books.stream().map(book -> book.getId()).collect(Collectors.toList());
+        List<Long> bookIds = books.stream().map(book -> book.getId()).collect(Collectors.toList()); //페이징된 책의 리스트에서 id리스트를 뺌
 
         // 비로그인: isbn별 대여 가능 여부 / 로그인: 예약 상태 + 추천 여부
-        final Set<String> availableIsbns;   //람다식으로 사용하기 위해 final로 선언(추후 함수 끝나기 전에 무조건 초기화를 진행해줘야 한다.)
-        final Set<String> recommendedBookIds;
-        final Set<String> requestBookIsbn;
+        final Set<String> recommendedBookIsbns;
+        final Set<String> requestBookIsbns;
         final Set<String> rentedByMeIsbns;  // 내가 현재 대여중인 isbn
-        List<String> isbns = books.stream().map(book -> book.getIsbn()).collect(Collectors.toList());
+        List<String> isbns = books.stream().map(book -> book.getIsbn()).collect(Collectors.toList());   //페이징된 책의 리스트에서 isbn리스트를 뺌
+        Set<String> availableIsbns = isbns.isEmpty() ? new HashSet<>()
+                : new HashSet<>(bookRepository.findAvailableIsbnIn(isbns, BookStatus.AVAILABLE));
+        //리스트에 있는 isbn들 중에 빌릴수 있는 상태의 isbn들을 추출(혹시나 모르는 중복제거위해 hashset)
+
         if (memberId == null) {
-            availableIsbns = isbns.isEmpty() ? new HashSet<>()
-                    : new HashSet<>(bookRepository.findAvailableIsbnIn(isbns, BookStatus.AVAILABLE));
-            recommendedBookIds = new HashSet<>();
-            requestBookIsbn = new HashSet<>();
+            recommendedBookIsbns = new HashSet<>();
+            requestBookIsbns = new HashSet<>();
             rentedByMeIsbns = new HashSet<>();
         } else {
-            availableIsbns = isbns.isEmpty() ? new HashSet<>()
-                    : new HashSet<>(bookRepository.findAvailableIsbnIn(isbns, BookStatus.AVAILABLE));
-            requestBookIsbn = isbns.isEmpty() ? new HashSet<>()
+            requestBookIsbns = isbns.isEmpty() ? new HashSet<>()
                     : new HashSet<>(bookRequestRepository.findBookIsbnsByMemberIdAndBookIsbnInAndStatus(memberId, isbns, RequestStatus.PENDING));
-            recommendedBookIds = bookIds.isEmpty() ? new HashSet<>()
+            //리스트에 있는 isbn들 중에 해당 회원이 예약대기중인 책의 isbn들을 추출(혹시나 모르는 중복제거위해 hashset)
+            recommendedBookIsbns = isbns.isEmpty() ? new HashSet<>()
                     : new HashSet<>(recommendRepository.findBookIdsByBookIsbnIn(isbns, memberId));
+            //리스트에 있는 isbn들 중에 해당 회원이 추천중인 책의 isbn들을 추출(혹시나 모르는 중복제거위해 hashset)
             rentedByMeIsbns = isbns.isEmpty() ? new HashSet<>()
                     : new HashSet<>(rentalRepository.findRentedIsbnsByMemberIdAndIsbnIn(memberId, isbns, RentalStatus.RENTED));
+            //리스트에 있는 isbn들 중에 해당 회원이 대여중인 책의 isbn들을 추출(혹시나 모르는 중복제거위해 hashset)
         }
 
         // ── Book → BookDTO 변환 ────────────────────────────────────────────────
@@ -99,15 +91,15 @@ public class BookServiceImpl implements BookService {
                     // Set.contains()로 O(1) 조회 (DB 추가 쿼리 없음)
                     dto.setStatus(availableIsbns.contains(book.getIsbn())
                             ? BookStatus.AVAILABLE
-                            : BookStatus.RENTED);
+                            : BookStatus.RENTED);   //(가능뱃지)
                     if(memberId != null) {
-                        dto.setRequestPending(requestBookIsbn.contains(book.getIsbn()));
+                        dto.setRequestPending(requestBookIsbns.contains(book.getIsbn()));   //해당 책의 isbn이 예약중인 책의 isbn에 포함되어있을때(예약뱃지)
                         // 추천 여부: 이 bookId에 추천 기록이 있으면 true
                         // → 프론트에서 추천 버튼 초기 상태(♥ 추천됨 / ♡ 추천하기) 결정에 사용
-                        dto.setRecommended(recommendedBookIds.contains(book.getIsbn()));
+                        dto.setRecommended(recommendedBookIsbns.contains(book.getIsbn()));  //해당 책의 isbn이 추천중인 책의 isbn에 포함되어있을때(추천버튼)
                         // 내가 현재 대여중인 책인지 여부
                         // → 대여중인 책에 대해 예약 버튼 비활성화에 사용
-                        dto.setRentedByMe(rentedByMeIsbns.contains(book.getIsbn()));
+                        dto.setRentedByMe(rentedByMeIsbns.contains(book.getIsbn()));    //해당 책의 isbn이 대여중인 책의 isbn에 포함되어있을때(대여뱃지)
                     }
 
                     return dto;
@@ -123,7 +115,7 @@ public class BookServiceImpl implements BookService {
                 .pageRequestDTO(pageRequestDTO)
                 .dtoList(dtoList)
                 .total(total)
-                .build();
+                .build();   //페이지네이션 관련(시작페이지, 끝페이지, 현재페이지, 이전버튼여부, 다음버튼여부, 보여줄 책 리스트가 들어있음
     }
 
     // 책 단건 조회 (모달 상세정보용)

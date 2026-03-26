@@ -7,22 +7,22 @@ public class KoreanDecomposer {
 
     private static final char[] CHOSUNG = {
         'ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'
-    };
+    };  //초성 19개
 
     public String toChosung(String text) {
         if (text == null) return null;
 
         StringBuilder sb = new StringBuilder();
 
-        for (char c : text.toCharArray()) {
-            if (c >= 0xAC00 && c <= 0xD7A3) {
+        for (char character : text.toCharArray()) {
+            if (character >= 0xAC00 && character <= 0xD7A3) {   //한글 처음 부터 끝까지
                 // 한글 음절인 경우: 초성만 추출
                 // (c - 0xAC00): 0xAC00 기준 음절 인덱스 계산
                 // / (21 * 28) : 중성(21)×종성(28) = 588가지를 나누면 초성 인덱스가 나옴
-                int syllable = c - 0xAC00;
-                sb.append(CHOSUNG[syllable / (21 * 28)]);
-            } else if (Character.isLetterOrDigit(c)) {
-                sb.append(c);
+                int syllable = character - 0xAC00;  //44033 - 44032 가 0이면 가 1이면 각 이런식으로 감
+                sb.append(CHOSUNG[syllable / (21 * 28)]);   //값이 0이면 ㄱ, 값이 1이면 ㄴ
+            } else if (Character.isLetterOrDigit(character)) {  //한글이 아닌 글자라면
+                sb.append(character);
             }
         }
 
@@ -34,21 +34,21 @@ public class KoreanDecomposer {
 
         StringBuilder sb = new StringBuilder();
 
-        for (char c : text.toCharArray()) {
-            if (Character.isLetterOrDigit(c) || (c >= 0xAC00 && c <= 0xD7A3)) {
-                sb.append(c);
+        for (char character : text.toCharArray()) {
+            if (Character.isLetterOrDigit(character) || (character >= 0xAC00 && character <= 0xD7A3)) {
+                sb.append(character);   //글자, 숫자라면 그냥 넣음(특수문자와 띄어쓰기 제외)
             }
         }
 
         return sb.toString();
     }
 
-    // 키워드가 순수 초성(ㄱ~ㅎ)으로만 이루어져 있는지 확인
-    // 예: "ㄷㅁㅇ" → true, "데미안" → false, "ㄷ미안" → false
     public boolean isChosungOnly(String text) {
         if (text == null || text.isBlank()) return false;
-        for (char c : text.toCharArray()) {
-            if (c >= 'ㄱ' && c <= 'ㅎ') continue;
+        for (char character : text.toCharArray()) {
+            //공백과 초성만 있을때는 false로 가지 않음
+            if (character == ' ') continue;
+            if (character >= 'ㄱ' && character <= 'ㅎ') continue;
             return false;
         }
         return true;

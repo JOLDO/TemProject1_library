@@ -51,6 +51,10 @@ public class PageRequestDTO {
         return PageRequest.of(this.page - 1, this.size, Sort.by(props).descending());
     }
 
+    public Pageable getPageable() {
+        return PageRequest.of(this.page - 1, this.size, Sort.unsorted());
+    }
+
     public String getLink() {
         if(link == null || link.isEmpty()) {
             StringBuilder builder = new StringBuilder();

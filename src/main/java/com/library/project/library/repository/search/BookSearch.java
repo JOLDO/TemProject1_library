@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface BookSearch {
 //    boolean existsByBooks();
-    Page<Book> searchDistinctAll(String keyword, String keywordNor, String keywordCho, String sort, Pageable pageable);
+    Page<Book> searchDistinctAll(String keyword, String sort, Pageable pageable);
 }
 
 /*

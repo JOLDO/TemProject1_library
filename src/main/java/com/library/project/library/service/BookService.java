@@ -8,10 +8,10 @@ import com.library.project.library.dto.PageResponseDTO;
 public interface BookService {
     // void printApiResponse();
     // boolean isReady();
-    PageResponseDTO<BookDTO> list(PageRequestDTO pageRequestDTO, Long memberId);
-    BookDTO getBook(Long bookId, Long memberId);
-    void recommend(Long bookId, Long memberId);
-    void unrecommend(Long bookId, Long memberId);
+    PageResponseDTO<BookDTO> list(PageRequestDTO pageRequestDTO, Long memberId);    //페이징 된 리스트와 데이터가 들어있는 dto 반환
+    BookDTO getBook(Long bookId, Long memberId);    //책의 단건 조회(이것도 회원 비회원 상관 없이 사용)
+    void recommend(Long bookId, Long memberId); //추천 테이블에 넣기
+    void unrecommend(Long bookId, Long memberId);   //추천 테이블에서 지우기
 }
 
 /*
