@@ -46,7 +46,9 @@ public class CustomServletConfig implements WebMvcConfigurer {
                         "/member/inquiryList",     // 나의 문의내역
                         "/member/applyMyWishBookk", // 나의 희망도서
                         "/member/myFacilityList", // 나의 시설예약
-                        "/member/apply-list"    // 나의 행사강좌
+                        "/member/apply-list",    // 나의 행사강좌
+                        "/book/recommend/**",
+                        "/api/requests/**"
 
                 )
                 .excludePathPatterns(
