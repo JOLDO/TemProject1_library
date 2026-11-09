@@ -11,10 +11,47 @@
 
 ## 🖼 화면
 
-| 초성 검색 + 키워드 하이라이트 | 상세보기 모달 |
+### 도서 리스트
+
+![도서 리스트](src/main/docs/taeheun/images/01_booklist.png)
+> 표지 · 저자 · 출판사 · 발행일/등록일과 **대여 가능 여부 배지**를 표시하고, 하단에 **페이지네이션**
+
+### 검색
+
+| 초성 검색 + 하이라이트 | 정규화 검색 (띄어쓰기 무시) |
 |:---:|:---:|
-| ![초성 검색](docs/images/search.png) | ![상세보기](docs/images/detail.png) |
-| `ㄴㄹㅌ` 입력 → **나루토** 마킹, 정렬 · 페이지네이션 | 하이라이트 유지, 대여 가능 배지, 추천(♡/♥) |
+| ![초성 검색](src/main/docs/taeheun/images/02_search_chosung.png) | ![정규화 검색](src/main/docs/taeheun/images/03_search_normal.png) |
+| `ㄴㄹㅌ` 입력 → **나루토** 위치에 마킹 | `마법사의돌1` 입력 → `해리 포터와 마법사의 돌 1` 매칭 |
+
+![검색 우선순위](src/main/docs/taeheun/images/04_search_priority.png)
+> **검색 우선순위**: `d`로 검색하면 **제목**(Design)이 일치한 결과가 먼저 나오고, 그다음 **저자**(David Cho), **출판사**(Candlewick Press) 일치 순으로 정렬
+
+### 정렬
+
+![추천순 정렬](src/main/docs/taeheun/images/05_sort.png)
+> 상단 메뉴 **자료 검색 → 새로들어온책 / 대출이많은책 / 추천하는책**으로 정렬하고, 페이지 타이틀도 정렬 기준에 맞게 변경
+
+### 상세보기 · 추천
+
+| 상세보기 모달 | 추천하기 |
+|:---:|:---:|
+| ![상세보기](src/main/docs/taeheun/images/06_detail_modal.png) | ![추천](src/main/docs/taeheun/images/07_recommend.png) |
+| 리스트의 검색어 하이라이트가 **모달의 제목 · 책 소개까지 유지** | 추천 시 완료 모달 표시, 버튼이 **♥ 추천됨**으로 전환 |
+
+### 대여 예약
+
+| 상세 모달 (대여 불가 도서) | 예약 완료 |
+|:---:|:---:|
+| ![상세 모달 예약](src/main/docs/taeheun/images/08_wish.png) | ![예약 완료](src/main/docs/taeheun/images/09_rental_reserve.png) |
+| 추천 상태(♥)를 제목 옆에 표시하고, 대여 불가 도서도 **대여 예약** 가능 | 예약 버튼 클릭 → 대출 예약 완료 |
+
+![관리자 예약 목록](src/main/docs/taeheun/images/10_rental_list.png)
+> 회원이 신청한 예약이 관리자 **대출 예약 목록**에 `대기 중` 상태로 반영됨
+
+### 공통 레이아웃
+
+![메인](src/main/docs/taeheun/images/11_base_layout.png)
+> `base.html` 공통 레이아웃: 헤더 메뉴(로그인 시 **내서재** 메뉴 노출), 로그인 정보, 푸터
 
 ---
 
@@ -41,7 +78,7 @@
 - QueryDSL 동적 쿼리로 다중 필드 검색
 - `CaseBuilder`로 가상 `priority` 컬럼을 만들어 **관련도 순 정렬**
   `제목 > 정규화 제목 > 초성 제목 > 저자 > 출판사 > 책 소개`
-- 정렬 5종: 최신 등록 / 출판일 / 제목 / 추천수 / 대출 빈도
+- 정렬: 최신 등록 / 출판일 / 제목 / 추천수 / 대출 빈도 (백엔드 5종 지원, 화면 메뉴에서는 새로들어온책 · 대출이많은책 · 추천하는책 3종 제공)
 - `JPAExpressions` 서브쿼리로 **ISBN 단위 중복 제거** 후 페이지네이션
 
 ### 3. 검색어 하이라이트
