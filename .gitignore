@@ -53,3 +53,5 @@ Thumbs.db
 # API 키나 DB 비밀번호가 포함된 설정 파일은 버전 관리에서 제외하는 것이 권장됩니다.
 # application.yml
 # application.properties
+# API 키 (민감 정보)
+application-secret.properties

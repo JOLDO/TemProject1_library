@@ -182,8 +182,8 @@ public class BookServiceImpl implements BookService {
         responseStatus = true;
         if (!bookRepository.existsByBooks() && responseStatus) {
             responseStatus = false;
-            String clientId = "8KdNgUdpwIYVPrI3OINv";
-            String clientSecret = "nUeGUYzYdc";
+            String clientId = "YOUR_NAVER_CLIENT_ID";      // application-secret.properties의 naver.client-id 사용
+            String clientSecret = "YOUR_NAVER_CLIENT_SECRET"; // application-secret.properties의 naver.client-secret 사용
 
             RestTemplate restTemplate = new RestTemplate();
 
