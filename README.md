@@ -162,20 +162,6 @@ erDiagram
 
 ---
 
-## 📂 담당 주요 파일
-
-| 계층 | 파일 |
-|------|------|
-| Controller | `BookController`, `BookRestController` |
-| Service | `BookServiceImpl` |
-| Repository | `BookSearchImpl` (QueryDSL), `BookRepository`, `RecommendRepository` |
-| Utility | `KoreanDecomposer` (초성 추출 · 정규화) |
-| Frontend | `templates/book/booklist.html`, `static/js/booklist.js`, `layout/base.html` |
-
-> 📖 조회 흐름도, 검색 처리 흐름, N+1 개선 상세는 **[BOOK.md](BOOK.md)** 참고
-
----
-
 ## 🏛 프로젝트 전체 기능 (팀)
 
 회원 관리 · 도서 리스트/검색 · 대출/반납 · 행사/이벤트 · 공지사항 · Q&A · 비치희망도서 신청 · 시설 예약 · 도서관 정보 · 관리자 페이지
