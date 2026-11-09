@@ -1,133 +1,157 @@
-# 📚 도서관 관리 시스템 (Library Management System)
+# 📚 지역 도서관 공공 사이트 — 도서 리스트 · 검색 파트
 
-> Spring Boot 기반 시립 도서관 운영 플랫폼  
-> 일반 회원과 관리자를 지원하는 웹 애플리케이션
+> Spring Boot 기반 시립 도서관 운영 플랫폼 (팀 프로젝트)
+> 이 브랜치(`taeheun`)는 **오태흔**이 맡은 **도서 리스트 및 검색** 기능을 중심으로 정리한 문서입니다.
+
+- **기간**: 2026.03 ~ 2026.04
+- **인원**: 7명 (백엔드 + 프론트 풀스택 분담)
+- **담당**: 도서 데이터 수집, 도서 리스트, 검색 · 정렬 · 페이지네이션, 검색어 하이라이트, 상세보기 · 추천 · 찜, 대여 예약 로직, 공통 레이아웃
 
 ---
 
-## 🛠 기술 스택
+## 🖼 화면
+
+| 초성 검색 + 키워드 하이라이트 | 상세보기 모달 |
+|:---:|:---:|
+| ![초성 검색](docs/images/search.png) | ![상세보기](docs/images/detail.png) |
+| `ㄴㄹㅌ` 입력 → **나루토** 마킹, 정렬 · 페이지네이션 | 하이라이트 유지, 대여 가능 배지, 추천(♡/♥) |
+
+---
+
+## 🛠 사용 기술
 
 | 구분 | 기술 |
 |------|------|
-| Backend | Spring Boot 3.5.11, Java 17 |
-| ORM | Spring Data JPA + Hibernate, QueryDSL 5.0.0 |
-| Template | Thymeleaf + Bootstrap |
-| Security | Spring Security (세션 기반 + 인터셉터) |
-| Database | MariaDB |
-| API 문서 | SpringDoc OpenAPI (Swagger UI) |
-| 외부 API | 기상청 초단기실황 API, 네이버 책 검색 API |
-| 빌드 도구 | Gradle |
+| Backend | Java 17, Spring Boot 3.5 |
+| ORM / Query | Spring Data JPA (Hibernate), JPQL, **QueryDSL 5.0** |
+| 외부 API | **네이버 책 검색 API** (RestTemplate + Jackson) |
+| Frontend | Thymeleaf + Layout Dialect, JavaScript (ES6, async/await), Axios, Bootstrap 5 |
+| Database | MariaDB (Docker) |
+| 기타 | Lombok, ModelMapper, JUnit 5, Gradle, Git/GitHub |
 
 ---
 
-## 📁 프로젝트 구조
+## ✨ 담당 기능
+
+### 1. 도서 데이터 수집
+- 네이버 책 검색 API로 받아온 도서 정보를 파싱해 `book` 테이블에 적재
+- 적재 시 **초성 컬럼**(`ㄴㄹㅌ`)과 **정규화 컬럼**(특수문자 · 띄어쓰기 제거)을 함께 생성 → 검색 전용 데이터 확보
+
+### 2. 검색 · 정렬 · 페이지네이션
+- QueryDSL 동적 쿼리로 다중 필드 검색
+- `CaseBuilder`로 가상 `priority` 컬럼을 만들어 **관련도 순 정렬**
+  `제목 > 정규화 제목 > 초성 제목 > 저자 > 출판사 > 책 소개`
+- 정렬 5종: 최신 등록 / 출판일 / 제목 / 추천수 / 대출 빈도
+- `JPAExpressions` 서브쿼리로 **ISBN 단위 중복 제거** 후 페이지네이션
+
+### 3. 검색어 하이라이트
+- 리스트 · 상세 모달 모두에서 검색어를 `<mark>`로 표시
+- 초성 검색어도 실제 글자 위치를 찾아 마킹 (`ㄴㄹㅌ` → **나루토**)
+
+### 4. 렌더링 · 성능
+- **첫 진입은 서버 렌더링(동기), 이후 검색 · 정렬 · 페이지 이동은 비동기** → 화면 깜빡임 제거
+- 상세보기 데이터는 리스트를 받아올 때 함께 저장해 모달을 열 때 추가 요청 없음
+- **N+1 문제 개선**: 루프 내 개별 조회 → ISBN `IN` 절 배치 조회, **쿼리 21개 → 5개 (76% 감소)**
+
+### 5. 그 외
+- 도서 추천(♡/♥), 찜하기, 대여 가능 여부 배지
+- 대여 예약 로직: 같은 ISBN의 여러 복본에 **균등하게 배정**, 중복 예약 방지 (+ 단위 테스트)
+- `base.html` 공통 레이아웃, `ControllerAdvice` 전역 예외 처리
+
+---
+
+## 🗄 DB 관계 (담당 기능 관련)
 
 ```mermaid
-graph TD
-    ROOT["📦 src/main"]
+erDiagram
+    MEMBER ||--o{ RECOMMEND : "추천"
+    BOOK   ||--o{ RECOMMEND : "추천받음"
+    MEMBER ||--o{ RENTAL : "대여"
+    BOOK   ||--o{ RENTAL : "대여됨"
+    MEMBER ||--o{ BOOK_REQUEST : "예약"
+    BOOK   ||--o{ BOOK_REQUEST : "예약됨"
 
-    ROOT --> JAVA["📂 java/com/library/project/library"]
-    ROOT --> RES["📂 resources"]
-
-    JAVA --> CFG["📂 config\nSecurity · Interceptor · Swagger"]
-    JAVA --> CTR["📂 controller\nView + REST 컨트롤러"]
-    JAVA --> ENT["📂 entity/domain\nJPA 엔티티"]
-    JAVA --> REP["📂 repository\n데이터 접근 계층 + QueryDSL"]
-    JAVA --> SVC["📂 service\n비즈니스 로직"]
-    JAVA --> DTO["📂 dto\n데이터 전송 객체"]
-    JAVA --> ENM["📂 enums\nEnum 상수 정의"]
-    JAVA --> EXC["📂 exception\n전역 예외 처리"]
-
-    RES --> TPL["📂 templates\nThymeleaf HTML (40+ 페이지)"]
-    RES --> STT["📂 static\nCSS · JS · Images"]
-    RES --> PRP["📜 application.properties"]
-
-    style ROOT fill:#6d4aff,color:#fff,stroke:none
-    style JAVA fill:#4a90d9,color:#fff,stroke:none
-    style RES fill:#4a90d9,color:#fff,stroke:none
-    style CFG fill:#e8f4fd,stroke:#4a90d9
-    style CTR fill:#e8f4fd,stroke:#4a90d9
-    style ENT fill:#e8f4fd,stroke:#4a90d9
-    style REP fill:#e8f4fd,stroke:#4a90d9
-    style SVC fill:#e8f4fd,stroke:#4a90d9
-    style DTO fill:#e8f4fd,stroke:#4a90d9
-    style ENM fill:#e8f4fd,stroke:#4a90d9
-    style EXC fill:#fdeaea,stroke:#d9534a
-    style TPL fill:#eafdf0,stroke:#4aad5a
-    style STT fill:#eafdf0,stroke:#4aad5a
-    style PRP fill:#eafdf0,stroke:#4aad5a
+    BOOK {
+        bigint id PK
+        varchar isbn "복본마다 같은 ISBN"
+        varchar book_title
+        varchar book_title_normal "특수문자·공백 제거"
+        varchar book_title_chosung "초성"
+        varchar author
+        varchar publisher
+        date pubdate
+        enum status "AVAILABLE / RENTED"
+    }
+    MEMBER {
+        bigint id PK
+        varchar mid "로그인 아이디"
+    }
+    RECOMMEND {
+        bigint id PK
+        bigint book_id FK
+        bigint member_id FK "book_id + member_id UNIQUE"
+    }
+    RENTAL {
+        bigint rental_id PK
+        bigint book_id FK
+        bigint member_id FK
+        date rental_date
+        date due_date
+        enum status
+    }
+    BOOK_REQUEST {
+        bigint id PK
+        bigint book_id FK
+        bigint member_id FK
+        date request_date
+        enum status
+    }
 ```
+
+- **책 1권 = `book` 1행**이라, 같은 책의 복본은 같은 `isbn`으로 여러 행이 생김 → 리스트에서는 ISBN 단위로 묶어서 출력
+- `book_title_normal`, `book_title_chosung`은 **검색 전용 컬럼**으로, 데이터를 적재할 때 `KoreanDecomposer`로 생성
+- `recommend`는 `(book_id, member_id)` UNIQUE 제약으로 중복 추천을 막음
 
 ---
 
-## ✨ 주요 기능
+## 🐛 트러블슈팅
 
-### 👤 회원 관리
-- 회원가입, 로그인/로그아웃 (세션 기반)
-- 아이디 찾기, 비밀번호 재설정
-- 마이페이지 관리
-
-### 📖 도서 관리 및 검색
-- ISBN 기반 도서 목록, 초성 검색 지원
-- 정렬: 등록순 / 출판일 / 추천수 / 대출빈도
-- 도서 추천(♡/♥) 기능
-
-### 🔄 대출/반납 시스템
-- 14일 대출 기간, 1일 최대 3권 제한
-- 중복 대출 방지, 반납, 연장(1회 한정)
-- 대출 이력 조회
-
-### 📅 행사/이벤트
-- 강좌 / 영화상영 / 행사 3가지 카테고리
-- 행사 신청(중복 방지), 캘린더 뷰 제공
-
-### 📢 공지사항
-- 관리자 전용 등록·수정·삭제
-- 다중 이미지 첨부, 상단 고정, 조회수 추적
-
-### 💬 문의사항 (Q&A)
-- 문의 등록 (비밀글 지원)
-- 관리자 답변 기능, 답변 수 표시
-
-### 📦 비치희망도서 신청
-- 도서 구입 요청 (이미지 첨부 가능)
-- 상태 흐름: `신청중` → `심사중` → `구입중` → `정리중` → `이용가능 / 반려`
-
-### 🏛 시설/공간 예약
-- 시설 예약 신청서 제출 및 상태 추적
-
-### 📋 도서관 정보
-- 운영시간, 시설 안내, 조직도
-- 자료현황 통계
-
-### 🔐 인증/인가
-- 세션 기반 인증 + `LoginCheck` / `AdminCheck` 인터셉터
-- `USER` / `ADMIN` 역할 기반 접근 제어
+| 문제 | 원인 | 해결 |
+|------|------|------|
+| 책 표지가 비어서 나옴 | 국립중앙도서관 API의 표지 URL 누락 | 네이버 책 검색 API로 전환 |
+| 정확히 같은 글자로만 검색됨 | 원본 제목 컬럼만 `LIKE` 검색 | 초성 · 정규화 컬럼 추가 후 우선순위 검색 |
+| "데미안" 검색 시 "동물의세계"도 노출 | 일반 검색어에도 초성 매칭 적용 | 검색어가 **순수 초성일 때만** 초성 컬럼 검색 |
+| 관련 없는 결과가 위로 섞임 | 매칭 필드와 상관없이 정렬 | CASE 기반 `priority` 컬럼을 정렬 기준에 추가 |
+| 첫 화면 깜빡임 | 비동기 렌더링과 데이터 수신 시점 차이 | 첫 진입만 동기 렌더링 |
+| 다른 복본에 중복 예약 가능 | 고정 `book_id` 기준 중복 체크 | ISBN + 상태값으로 `book_id`를 동적으로 탐색 |
 
 ---
 
-## 🗄 아키텍처 및 DB 설계
+## 📂 담당 주요 파일
 
-### MVC 패턴 기반 레이어 구조
+| 계층 | 파일 |
+|------|------|
+| Controller | `BookController`, `BookRestController` |
+| Service | `BookServiceImpl` |
+| Repository | `BookSearchImpl` (QueryDSL), `BookRepository`, `RecommendRepository` |
+| Utility | `KoreanDecomposer` (초성 추출 · 정규화) |
+| Frontend | `templates/book/booklist.html`, `static/js/booklist.js`, `layout/base.html` |
 
-```
-[Controller Layer]  →  요청 처리 분리 (View + REST 컨트롤러)
-       ↓
-[Service Layer]     →  트랜잭션 관리 및 비즈니스 로직
-       ↓
-[Repository Layer]  →  Spring Data JPA + QueryDSL
-       ↓
-[Database]          →  MariaDB (영구 데이터 저장소)
-```
-
-### 주요 DB 엔티티
-
-`member` · `book` · `rental` · `library_event` · `event_application` · `notice` · `tbl_inquiry` · `reply` · `wish_book` · `book_request` · `recommend` · `library_info` · `library_stats`
+> 📖 조회 흐름도, 검색 처리 흐름, N+1 개선 상세는 **[BOOK.md](BOOK.md)** 참고
 
 ---
 
-## 📊 프로젝트 규모
+## 🏛 프로젝트 전체 기능 (팀)
 
-- Java 파일 **125개 이상**
-- HTML 페이지 **40개 이상**
-- 패키지: `config` · `controller` · `entity` · `repository` · `service` · `dto` · `enums` · `exception`
+회원 관리 · 도서 리스트/검색 · 대출/반납 · 행사/이벤트 · 공지사항 · Q&A · 비치희망도서 신청 · 시설 예약 · 도서관 정보 · 관리자 페이지
+
+---
+
+## ▶ 실행 방법
+
+```bash
+# 1. MariaDB 준비 후 src/main/resources/application.properties의 DB 정보 수정
+# 2. 실행
+./gradlew bootRun
+# 3. http://localhost:8080 접속
+```
